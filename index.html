@@ -135,12 +135,7 @@ details ul { margin: 6px 0 0; padding-left: 1.2em; display: flex; flex-direction
   padding-top: 10px;
 }
 .rank b { font-size: 30px; color: var(--accent-red); margin-right: 8px; vertical-align: -3px; }
-button {
-  font-family: var(--ui);
-  font-weight: 700;
-  border: 0;
-  cursor: pointer;
-}
+button { font-family: var(--ui); font-weight: 700; border: 0; cursor: pointer; }
 .primary {
   font-size: 16px;
   padding: 12px 18px;
@@ -170,9 +165,7 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
   font-size: 18px;
   box-shadow: inset 0 0 0 2px var(--gold);
   touch-action: none;
-  transition: transform 0.05s;
 }
-.pad:active { transform: scale(0.98); }
 .calib-value {
   font-family: var(--display);
   font-size: 26px;
@@ -198,26 +191,30 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
       <div class="card-inner">
         <p class="eyebrow">PROGRAMME · 本日の演目</p>
         <h1>マエストロと蚊</h1>
-        <p class="lead">本番の真っ最中。拍に合わせて指揮棒を振り、マエストロの頭をねらう蚊を追い払いましょう。</p>
+        <p class="lead">オーケストラはあなたの指揮棒についてきます。テンポも音量も出番の合図も、ぜんぶマエストロ次第。なのに蚊が飛んでいる。</p>
         <h3>曲をえらぶ</h3>
         <div class="songs" id="songList"></div>
-        <details>
-          <summary>遊び方</summary>
+        <details open>
+          <summary>指揮のしかた</summary>
           <ul>
-            <li><b>拍に合わせてタップ</b>すると指揮棒を振ります。蚊のまわりの金の輪が縮みきった瞬間が拍です。</li>
-            <li><b>蚊の上で振れば撃退</b>。拍ぴったりならボーナス。</li>
-            <li>拍から<b>ズレて振ると、オーケストラが乱れます</b>。100%で暴走。</li>
-            <li>楽団員が光ったら<b>出番の合図</b>。金色の「合図」マークを「今！」の拍でタップ。</li>
-            <li><b>楽団員を叩くとゴツン！</b>演奏が乱れます。蚊が団員に止まったら、すぐ近くの何もない所を振って追い払いましょう。</li>
-            <li>曲によっては<b>テンポが急に変わります</b>。「テンポ急変！」の表示に注意。</li>
-            <li>しま模様の蚊はすばやく、大きな蚊は2回たたかないと倒れません。</li>
-            <li>16コンボで<b>ノリノリ</b>。スコア2倍、当たり判定も大きくなります。</li>
-            <li>頭を3回刺されてもアウト。</li>
+            <li><b>テンポ</b>：拍に合わせてタップ。楽団はあなたの拍についてきます。accel.（だんだん速く）では少しずつ早めに、rit.（だんだん遅く）では遅めに振って導きます。</li>
+            <li><b>音量</b>：トンと軽く叩くと小さく、サッと大きく払うと大きく鳴ります。楽譜の p（小さく）f（大きく）に合わせましょう。</li>
+            <li><b>合図</b>：光った団員の頭上の金色の「合図」を「今！」の拍でタップ。</li>
+            <li><b>締め</b>：最後の音はしばらくのばして、好きなところでタップして止めます。</li>
+          </ul>
+        </details>
+        <details>
+          <summary>蚊と団員について</summary>
+          <ul>
+            <li>蚊の上で振れば撃退。拍ぴったりならボーナス。頭を3回刺されたらアウト。</li>
+            <li><b>団員を叩くとゴツン！</b>大きく払うと、指揮棒の通り道にいる団員にも当たります。</li>
+            <li>団員に止まった蚊は、<b>蚊だけをピンポイントで</b>叩けば団員に当たりません（神業ボーナス）。近くの何もない所を振れば追い払えます。</li>
+            <li>拍から外れて振る・テンポや音量が楽譜から大きく外れると、オーケストラが乱れます。</li>
           </ul>
         </details>
         <button class="secondary" id="calibBtn" type="button">タイミング調整（いま <span id="calibNow">0</span>ms）</button>
-        <p class="note">音が出ます。iPhoneはマナーモードだと音が鳴りません。音とタップがずれると感じたら、タイミング調整をしてください。</p>
-        <p class="note">楽器の音：FluidR3_GM サウンドフォント（Frank Wen ほか、CC BY 3.0）／ midi-js-soundfonts（gleitz）。曲はこのゲーム用に短く編曲しています。</p>
+        <p class="note">音が出ます。iPhoneはマナーモードだと音が鳴りません。</p>
+        <p class="note">楽器の音：MusyngKite サウンドフォント（CC BY-SA 3.0）／ midi-js-soundfonts（gleitz）。曲はこのゲーム用に短く編曲しています。</p>
       </div>
     </div>
 
@@ -247,11 +244,13 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
         <p class="lead" id="resSub"></p>
         <dl class="stats">
           <dt>スコア</dt><dd id="resScore">0</dd>
-          <dt>撃退した蚊</dt><dd id="resSwats">0</dd>
-          <dt>出番の合図</dt><dd id="resCues">0</dd>
           <dt>拍ぴったり</dt><dd id="resAcc">0%</dd>
+          <dt>テンポ合わせ</dt><dd id="resTempo">0%</dd>
+          <dt>強弱合わせ</dt><dd id="resDyn">0%</dd>
+          <dt>出番の合図</dt><dd id="resCues">0</dd>
+          <dt>締め</dt><dd id="resCut">-</dd>
+          <dt>撃退した蚊</dt><dd id="resSwats">0</dd>
           <dt>叩いてしまった団員</dt><dd id="resBonk">0</dd>
-          <dt>最大コンボ</dt><dd id="resCombo">0</dd>
         </dl>
         <p class="rank" id="resRank"></p>
         <div class="row">
@@ -274,11 +273,13 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
   const FONT_UI = '"Zen Kaku Gothic New","Hiragino Sans","Yu Gothic",sans-serif';
   const FONT_D = '"Shippori Mincho B1","Hiragino Mincho ProN","Yu Mincho",serif';
   const PERFECT = 0.07, GOOD = 0.15;   // 判定の幅（秒）
-  const HEAD = { x: 240, y: 598, r: 27 };
-  const BALD = { x: 240, y: 580 };
-  const SUCK_TIME = 1.4;
-  const CUE_LEAD = 8;                  // 出番の何拍前から光るか
+  const HEAD = { x: 240, y: 596, r: 30 };
+  const BALD = { x: 240, y: 576 };
+  const SUCK_TIME = 1.4, LAND_TIME = 2.6;
+  const CUE_LEAD = 8;
+  const GESTURE_MS = 260;               // 振りの大きさを測る時間
   const reduceMotion = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 
   const store = {
     get(k, d) { try { const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } },
@@ -295,7 +296,7 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
   let scale = 1;
 
   // ======================================================
-  //  楽譜（すべてパブリックドメインの曲を簡略化して編曲）
+  //  楽譜（パブリックドメインの曲を簡略化して編曲）
   //  書き方: 音名+オクターブ*長さ(拍)。r は休符。+ で和音。
   // ======================================================
   const NOTE_BASE = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
@@ -304,21 +305,20 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
     if (!m) throw new Error("bad note " + name);
     return (parseInt(m[3], 10) + 1) * 12 + NOTE_BASE[m[1]] + (m[2] === "#" ? 1 : m[2] === "b" ? -1 : 0);
   }
-  // 文字列を音符の列に。start拍から並べ、終わりの拍を返す
   function seq(out, str, start, dflt, opt) {
     let b = start;
     str.trim().split(/\s+/).forEach(tok => {
       const [n, d] = tok.split("*");
       const dur = d ? parseFloat(d) : dflt;
       if (n !== "r") {
-        n.split("+").forEach(nm => out.push({ b, d: dur, m: midiOf(nm) + (opt.tr || 0), inst: opt.inst, layer: opt.layer, v: opt.v }));
+        n.split("+").forEach(nm => out.push({ b, d: dur, m: midiOf(nm) + (opt.tr || 0), inst: opt.inst, layer: opt.layer, v: opt.v, hold: !!opt.hold }));
       }
       b += dur;
     });
     return b;
   }
   function chordsOn(out, beats, chord, opt) {
-    beats.forEach(b => chord.split("+").forEach(nm => out.push({ b, d: opt.d, m: midiOf(nm), inst: opt.inst, layer: opt.layer, v: opt.v })));
+    beats.forEach(b => chord.split("+").forEach(nm => out.push({ b, d: opt.d, m: midiOf(nm), inst: opt.inst, layer: opt.layer, v: opt.v, hold: !!opt.hold })));
   }
 
   const SONGS = [
@@ -327,29 +327,34 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
       title: "アイネ・クライネ・ナハトムジーク",
       composer: "モーツァルト",
       stars: 1,
-      feature: "一定のテンポ・最後にリタルダンド",
+      feature: "強弱の練習・最後にリタルダンド",
       meter: 4,
       build() {
         const n = [];
         const M = "G4*1 r D4 G4*1 r D4 G4 D4 G4 B4 D5*1 r*1 C5*1 r A4 C5*1 r A4 C5 A4 F#4 A4 D4*1 r*1";
         for (let r = 0; r < 4; r++) {
           seq(n, M, r * 16, 0.5, { inst: "vln", layer: "violin", v: 0.2, tr: r === 3 ? 12 : 0 });
-          if (r >= 1) seq(n, M, r * 16, 0.5, { inst: "low", layer: "cello", v: 0.22, tr: -24 });
+          if (r >= 1) {
+            seq(n, M, r * 16, 0.5, { inst: "low", layer: "cello", v: 0.2, tr: -12 });
+            seq(n, M, r * 16, 0.5, { inst: "cb", layer: "cello", v: 0.14, tr: -24 });
+          }
           if (r >= 2) {
             const base = r * 16;
-            chordsOn(n, [base, base + 4], "G3+B3+D4", { d: 3.8, inst: "pad", layer: "brass", v: 0.05 });
-            chordsOn(n, [base + 8, base + 12], "F#3+A3+D4", { d: 3.8, inst: "pad", layer: "brass", v: 0.05 });
+            chordsOn(n, [base, base + 4], "G3+B3+D4", { d: 3.8, inst: "horn", layer: "brass", v: 0.07 });
+            chordsOn(n, [base + 8, base + 12], "F#3+A3+D4", { d: 3.8, inst: "horn", layer: "brass", v: 0.07 });
           }
         }
-        chordsOn(n, [64], "G2+G3+B3+D4+G4+B4", { d: 4, inst: "pad", layer: "all", v: 0.07 });
-        seq(n, "G4*4", 64, 4, { inst: "vln", layer: "violin", v: 0.2 });
+        chordsOn(n, [64], "G2+G3+B3+D4+G4+B4", { d: 8, inst: "pad", layer: "all", v: 0.08, hold: true });
+        chordsOn(n, [64], "G3+D4", { d: 8, inst: "horn", layer: "brass", v: 0.08, hold: true });
+        seq(n, "G1*8", 64, 8, { inst: "cb", layer: "cello", v: 0.16, hold: true });
         return {
           notes: n,
-          tempo: [{ b: -4, bpm: 96 }, { b: 48, bpm: 96 }, { b: 64, bpm: 64 }],
+          tempo: [{ b: -4, bpm: 96 }, { b: 48, bpm: 96 }, { b: 64, bpm: 66 }],
+          dyn: [{ b: 0, v: 0.8, mark: "f" }, { b: 15.9, v: 0.8 }, { b: 16, v: 0.3, mark: "p" }, { b: 32, v: 0.3, mark: "cresc." }, { b: 48, v: 0.85, mark: "f" }, { b: 56, v: 0.85, mark: "dim." }, { b: 64, v: 0.45, mark: "mp" }],
           tapEvery: [{ b: 0, e: 1 }],
           lastTap: 64,
-          cues: [{ b: 16, row: "cello", rest: true }, { b: 32, row: "brass", rest: true }],
-          spawn: p => ({ max: 1, fast: 0, big: 0, speed: 0.9 }),
+          cues: [{ b: 16, row: "cello", who: 3, rest: true }, { b: 32, row: "brass", who: 4, rest: true }],
+          spawn: p => ({ max: 1, fast: 0, big: 0, speed: 0.9, land: 0.35 }),
         };
       },
     },
@@ -358,7 +363,7 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
       title: "天国と地獄",
       composer: "オッフェンバック",
       stars: 2,
-      feature: "最後にどんどん速くなる（アッチェレランド）",
+      feature: "最後にどんどん速く（アッチェレランド）",
       meter: 2,
       build() {
         const n = [];
@@ -379,26 +384,32 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
               for (let q = 0; q < 2; q++) {
                 const c = CH[hs[q * 2]];
                 seq(n, c[0] + "*0.4", b + q, 0.4, { inst: "pizz", layer: "cello", v: 0.3 });
-                if (r >= 1) chordsOn(n, [b + q + 0.5], c[1], { d: 0.3, inst: "brass", layer: "brass", v: 0.045 });
+                seq(n, c[0] + "*0.4", b + q, 0.4, { inst: "cb", layer: "cello", v: 0.12, tr: -12 });
+                if (r >= 1) chordsOn(n, [b + q + 0.5], c[1], { d: 0.3, inst: "brass", layer: "brass", v: 0.05 });
               }
             });
           });
         }
         const end = 128;
-        seq(n, "C5*0.5 r*0.5 G4*0.5 r*0.5 C5*2", end, 0.5, { inst: "vln", layer: "violin", v: 0.22 });
+        seq(n, "C5*0.5 r*0.5 G4*0.5 r*0.5", end, 0.5, { inst: "vln", layer: "violin", v: 0.22 });
         chordsOn(n, [end], "C3+E4+G4+C5", { d: 0.4, inst: "brass", layer: "brass", v: 0.07 });
         chordsOn(n, [end + 1], "G2+B3+D4+G4", { d: 0.4, inst: "brass", layer: "brass", v: 0.07 });
-        chordsOn(n, [end + 2], "C2+C3+E4+G4+C5", { d: 2.5, inst: "pad", layer: "all", v: 0.08 });
-        seq(n, "C2*1 G2*1 C2*2", end, 1, { inst: "timp", layer: "all", v: 0.14 });
+        seq(n, "C2*1 G2*1", end, 1, { inst: "timp", layer: "all", v: 0.14 });
+        chordsOn(n, [end + 2], "C2+C3+E4+G4+C5", { d: 8, inst: "pad", layer: "all", v: 0.08, hold: true });
+        chordsOn(n, [end + 2], "C4+E4+G4", { d: 8, inst: "horn", layer: "brass", v: 0.07, hold: true });
+        seq(n, "C6*8", end + 2, 8, { inst: "vln", layer: "violin", v: 0.16, hold: true });
+        seq(n, "C2*8", end + 2, 8, { inst: "cb", layer: "cello", v: 0.15, hold: true });
+        seq(n, "C2*2", end + 2, 2, { inst: "timp", layer: "all", v: 0.16 });
         return {
           notes: n,
           tempo: [{ b: -4, bpm: 132 }, { b: 96, bpm: 138 }, { b: 128, bpm: 184 }],
+          dyn: [{ b: 0, v: 0.55, mark: "mf" }, { b: 31.9, v: 0.55 }, { b: 32, v: 0.85, mark: "f" }, { b: 63.9, v: 0.85 }, { b: 64, v: 0.3, mark: "p" }, { b: 80, v: 0.3, mark: "cresc." }, { b: 96, v: 1, mark: "ff" }],
           tapEvery: [{ b: 0, e: 1 }, { b: 112, e: 2 }],
           lastTap: 130,
-          cues: [{ b: 32, row: "brass", rest: true }, { b: 64, row: "cello" }, { b: 96, row: "violin" }],
-          spawn: p => p < 0.25 ? { max: 1, fast: 0, big: 0, speed: 1.1 }
-            : p < 0.6 ? { max: 2, fast: 0.25, big: 0, speed: 1.25 }
-            : { max: 2, fast: 0.4, big: 0.15, speed: 1.4 },
+          cues: [{ b: 32, row: "brass", who: 4, rest: true }, { b: 64, row: "cello", who: 2 }, { b: 96, row: "violin", who: 1 }],
+          spawn: p => p < 0.25 ? { max: 1, fast: 0, big: 0, speed: 1.1, land: 0.4 }
+            : p < 0.6 ? { max: 2, fast: 0.25, big: 0, speed: 1.25, land: 0.45 }
+            : { max: 2, fast: 0.4, big: 0.15, speed: 1.4, land: 0.5 },
         };
       },
     },
@@ -418,12 +429,13 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
         const bars = (from, count, fn) => { for (let i = 0; i < count; i++) fn(from + i * 4, ROOT[i % 16]); };
         // 1. 低音弦だけで静かに（交響曲と同じ始まり方）
         seq(n, HALF, 0, 1, { inst: "vlc", layer: "cello", v: 0.2, tr: -12 });
-        bars(0, 8, (b, r) => seq(n, BASS[r] + "*0.6", b, 1, { inst: "pizz", layer: "cello", v: 0.18 }));
+        seq(n, HALF, 0, 1, { inst: "cb", layer: "cello", v: 0.12, tr: -24 });
         // 2. バイオリンが加わる
         seq(n, ODE, 32, 1, { inst: "vln", layer: "violin", v: 0.2 });
         bars(32, 16, (b, r) => seq(n, BASS[r] + "*2 " + BASS[r] + "*2", b, 2, { inst: "vlc", layer: "cello", v: 0.12, tr: 12 }));
+        bars(32, 16, (b, r) => seq(n, BASS[r] + "*4", b, 4, { inst: "cb", layer: "cello", v: 0.1 }));
         // 3. 行進曲（急に速く・管楽器が旋律）
-        seq(n, ODE, 96, 1, { inst: "brass", layer: "brass", v: 0.13 });
+        seq(n, ODE, 96, 1, { inst: "brass", layer: "brass", v: 0.14 });
         seq(n, ODE, 96, 1, { inst: "vln", layer: "violin", v: 0.09, tr: 12 });
         bars(96, 16, (b, r) => {
           for (let q = 0; q < 4; q++) seq(n, (q % 2 ? (r === "D" ? "A1" : "E2") : BASS[r]) + "*0.5", b + q, 1, { inst: "pizz", layer: "cello", v: 0.26 });
@@ -431,10 +443,11 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
         });
         // 4. マエストーソ（急にとても遅く・全員で堂々と）
         seq(n, HALF, 160, 1, { inst: "vln", layer: "violin", v: 0.2 });
-        seq(n, HALF, 160, 1, { inst: "brass", layer: "brass", v: 0.09 });
+        seq(n, HALF, 160, 1, { inst: "brass", layer: "brass", v: 0.1 });
         seq(n, HALF, 160, 1, { inst: "vlc", layer: "cello", v: 0.15, tr: -12 });
         bars(160, 8, (b, r) => {
-          chordsOn(n, [b], PAD[r], { d: 4, inst: "pad", layer: "all", v: 0.05 });
+          chordsOn(n, [b], PAD[r], { d: 4, inst: "horn", layer: "brass", v: 0.06 });
+          seq(n, BASS[r] + "*4", b, 4, { inst: "cb", layer: "cello", v: 0.14 });
           seq(n, BASS[r] + "*2", b, 2, { inst: "timp", layer: "all", v: 0.1 });
         });
         // 5. プレスティッシモ（急に最高速）
@@ -448,9 +461,13 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
         });
         const end = 224;
         chordsOn(n, [end, end + 2], "D3+A3+D4+F#4+A4", { d: 0.5, inst: "brass", layer: "all", v: 0.07 });
-        chordsOn(n, [end + 4], "D2+A2+D3+F#3+A3+D4+F#4+A4+D5", { d: 3, inst: "pad", layer: "all", v: 0.06 });
-        seq(n, "D2*0.5 r*1.5 D2*0.5 r*1.5 D2*3", end, 1, { inst: "timp", layer: "all", v: 0.14 });
-        seq(n, "D5*0.5 r*1.5 D5*0.5 r*1.5 D5*3", end, 1, { inst: "vln", layer: "violin", v: 0.2 });
+        seq(n, "D2*0.5 r*1.5 D2*0.5 r*1.5", end, 1, { inst: "timp", layer: "all", v: 0.14 });
+        seq(n, "D5*0.5 r*1.5 D5*0.5 r*1.5", end, 1, { inst: "vln", layer: "violin", v: 0.2 });
+        chordsOn(n, [end + 4], "D2+A2+D3+F#3+A3+D4+F#4+A4+D5", { d: 8, inst: "pad", layer: "all", v: 0.07, hold: true });
+        chordsOn(n, [end + 4], "D3+A3+F#4", { d: 8, inst: "horn", layer: "brass", v: 0.07, hold: true });
+        seq(n, "D5*8", end + 4, 8, { inst: "vln", layer: "violin", v: 0.17, hold: true });
+        seq(n, "D2*8", end + 4, 8, { inst: "cb", layer: "cello", v: 0.15, hold: true });
+        seq(n, "D2*2", end + 4, 2, { inst: "timp", layer: "all", v: 0.16 });
         return {
           notes: n,
           tempo: [
@@ -459,12 +476,13 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
             { b: 160, bpm: 56, label: "マエストーソ（堂々と・とても遅く）" }, { b: 192, bpm: 56 },
             { b: 192, bpm: 192, label: "プレスティッシモ（最高速・2拍に1回）" },
           ],
+          dyn: [{ b: 0, v: 0.2, mark: "p" }, { b: 31.9, v: 0.2 }, { b: 32, v: 0.45, mark: "mf" }, { b: 95.9, v: 0.45 }, { b: 96, v: 0.75, mark: "f" }, { b: 159.9, v: 0.75 }, { b: 160, v: 1, mark: "ff" }, { b: 191.9, v: 1 }, { b: 192, v: 0.85, mark: "f" }],
           tapEvery: [{ b: 0, e: 1 }, { b: 192, e: 2 }],
           lastTap: 228,
-          cues: [{ b: 32, row: "violin", rest: true }, { b: 96, row: "brass", rest: true }],
-          spawn: p => p < 0.25 ? { max: 1, fast: 0, big: 0, speed: 1.0, land: 0.3 }
-            : p < 0.6 ? { max: 2, fast: 0.25, big: 0.1, speed: 1.2, land: 0.4 }
-            : { max: 2, fast: 0.35, big: 0.2, speed: 1.4, land: 0.45 },
+          cues: [{ b: 32, row: "violin", who: 3, rest: true }, { b: 96, row: "brass", who: 4, rest: true }],
+          spawn: p => p < 0.25 ? { max: 1, fast: 0, big: 0, speed: 1.0, land: 0.4 }
+            : p < 0.6 ? { max: 2, fast: 0.25, big: 0.1, speed: 1.2, land: 0.45 }
+            : { max: 2, fast: 0.35, big: 0.2, speed: 1.4, land: 0.5 },
         };
       },
     },
@@ -473,7 +491,7 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
       title: "山の魔王の宮殿にて",
       composer: "グリーグ",
       stars: 3,
-      feature: "ゆっくり始まり倍以上の速さへ・途中から2拍に1回",
+      feature: "ささやきから大音量へ・どんどん加速",
       meter: 4,
       build() {
         const n = [];
@@ -486,7 +504,10 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
             const base = r * 64 + k * 16;
             seq(n, ph === "A" ? A : B, base, 0.5, { inst: "bsn", layer: "cello", v: 0.2 });
             if (r >= 1) seq(n, ph === "A" ? A : B, base, 0.5, { inst: "vln", layer: "violin", v: 0.13, tr: 12 });
-            if (r >= 2) seq(n, ph === "A" ? A : B, base, 0.5, { inst: "vln", layer: "violin", v: 0.06, tr: 24 });
+            if (r >= 2) {
+              seq(n, ph === "A" ? A : B, base, 0.5, { inst: "vln", layer: "violin", v: 0.06, tr: 24 });
+              seq(n, ph === "A" ? A : B, base, 0.5, { inst: "low", layer: "cello", v: 0.12 });
+            }
             for (let q = 0; q < 16; q++) {
               const root = ph === "A" ? BASS_A[q] : "F#1";
               seq(n, root + "*0.4", base + q, 0.4, { inst: "pizz", layer: "cello", v: 0.28, tr: q % 2 ? 12 : 0 });
@@ -498,49 +519,54 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
         }
         const end = 192;
         chordsOn(n, [end, end + 1, end + 2, end + 3], "B1+B2+D4+F#4+B4", { d: 0.35, inst: "brass", layer: "all", v: 0.07 });
-        chordsOn(n, [end + 4], "B1+B2+F#3+B3+D4+F#4+B4", { d: 3, inst: "pad", layer: "all", v: 0.08 });
-        seq(n, "B1*1 B1*1 B1*1 B1*1 B1*3", end, 1, { inst: "timp", layer: "all", v: 0.14 });
+        seq(n, "B1*1 B1*1 B1*1 B1*1", end, 1, { inst: "timp", layer: "all", v: 0.14 });
+        chordsOn(n, [end + 4], "B1+B2+F#3+B3+D4+F#4+B4", { d: 8, inst: "pad", layer: "all", v: 0.08, hold: true });
+        chordsOn(n, [end + 4], "B2+F#3+D4", { d: 8, inst: "horn", layer: "brass", v: 0.08, hold: true });
+        seq(n, "B1*8", end + 4, 8, { inst: "cb", layer: "cello", v: 0.16, hold: true });
+        seq(n, "B1*2", end + 4, 2, { inst: "timp", layer: "all", v: 0.16 });
         return {
           notes: n,
           tempo: [{ b: -4, bpm: 72 }, { b: 0, bpm: 72 }, { b: 64, bpm: 100 }, { b: 128, bpm: 138 }, { b: 192, bpm: 200 }],
+          dyn: [{ b: 0, v: 0.12, mark: "pp" }, { b: 32, v: 0.12, mark: "cresc." }, { b: 192, v: 1, mark: "ff" }],
           tapEvery: [{ b: 0, e: 1 }, { b: 128, e: 2 }],
           lastTap: 196,
-          cues: [{ b: 64, row: "violin", rest: true }, { b: 128, row: "brass", rest: true }],
-          spawn: p => p < 0.33 ? { max: 1, fast: 0, big: 0, speed: 1.0 }
-            : p < 0.66 ? { max: 2, fast: 0.3, big: 0.1, speed: 1.3 }
-            : { max: 3, fast: 0.4, big: 0.2, speed: 1.6 },
+          cues: [{ b: 64, row: "violin", who: 3, rest: true }, { b: 128, row: "brass", who: 4, rest: true }],
+          spawn: p => p < 0.33 ? { max: 1, fast: 0, big: 0, speed: 1.0, land: 0.4 }
+            : p < 0.66 ? { max: 2, fast: 0.3, big: 0.1, speed: 1.3, land: 0.45 }
+            : { max: 3, fast: 0.4, big: 0.2, speed: 1.6, land: 0.5 },
         };
       },
     },
   ];
   const ROW_LABEL = { brass: "管楽器", cello: "低音弦", violin: "バイオリン" };
 
-  // テンポ表から「拍 → 秒」を作る（テンポは点と点の間でなめらかに変化）
-  function makeTiming(tempo, lastBeat) {
-    const STEP = 1 / 16, b0 = -4, b1 = lastBeat + 16;
-    function bpmAt(b) {
+  // 楽譜のテンポ（目標）: 拍 → bpm
+  function makeTargetTempo(tempo) {
+    return function bpmAt(b) {
       if (b <= tempo[0].b) return tempo[0].bpm;
       for (let i = 0; i < tempo.length - 1; i++) {
         const a = tempo[i], c = tempo[i + 1];
         if (b >= a.b && b < c.b) return a.bpm + (c.bpm - a.bpm) * (b - a.b) / (c.b - a.b);
       }
       return tempo[tempo.length - 1].bpm;
-    }
-    const tbl = [0];
-    for (let b = b0; b < b1; b += STEP) tbl.push(tbl[tbl.length - 1] + STEP * 60 / bpmAt(b + STEP / 2));
-    const zero = tbl[Math.round((0 - b0) / STEP)];
-    for (let i = 0; i < tbl.length; i++) tbl[i] -= zero;
-    function timeOf(b) {
-      const x = (b - b0) / STEP, i = Math.max(0, Math.min(tbl.length - 2, Math.floor(x)));
-      return tbl[i] + (tbl[i + 1] - tbl[i]) * (x - i);
-    }
-    function beatAt(t) {
-      let lo = 0, hi = tbl.length - 1;
-      if (t <= tbl[0]) return b0;
-      while (hi - lo > 1) { const mid = (lo + hi) >> 1; if (tbl[mid] <= t) lo = mid; else hi = mid; }
-      return b0 + (lo + (t - tbl[lo]) / (tbl[hi] - tbl[lo])) * STEP;
-    }
-    return { bpmAt, timeOf, beatAt };
+    };
+  }
+  function makeDyn(dyn) {
+    return {
+      at(b) {
+        if (b <= dyn[0].b) return dyn[0].v;
+        for (let i = 0; i < dyn.length - 1; i++) {
+          const a = dyn[i], c = dyn[i + 1];
+          if (b >= a.b && b < c.b) return a.v + (c.v - a.v) * (b - a.b) / (c.b - a.b);
+        }
+        return dyn[dyn.length - 1].v;
+      },
+      mark(b) {
+        let m = dyn[0].mark;
+        dyn.forEach(d => { if (d.mark && b >= d.b) m = d.mark; });
+        return m;
+      },
+    };
   }
 
   // ======================================================
@@ -563,15 +589,18 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
   }
 
   // ======================================================
-  //  楽団員
+  //  楽団員（ひとりひとり名前とくせがある）
   // ======================================================
-  const SKIN = ["#f1c9a5", "#e3b38c", "#c98f66", "#f6dcc2", "#a86f4c", "#8a5638"];
-  const HAIR = ["#2a1a12", "#4a3020", "#151012", "#7a5a3a", "#9e9890", "#5b2a1a", "#c9a46a"];
+  const SKIN = ["#f6d2b0", "#ebbd96", "#d29a70", "#f8e0c8", "#b07a55", "#8e5a3c"];
+  const HAIR = ["#3a2418", "#5a3a24", "#1d1416", "#8a6440", "#b98a52", "#6e2c1c", "#d9b779"];
+  const NAMES = ["ハナコ", "ゴロウ", "ミドリ", "ポン太", "サクラ", "テツ", "ユキ", "ブン", "モモ",
+    "ケンジ", "チヨ", "ガク", "スズ", "ロク", "ナナ", "ジロウ",
+    "コンマス・ヒゲ田", "アヤ", "マル", "トモ", "キク", "シン", "メイ"];
   const musicians = [];
   const ROWS = {
     brass: { y: 160, n: 9, s: 0.62, rx: 190 },
-    cello: { y: 222, n: 8, s: 0.78, rx: 198 },
-    violin: { y: 290, n: 7, s: 0.95, rx: 200 },
+    cello: { y: 224, n: 8, s: 0.78, rx: 198 },
+    violin: { y: 292, n: 7, s: 0.95, rx: 200 },
   };
   (function makeOrchestra() {
     let k = 0;
@@ -581,52 +610,92 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
         const xn = (i / (row.n - 1)) * 2 - 1;
         const female = (k * 3 + 1) % 5 < 2;
         const old = k % 7 === 3;
+        const name = NAMES[k % NAMES.length];
         musicians.push({
-          x: 240 + row.rx * xn, y: row.y + 12 * xn * xn, s: row.s, type, row: i,
+          x: 240 + row.rx * xn, y: row.y + 12 * xn * xn, s: row.s, type, idx: i, name,
           skin: SKIN[(k * 7 + 2) % SKIN.length],
-          hair: old ? "#c8c4bc" : HAIR[(k * 5) % HAIR.length],
-          female,
+          hair: old ? "#e2ded6" : HAIR[(k * 5) % HAIR.length],
+          female, old,
           style: female ? ["bun", "bob", "long"][k % 3] : old ? "bald" : ["short", "part", "curly", "short"][k % 4],
           glasses: k % 6 === 1 || old,
-          suit: female ? "#141013" : (k % 4 === 2 ? "#1d1a24" : "#121012"),
+          mustache: !female && (k % 3 === 0 || name.indexOf("ヒゲ") >= 0),
+          freckles: k % 4 === 1,
+          ribbon: female && k % 2 === 0,
+          sleepy: k % 5 === 2,
+          suit: female ? "#1a1418" : (k % 4 === 2 ? "#232032" : "#151316"),
           seed: Math.random() * 100,
+          hurt: 0, angry: 0, itch: 0, joy: 0,
         });
         k++;
       }
     });
   })();
-  function rowAt(x, y) {
-    let best = null, bd = 46;
-    musicians.forEach(m => {
-      const d = Math.hypot(m.x - x, (m.y - 20 * m.s) - y);
-      if (d < bd) { bd = d; best = m.type; }
-    });
-    return best;
+  function rowList(type) { return musicians.filter(m => m.type === type); }
+  // 団員の体（頭と胴体）までの距離。マイナスなら体の中
+  function bodyDist(m, x, y) {
+    const s = m.s;
+    const dh = Math.hypot(x - m.x, y - (m.y - 43 * s)) - 13 * s;
+    const cx = m.x, cy = m.y - 14 * s, hw = 13 * s, hh = 16 * s;
+    const dx = Math.abs(x - cx) - hw, dy = Math.abs(y - cy) - hh;
+    const dr = dx > 0 || dy > 0 ? Math.hypot(Math.max(dx, 0), Math.max(dy, 0)) : Math.max(dx, dy);
+    return Math.min(dh, dr);
+  }
+  function musicianAt(x, y) {
+    for (let i = musicians.length - 1; i >= 0; i--) if (bodyDist(musicians[i], x, y) < 0) return musicians[i];
+    return null;
+  }
+  function nearestBodyGap(x, y) {
+    let d = 1e9;
+    musicians.forEach(m => { d = Math.min(d, bodyDist(m, x, y)); });
+    return d;
   }
 
   // ======================================================
   //  音（Web Audio）
+  //  楽器ごとに左右の位置を決め、ホールの響きを足し、
+  //  オーケストラ全体の音量と明るさを「指揮の大きさ」で変える
   // ======================================================
   const AC = window.AudioContext || window.webkitAudioContext;
-  let ac = null, master = null, dry = null, noiseBuf = null, buzz = null;
+  let ac = null, master = null, orchIn = null, orchLP = null, orchDyn = null, sfxBus = null, noiseBuf = null, buzz = null;
+
+  function makeHallIR() {
+    const sr = ac.sampleRate, len = Math.floor(sr * 2.8), pre = Math.floor(sr * 0.018);
+    const ir = ac.createBuffer(2, len, sr);
+    for (let ch = 0; ch < 2; ch++) {
+      const d = ir.getChannelData(ch);
+      let y = 0;
+      for (let i = pre; i < len; i++) {
+        const t = (i - pre) / sr;
+        const a = 0.85 - 0.75 * Math.min(1, t / 2.2);      // 時間がたつほど高音が減る
+        y += a * ((Math.random() * 2 - 1) - y);
+        d[i] = y * Math.exp(-6.9 * t / 2.6);
+      }
+      // 初期反射
+      [0.011, 0.019, 0.027, 0.037, 0.049].forEach((tt, j) => {
+        const idx = pre + Math.floor((tt + ch * 0.003) * sr);
+        if (idx < len) d[idx] += (0.6 - j * 0.1) * (ch ? -1 : 1);
+      });
+    }
+    return ir;
+  }
 
   function initAudio() {
     if (ac) return;
     try { ac = new AC({ latencyHint: "interactive" }); } catch (e) { ac = new AC(); }
-    master = ac.createGain(); master.gain.value = 0.7;
+    master = ac.createGain(); master.gain.value = 0.8;
     const comp = ac.createDynamicsCompressor();
+    comp.threshold.value = -14; comp.ratio.value = 3; comp.attack.value = 0.01; comp.release.value = 0.2;
     master.connect(comp); comp.connect(ac.destination);
-    // ホールの響き
-    const len = Math.floor(ac.sampleRate * 1.8);
-    const ir = ac.createBuffer(2, len, ac.sampleRate);
-    for (let ch = 0; ch < 2; ch++) {
-      const d = ir.getChannelData(ch);
-      for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 3);
-    }
-    const verb = ac.createConvolver(); verb.buffer = ir;
-    const wet = ac.createGain(); wet.gain.value = 0.22;
-    dry = ac.createGain(); dry.gain.value = 1;
-    dry.connect(master); dry.connect(verb); verb.connect(wet); wet.connect(master);
+
+    orchIn = ac.createGain(); orchIn.gain.value = 1;
+    orchLP = ac.createBiquadFilter(); orchLP.type = "lowpass"; orchLP.frequency.value = 6000; orchLP.Q.value = 0.5;
+    orchDyn = ac.createGain(); orchDyn.gain.value = 0.7;
+    orchIn.connect(orchLP); orchLP.connect(orchDyn); orchDyn.connect(master);
+    const verb = ac.createConvolver(); verb.buffer = makeHallIR();
+    const send = ac.createGain(); send.gain.value = 0.32;
+    orchDyn.connect(send); send.connect(verb); verb.connect(master);
+
+    sfxBus = ac.createGain(); sfxBus.gain.value = 1; sfxBus.connect(master);
 
     noiseBuf = ac.createBuffer(1, ac.sampleRate, ac.sampleRate);
     const nd = noiseBuf.getChannelData(0);
@@ -655,52 +724,59 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
     s.type = type; s.frequency.value = freq;
     if (o.detune) s.detune.value = o.detune;
     const g = ac.createGain();
-    const atk = o.atk || 0.005, rel = o.rel || 0.08;
+    const atk = o.atk || 0.005;
     g.gain.setValueAtTime(0.0001, t);
     g.gain.linearRampToValueAtTime(vol, t + atk);
-    if (o.sustain) {
-      g.gain.setValueAtTime(vol * 0.8, t + Math.max(atk, dur - rel));
-      g.gain.exponentialRampToValueAtTime(0.0001, t + dur + rel);
-    } else {
-      g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
-    }
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
     let node = s;
     if (o.lp) {
-      const f = ac.createBiquadFilter(); f.type = "lowpass"; f.frequency.value = o.lp; f.Q.value = o.q || 0.7;
-      if (o.lpEnv) { f.frequency.setValueAtTime(o.lp * 2.5, t); f.frequency.exponentialRampToValueAtTime(o.lp, t + o.lpEnv); }
+      const f = ac.createBiquadFilter(); f.type = "lowpass"; f.frequency.value = o.lp;
       s.connect(f); node = f;
     }
-    node.connect(g); g.connect(dry);
-    s.start(t); s.stop(t + dur + rel + 0.05);
+    node.connect(g); g.connect(o.bus || sfxBus);
+    s.start(t); s.stop(t + dur + 0.05);
   }
 
-  function noise(t, dur, vol, freq, type = "bandpass", q = 1) {
+  function noise(t, dur, vol, freq, type = "bandpass", q = 1, bus) {
     const s = ac.createBufferSource(); s.buffer = noiseBuf;
     const f = ac.createBiquadFilter(); f.type = type; f.frequency.value = freq; f.Q.value = q;
     const g = ac.createGain();
     g.gain.setValueAtTime(vol, t);
     g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
-    s.connect(f); f.connect(g); g.connect(dry);
+    s.connect(f); f.connect(g); g.connect(bus || sfxBus);
     s.start(t, Math.random() * 0.5); s.stop(t + dur + 0.02);
   }
 
-  // ---------- 本物の楽器の音（FluidR3_GM サウンドフォント, CC BY 3.0） ----------
+  // ---------- 本物の楽器の音（MusyngKite サウンドフォント, CC BY-SA 3.0） ----------
   const SAMPLE_NOTES = {
-    violin: ["Ab3", "C4", "E4", "Ab4", "C5", "E5", "Ab5", "C6", "E6", "Ab6", "C7"],
-    cello: ["C2", "E2", "Ab2", "C3", "E3", "Ab3", "C4", "E4", "Ab4", "C5"],
-    bassoon: ["Ab2", "C3", "E3", "Ab3", "C4", "E4"],
-    pizzicato_strings: ["E1", "Ab1", "C2", "E2", "Ab2", "C3", "E3", "Ab3"],
-    trumpet: ["Ab3", "C4", "E4", "Ab4", "C5", "E5"],
-    string_ensemble_1: ["C2", "E2", "Ab2", "C3", "E3", "Ab3", "C4", "E4", "Ab4", "C5"],
-    timpani: ["C2", "E2", "Ab2", "C3"],
+    violin: ["Gb3", "A3", "C4", "Eb4", "Gb4", "A4", "C5", "Eb5", "Gb5", "A5", "C6", "Eb6", "Gb6", "A6", "C7"],
+    cello: ["C2", "Eb2", "Gb2", "A2", "C3", "Eb3", "Gb3", "A3", "C4", "Eb4", "Gb4", "A4", "C5"],
+    contrabass: ["Gb1", "A1", "C2", "Eb2", "Gb2", "A2", "C3"],
+    bassoon: ["A2", "C3", "Eb3", "Gb3", "A3", "C4", "Eb4"],
+    pizzicato_strings: ["Gb1", "A1", "C2", "Eb2", "Gb2", "A2", "C3", "Eb3", "Gb3", "A3"],
+    trumpet: ["A3", "C4", "Eb4", "Gb4", "A4", "C5", "Eb5"],
+    french_horn: ["A2", "C3", "Eb3", "Gb3", "A3", "C4", "Eb4", "Gb4"],
+    string_ensemble_1: ["C2", "Eb2", "Gb2", "A2", "C3", "Eb3", "Gb3", "A3", "C4", "Eb4", "Gb4", "A4", "C5", "Eb5"],
+    timpani: ["A1", "C2", "Eb2", "Gb2", "A2"],
   };
-  // 楽器名: [音のファイル, 音量の倍率, 音を切るときの余韻(秒)。-1は最後まで鳴らす]
-  const INST_MAP = {
-    vln: ["violin", 4, 0.12], vlc: ["cello", 4, 0.15], low: ["cello", 4, 0.08], bsn: ["bassoon", 3.2, 0.06],
-    pizz: ["pizzicato_strings", 3.5, -1], brass: ["trumpet", 5, 0.08], pad: ["string_ensemble_1", 5, 0.5], timp: ["timpani", 7, -1],
+  // 録音ごとの音量差をそろえる倍率
+  const NORM = { violin: 5.9, cello: 3.83, contrabass: 1.56, bassoon: 4.0, pizzicato_strings: 9.08, trumpet: 3.75, french_horn: 3.59, string_ensemble_1: 2.23, timpani: 2.0 };
+  // 楽器: 音ファイル, 何人で弾くか, 左右(-1左〜1右), 立ち上がり, 余韻(-1は鳴らしきり)
+  const INST = {
+    vln: { file: "violin", ens: 3, pan: -0.5, atk: 0.03, rel: 0.22 },
+    vlc: { file: "cello", ens: 2, pan: 0.4, atk: 0.04, rel: 0.25 },
+    low: { file: "cello", ens: 2, pan: 0.4, atk: 0.01, rel: 0.08 },
+    cb: { file: "contrabass", ens: 2, pan: 0.6, atk: 0.04, rel: 0.25 },
+    bsn: { file: "bassoon", ens: 1, pan: 0.05, atk: 0.01, rel: 0.07 },
+    pizz: { file: "pizzicato_strings", ens: 1, pan: 0.35, atk: 0.003, rel: -1 },
+    brass: { file: "trumpet", ens: 1, pan: 0.1, atk: 0.012, rel: 0.1 },
+    horn: { file: "french_horn", ens: 2, pan: -0.2, atk: 0.06, rel: 0.35 },
+    pad: { file: "string_ensemble_1", ens: 1, pan: 0, atk: 0.08, rel: 0.5 },
+    timp: { file: "timpani", ens: 1, pan: 0.15, atk: 0.003, rel: -1 },
   };
   const rawSamples = {}, sampleBufs = {};
   let samplesState = "idle", decodePromise = null;
+  let holdVoices = [];
   function prefetchSamples() {
     Object.keys(SAMPLE_NOTES).forEach(inst => SAMPLE_NOTES[inst].forEach(nm => {
       rawSamples[inst + "/" + nm] = fetch("sounds/" + inst + "/" + nm + ".mp3")
@@ -725,79 +801,93 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
       if (!buf) return;
       const [inst, nm] = key.split("/");
       (sampleBufs[inst] = sampleBufs[inst] || []).push({ midi: midiOf(nm), buf });
-    })).then(() => { samplesState = Object.keys(sampleBufs).length >= 5 ? "ready" : "failed"; });
+    })).then(() => { samplesState = Object.keys(sampleBufs).length >= 6 ? "ready" : "failed"; });
     return decodePromise;
   }
-  function playSample(t, midi, dur, inst, vol, detune) {
-    const map = INST_MAP[inst];
-    if (!map) return false;
-    const list = sampleBufs[map[0]];
+
+  function voice(t, buf, rate, peak, len, atk, rel, pan, loop) {
+    const src = ac.createBufferSource();
+    src.buffer = buf; src.playbackRate.value = rate;
+    if (loop) { src.loop = true; src.loopStart = 0.9; src.loopEnd = Math.min(buf.duration - 0.2, 2.7); }
+    const g = ac.createGain();
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.linearRampToValueAtTime(peak, t + atk);
+    if (rel >= 0) { g.gain.setValueAtTime(peak, t + Math.max(atk, len)); g.gain.exponentialRampToValueAtTime(0.0001, t + len + rel); }
+    src.connect(g);
+    if (ac.createStereoPanner) { const p = ac.createStereoPanner(); p.pan.value = clamp(pan, -1, 1); g.connect(p); p.connect(orchIn); }
+    else g.connect(orchIn);
+    src.start(t);
+    if (!loop) src.stop(t + len + Math.max(rel, 0) + 0.05);
+    return { src, g };
+  }
+
+  function playSample(t, midi, dur, inst, vol, detune, hold) {
+    const I = INST[inst];
+    if (!I) return false;
+    const list = sampleBufs[I.file];
     if (!list || !list.length) return false;
     let sm = list[0];
     list.forEach(x => { if (Math.abs(x.midi - midi) < Math.abs(sm.midi - midi)) sm = x; });
-    const rate = Math.pow(2, (midi - sm.midi + (detune || 0) / 100) / 12);
-    const src = ac.createBufferSource();
-    src.buffer = sm.buf; src.playbackRate.value = rate;
-    const g = ac.createGain(), peak = vol * map[1], rel = map[2];
-    const maxLen = sm.buf.duration / rate - 0.05;
-    const len = rel < 0 ? maxLen : Math.max(0.05, Math.min(dur, maxLen - rel));
-    g.gain.setValueAtTime(0.0001, t);
-    g.gain.linearRampToValueAtTime(peak, t + 0.008);
-    if (rel >= 0) { g.gain.setValueAtTime(peak, t + len); g.gain.exponentialRampToValueAtTime(0.0001, t + len + rel); }
-    src.connect(g); g.connect(dry);
-    src.start(t); src.stop(t + len + Math.max(rel, 0) + 0.05);
+    const n = I.ens;
+    for (let i = 0; i < n; i++) {
+      // 何人かで弾いているように、少しずつ音程・タイミング・位置をずらす
+      const det = (detune || 0) + (n > 1 ? (i - (n - 1) / 2) * 9 + (Math.random() - 0.5) * 4 : 0);
+      const rate = Math.pow(2, (midi - sm.midi + det / 100) / 12);
+      const delay = i * 0.014 + Math.random() * 0.006;
+      const maxLen = sm.buf.duration / rate - 0.05;
+      const len = I.rel < 0 ? maxLen : Math.max(0.05, hold ? 30 : Math.min(dur, maxLen - I.rel));
+      const peak = vol * NORM[I.file] * 8 / Math.sqrt(n) * (0.92 + Math.random() * 0.16);
+      const pan = I.pan + (n > 1 ? (i - (n - 1) / 2) * 0.22 : 0);
+      const v = voice(t + delay, sm.buf, rate, peak, len, I.atk, I.rel, pan, hold && I.rel >= 0);
+      if (hold) holdVoices.push(v);
+    }
     return true;
   }
 
-  // 楽器ごとの音色
-  function playNote(t, midi, dur, inst, vol, detune) {
-    if (samplesState === "ready" && playSample(t, midi, dur, inst, vol, detune)) return;
-    const f = mtof(midi);
-    if (inst === "timp") { osc(t, f, "sine", 0.9, vol * 2.5); noise(t, 0.15, vol, 300, "lowpass"); return; }
-    if (inst === "vlc") inst = "vln";
-    if (inst === "bsn") inst = "low";
-    if (inst === "vln") {
-      osc(t, f, "sawtooth", dur * 0.92, vol * 0.5, { atk: 0.02, sustain: true, rel: 0.06, lp: 2600, detune: detune + 4 });
-      osc(t, f, "sawtooth", dur * 0.92, vol * 0.5, { atk: 0.02, sustain: true, rel: 0.06, lp: 2600, detune: detune - 5 });
-    } else if (inst === "low") {
-      osc(t, f, "square", Math.min(dur * 0.8, 0.5), vol * 0.6, { atk: 0.01, lp: 900, lpEnv: 0.08, detune });
-      osc(t, f / 2, "triangle", Math.min(dur * 0.8, 0.5), vol * 0.5, { detune });
-    } else if (inst === "pizz") {
-      osc(t, f, "triangle", 0.35, vol, { atk: 0.003, detune });
-      osc(t, f * 2, "sine", 0.12, vol * 0.3, { atk: 0.003, detune });
-    } else if (inst === "brass") {
-      osc(t, f, "sawtooth", dur, vol, { atk: 0.015, lp: 1500, lpEnv: 0.1, q: 2, detune });
-    } else if (inst === "pad") {
-      osc(t, f, "sawtooth", dur, vol, { atk: 0.06, sustain: true, rel: 0.6, lp: 1800, detune: detune + 3 });
-      osc(t, f, "sawtooth", dur, vol * 0.7, { atk: 0.06, sustain: true, rel: 0.6, lp: 1800, detune: detune - 6 });
-    }
+  // 合成音（録音が読めないとき用）
+  function playSynth(t, midi, dur, inst, vol, detune) {
+    const f = mtof(midi), o = { bus: orchIn, detune };
+    if (inst === "timp") { osc(t, f, "sine", 0.9, vol * 2.5, o); return; }
+    if (inst === "pizz") { osc(t, f, "triangle", 0.35, vol, o); return; }
+    if (inst === "low" || inst === "bsn") { osc(t, f, "square", Math.min(dur * 0.8, 0.5), vol * 0.5, { ...o, lp: 900 }); return; }
+    if (inst === "brass") { osc(t, f, "sawtooth", dur, vol, { ...o, lp: 1600 }); return; }
+    osc(t, f, "sawtooth", Math.min(dur, 3), vol * 0.6, { ...o, lp: 2400, atk: 0.03 });
+  }
+
+  function playNote(t, midi, dur, inst, vol, detune, hold) {
+    if (samplesState === "ready" && playSample(t, midi, dur, inst, vol, detune, hold)) return;
+    playSynth(t, midi, dur, inst, vol, detune);
   }
   function click(t, accent, vol) { osc(t, accent ? 2100 : 1600, "triangle", 0.04, vol, { atk: 0.001 }); }
-  function sfxSwing(t) { noise(t, 0.1, 0.07, 2500, "bandpass", 0.6); }
+  function sfxSwing(t, size) { noise(t, 0.08 + size * 0.1, 0.05 + size * 0.06, 2200 - size * 800, "bandpass", 0.6); }
   function sfxSwat(t) { noise(t, 0.09, 0.45, 1800, "bandpass", 0.8); osc(t, 55, "sine", 0.12, 0.4); }
   function sfxBonk(t) {
     const o = ac.createOscillator(), g = ac.createGain();
     o.type = "sine"; o.frequency.setValueAtTime(420, t); o.frequency.exponentialRampToValueAtTime(140, t + 0.15);
     g.gain.setValueAtTime(0.5, t); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.2);
-    o.connect(g); g.connect(master); o.start(t); o.stop(t + 0.22);
+    o.connect(g); g.connect(sfxBus); o.start(t); o.stop(t + 0.22);
     noise(t, 0.06, 0.3, 900, "bandpass", 1.5);
   }
-  function sfxCue(t) { osc(t, 1568, "sine", 0.4, 0.12); osc(t + 0.06, 2093, "sine", 0.5, 0.1); }
+  function sfxCue(t) { osc(t, 1568, "sine", 0.4, 0.1); osc(t + 0.06, 2093, "sine", 0.5, 0.08); }
   function sfxBite(t) {
     const o = ac.createOscillator(), g = ac.createGain();
     o.type = "square"; o.frequency.setValueAtTime(1900, t); o.frequency.exponentialRampToValueAtTime(700, t + 0.18);
-    g.gain.setValueAtTime(0.12, t); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.2);
-    o.connect(g); g.connect(master); o.start(t); o.stop(t + 0.22);
+    g.gain.setValueAtTime(0.1, t); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.2);
+    o.connect(g); g.connect(sfxBus); o.start(t); o.stop(t + 0.22);
+  }
+  function applause(t, amount) {
+    const n = Math.floor(160 * amount);
+    for (let i = 0; i < n; i++) {
+      const tt = t + Math.pow(Math.random(), 0.7) * 3.2;
+      noise(tt, 0.03 + Math.random() * 0.03, 0.05 + Math.random() * 0.08, 1200 + Math.random() * 2400, "bandpass", 1.2);
+    }
   }
 
   // ======================================================
-  //  時計（遅延対策の中心）
-  //  「いまスピーカーから出ている音」の時刻を performance.now() に対応づける。
-  //  - getOutputTimestamp() で出力遅延を自動補正
-  //  - タップは event.timeStamp（指が触れた瞬間）で判定
-  //  - さらに利用者ごとのズレ（calibMs）を引く
+  //  時計（遅延対策）
+  //  「いまスピーカーから聞こえている音」の時刻を performance.now() に対応づける
   // ======================================================
-  let clockOffset = null;   // 秒: 聞こえている音の時刻 = perf秒 + clockOffset
+  let clockOffset = null;
   function measureOffset() {
     const perf = performance.now();
     let est = ac.currentTime - (ac.outputLatency || 0) - (ac.baseLatency || 0) - perf / 1000;
@@ -817,30 +907,48 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
     else clockOffset += (m - clockOffset) * 0.05;
   }
   function evTime(e) {
-    const ts = e && e.timeStamp;
-    const p = performance.now();
+    const ts = e && e.timeStamp, p = performance.now();
     return ts && ts > p - 1000 && ts <= p + 5 ? ts : p;
   }
-  // 曲の時刻（秒）。perfMs は performance.now() 基準
-  function songTimeAt(perfMs, useCalib = true) {
-    if (!ac || clockOffset === null) return -99;
-    return perfMs / 1000 + clockOffset - startAt - (useCalib ? calibMs / 1000 : 0);
+  // 聞こえている音の時刻（AudioContext の時間軸）
+  function heardAt(perfMs, useCalib = true) {
+    if (!ac || clockOffset === null) return 0;
+    return perfMs / 1000 + clockOffset - (useCalib ? calibMs / 1000 : 0);
+  }
+
+  // ======================================================
+  //  指揮についてくるオーケストラ
+  //  曲の位置（拍）は「いまのテンポ」で進む。あなたの拍でテンポと位置が少しずつ寄ってくる
+  // ======================================================
+  let A = null, A0 = null;   // 基準点 {t: 時刻, p: 拍, T: テンポ}
+  let schedT = 0;
+  function posAt(t) { const a = (A0 && t < A.t) ? A0 : A; return a.p + (t - a.t) * a.T / 60; }
+  function timeAt(p) { const a = (A0 && p < A.p) ? A0 : A; return a.t + (p - a.p) * 60 / a.T; }
+  function retempo(newT, shift) {
+    const tc = Math.max(schedT, ac.currentTime);
+    const pc = posAt(tc) + (shift || 0);
+    A0 = A; A = { t: tc, p: pc, T: clamp(newT, 30, 240) };
   }
 
   // ======================================================
   //  ゲームの状態
   // ======================================================
   let state = "title";
-  let song = null, chart = null, timing = null;
-  let events = [], evPtr = 0, taps = [], tapPtr = 0, cues = [];
-  let startAt = 0, endTime = 0;
+  let song = null, chart = null, targetBpm = null, dynMap = null;
+  let events = [], evPtr = 0, taps = [], tapPtr = 0, clickPtr = 0, cues = [], jumps = [];
   let chaos = 0, lives = 3, score = 0, combo = 0, maxCombo = 0;
   let swats = 0, perfects = 0, goods = 0, cueOk = 0, songTaps = 0, bonks = 0;
+  let tempoOk = 0, tempoChecks = 0, dynOk = 0, dynChecks = 0, cutResult = "-";
+  let level = 0.5;            // オーケストラのいまの音量（0〜1）
+  let lastJ = null;           // 直前に拍ぴったりで振った拍
   let mosq = [], pops = [], parts = [], swooshes = [], bites = [];
   let spawnTimer = 0, flash = 0, redFlash = 0, endTimer = 0, endReason = "";
   let hand = { tx: 330, ty: 520, amt: 0 };
   let banner = { text: "", sub: "", t: 0 };
-  let layerMess = {}, lastEvery = 1, vt = 0;
+  let layerMess = {}, lastEvery = 1, vtc = 0, beatNow = -4;
+  let warnAt = { tempo: -99, dyn: -99 }, lastMark = "";
+  let fermataT = 0, maestro = { bite: 0, sorry: 0, joy: 0 };
+  let gest = null;
 
   function everyAt(b) {
     let e = 1;
@@ -851,17 +959,19 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
   function loadSong(s) {
     song = s;
     chart = s.build();
-    timing = makeTiming(chart.tempo, chart.lastTap);
-    events = chart.notes.map(n => {
-      const t = timing.timeOf(n.b);
-      return { t, dur: timing.timeOf(n.b + n.d) - t, m: n.m, inst: n.inst, layer: n.layer, v: n.v };
-    }).sort((a, b) => a.t - b.t);
+    targetBpm = makeTargetTempo(chart.tempo);
+    dynMap = makeDyn(chart.dyn);
+    events = chart.notes.slice().sort((a, b) => a.b - b.b);
     taps = [];
-    for (let b = -4; b < 0; b++) taps.push({ b, t: timing.timeOf(b), count: true, hit: false });
-    for (let b = 0; b <= chart.lastTap; b += everyAt(b)) taps.push({ b, t: timing.timeOf(b), count: false, hit: false });
+    for (let b = -4; b < 0; b++) taps.push({ b, count: true, hit: false });
+    for (let b = 0; b <= chart.lastTap; b += everyAt(b)) taps.push({ b, count: false, hit: false });
     songTaps = taps.filter(x => !x.count).length;
     cues = chart.cues.map(c => ({ ...c, done: false, ok: false }));
-    endTime = timing.timeOf(chart.lastTap) + 1.6;
+    jumps = [];
+    for (let i = 1; i < chart.tempo.length; i++) {
+      const a = chart.tempo[i - 1], c = chart.tempo[i];
+      if (a.b === c.b && a.bpm !== c.bpm) jumps.push({ b: c.b, bpm: c.bpm, label: c.label, done: false, warned: false });
+    }
   }
 
   let starting = false;
@@ -877,41 +987,60 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
     }
     starting = false;
     loadSong(s || song);
-    startAt = ac.currentTime + 0.4 + 4 * 60 / chart.tempo[0].bpm;
+    master.gain.cancelScheduledValues(ac.currentTime); master.gain.value = 0.8;
+    orchDyn.gain.cancelScheduledValues(ac.currentTime);
+    holdVoices = [];
+    const t0 = ac.currentTime + 0.5;
+    A0 = null; A = { t: t0, p: -4, T: chart.tempo[0].bpm };
+    schedT = ac.currentTime;
     clockOffset = null; syncClock();
     evPtr = 0; tapPtr = 0; clickPtr = 0;
     chaos = 0; lives = 3; score = 0; combo = 0; maxCombo = 0;
     swats = 0; perfects = 0; goods = 0; cueOk = 0; bonks = 0;
-    musicians.forEach(m => { m.hurt = 0; m.itch = 0; });
+    tempoOk = 0; tempoChecks = 0; dynOk = 0; dynChecks = 0; cutResult = "-";
+    level = dynMap.at(0); lastJ = null; lastMark = "";
+    musicians.forEach(m => { m.hurt = 0; m.angry = 0; m.itch = 0; m.joy = 0; });
     mosq = []; pops = []; parts = []; swooshes = []; bites = [];
     spawnTimer = 0; flash = 0; redFlash = 0; endTimer = 0; layerMess = {}; lastEvery = 1;
+    warnAt = { tempo: -99, dyn: -99 }; maestro = { bite: 0, sorry: 0, joy: 0 }; gest = null;
     hand = { tx: 330, ty: 520, amt: 0 };
     banner = { text: song.title, sub: song.composer, t: 2.4 };
     state = "play";
     ["titleCard", "resultCard", "calibCard"].forEach(id => document.getElementById(id).hidden = true);
   }
 
+  function stopHolds(t, fade) {
+    holdVoices.forEach(v => {
+      try {
+        v.g.gain.cancelScheduledValues(t);
+        v.g.gain.setTargetAtTime(0, t, fade);
+        v.src.stop(t + fade * 6);
+      } catch (e) {}
+    });
+    holdVoices = [];
+  }
+
   function endGame(reason) {
-    if (state !== "play") return;
+    if (state !== "play" && state !== "fermata") return;
     state = reason === "clear" ? "ending" : "over";
-    endTimer = reason === "clear" ? 1.2 : 1.4;
+    endTimer = reason === "clear" ? 3.4 : 1.4;
     endReason = reason;
-    if (reason !== "clear" && ac) {
-      const t = ac.currentTime;
+    const t = ac.currentTime;
+    if (reason !== "clear") {
       if (reason === "orchestra") {
         for (let i = 0; i < 9; i++) osc(t + i * 0.04, mtof(40 + Math.floor(Math.random() * 40)), "sawtooth", 1.2, 0.05, { lp: 1500, detune: Math.random() * 100 });
         noise(t, 1.2, 0.25, 5000, "highpass");
       } else { sfxBite(t); sfxBite(t + 0.15); }
-      // 予約済みの音を止める
-      master.gain.setTargetAtTime(0, t + 1.0, 0.2);
-      setTimeout(() => { if (master) master.gain.value = 0.7; }, 2600);
+      orchDyn.gain.setTargetAtTime(0, t + 0.6, 0.15);
+      stopHolds(t + 0.6, 0.15);
     }
   }
 
   function rankOf(acc, cleared) {
     if (!cleared) return "C";
-    if (acc >= 0.85 && lives === 3 && bonks === 0) return "S";
-    if (acc >= 0.7) return "A";
+    const tp = tempoChecks ? tempoOk / tempoChecks : 0, dp = dynChecks ? dynOk / dynChecks : 0;
+    if (acc >= 0.85 && tp >= 0.7 && dp >= 0.6 && lives === 3 && bonks === 0) return "S";
+    if (acc >= 0.7 && tp >= 0.5) return "A";
     return "B";
   }
 
@@ -919,11 +1048,14 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
     state = "result";
     const acc = songTaps ? (perfects + goods) / songTaps : 0;
     const $ = id => document.getElementById(id);
+    const pct = (a, b) => (b ? Math.round(a / b * 100) : 0) + "%";
     $("resScore").textContent = score.toLocaleString("ja-JP");
-    $("resSwats").textContent = swats + " 匹";
-    $("resCues").textContent = cueOk + " / " + cues.length;
     $("resAcc").textContent = Math.round(acc * 100) + "%";
-    $("resCombo").textContent = maxCombo;
+    $("resTempo").textContent = pct(tempoOk, tempoChecks);
+    $("resDyn").textContent = pct(dynOk, dynChecks);
+    $("resCues").textContent = cueOk + " / " + cues.length;
+    $("resCut").textContent = cutResult;
+    $("resSwats").textContent = swats + " 匹";
     $("resBonk").textContent = bonks + " 人";
     const cleared = endReason === "clear";
     const rank = rankOf(acc, cleared);
@@ -932,14 +1064,14 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
       $("resEyebrow").textContent = "終演 · " + song.title;
       $("resTitle").textContent = "ブラボー！";
       $("resSub").textContent = "最後まで指揮しきりました。客席から拍手が鳴りやみません。";
-      comment = rank === "S" ? "スタンディングオベーション。蚊にも音楽にも一切のすきを見せませんでした。"
+      comment = rank === "S" ? "スタンディングオベーション。テンポも強弱も思いのまま。蚊すら聴き入っていました。"
         : rank === "A" ? "見事な本番。新聞の批評欄でほめられそうです。"
         : "なんとか終演。団員たちは少しだけ首をかしげています。";
     } else if (endReason === "orchestra") {
       $("resEyebrow").textContent = "中断 · " + song.title;
       $("resTitle").textContent = "オーケストラ暴走";
-      $("resSub").textContent = "指揮棒の振りすぎで、テンポがばらばらになりました。";
-      comment = "蚊を追うのは拍に合わせて。輪が縮みきる瞬間をねらいましょう。";
+      $("resSub").textContent = "拍もテンポも音量もばらばらになってしまいました。";
+      comment = "まずは拍に合わせること。蚊は輪が縮みきる瞬間をねらいましょう。";
     } else {
       $("resEyebrow").textContent = "中断 · " + song.title;
       $("resTitle").textContent = "かゆくて指揮どころではない";
@@ -955,7 +1087,7 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
   }
 
   // ======================================================
-  //  入力
+  //  入力（タップ＝拍、払う大きさ＝音量）
   // ======================================================
   function toLogical(e) {
     const r = canvas.getBoundingClientRect();
@@ -963,36 +1095,56 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
   }
   canvas.addEventListener("pointerdown", e => {
     e.preventDefault();
-    if (state !== "play") return;
+    if (state !== "play" && state !== "fermata") return;
+    try { canvas.setPointerCapture(e.pointerId); } catch (err) {}
+    if (gest && !gest.done) finishGesture(gest);
     const p = toLogical(e);
-    swing(p.x, p.y, true, songTimeAt(evTime(e)));
+    gest = beginSwing(p.x, p.y, heardAt(evTime(e)), e.pointerId);
   });
+  canvas.addEventListener("pointermove", e => {
+    if (!gest || gest.done || e.pointerId !== gest.id) return;
+    const p = toLogical(e);
+    moveSwing(gest, p.x, p.y);
+    if (performance.now() - gest.t0 > GESTURE_MS) finishGesture(gest);
+  });
+  const endPointer = e => { if (gest && !gest.done && e.pointerId === gest.id) finishGesture(gest); };
+  canvas.addEventListener("pointerup", endPointer);
+  canvas.addEventListener("pointercancel", endPointer);
   window.addEventListener("keydown", e => {
-    if (e.code === "Space" && state === "play") {
+    if (e.code === "Space" && (state === "play" || state === "fermata")) {
       e.preventDefault();
-      if (!e.repeat) swing(330, 470, false, songTimeAt(evTime(e)));
+      if (!e.repeat) { const g = beginSwing(330, 470, heardAt(evTime(e)), -1, true); finishGesture(g); }
     }
   });
 
   function popup(x, y, text, color, size = 20) { pops.push({ x, y, text, color, size, t: 0 }); }
 
-  function swing(x, y, canSwat, t) {
-    if (state !== "play" || !ac) return;
+  function cueMark(cue) {
+    const m = rowList(cue.row)[cue.who];
+    return { x: m.x, y: m.y - 55 * m.s - 30, m };
+  }
+  function shownCueAt(b) { return cues.find(c => !c.done && b >= c.b - CUE_LEAD && b < c.b + 1); }
+
+  function beginSwing(x, y, th, id, noSwat) {
+    const g = { id, x0: x, y0: y, last: { x, y }, path: [{ x, y }], maxD: 0, t0: performance.now(), done: false, bonked: false, onBeat: false, judged: false, killed: 0 };
+    hand.tx = x; hand.ty = y; hand.amt = 1;
+    if (state === "fermata") { cutOff(th); g.done = true; return g; }
+
+    const pt = posAt(th);
     let best = null, bd = 1e9;
     for (let i = Math.max(0, tapPtr - 3); i < Math.min(taps.length, tapPtr + 4); i++) {
-      const d = Math.abs(t - taps[i].t);
+      const d = Math.abs(pt - taps[i].b);
       if (d < bd) { bd = d; best = taps[i]; }
     }
-    if (!best) return;
+    if (!best) return g;
+    const eSec = (pt - best.b) * 60 / A.T;
+    const ae = Math.abs(eSec);
     let q;
-    if (bd <= GOOD && !best.hit) { best.hit = true; q = bd <= PERFECT ? "perfect" : "good"; }
-    else if (bd <= GOOD) q = "extra";
+    if (ae <= GOOD && !best.hit) { best.hit = true; q = ae <= PERFECT ? "perfect" : "good"; }
+    else if (ae <= GOOD) q = "extra";
     else q = "off";
     const onBeat = q === "perfect" || q === "good";
-
-    hand.tx = x; hand.ty = y; hand.amt = 1;
-    swooshes.push({ x, y, t: 0, q });
-    sfxSwing(ac.currentTime);
+    g.onBeat = onBeat; g.count = best.count; g.q = q;
 
     const fever = combo >= 16;
     const mult = (1 + Math.min(combo, 40) / 20) * (fever ? 2 : 1);
@@ -1003,97 +1155,181 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
       popup(x, y - 34, "ぴったり", "#ffe08a", 20);
     } else if (q === "good") {
       goods++; combo++; chaos = Math.max(0, chaos - 2); score += Math.round(10 * mult);
-      popup(x, y - 34, "いい感じ", "#cfe7c8", 18);
+      popup(x, y - 34, eSec < 0 ? "いい感じ（早め）" : "いい感じ（遅め）", "#cfe7c8", 16);
     } else if (q === "extra") {
       combo = 0; chaos += 8; popup(x, y - 34, "振りすぎ！", "#ff8a7a", 20);
     } else {
-      combo = 0; chaos += 10; popup(x, y - 34, (t < best.t ? "早い！" : "遅い！"), "#ff8a7a", 20);
+      combo = 0; chaos += 10; popup(x, y - 34, eSec < 0 ? "早い！" : "遅い！", "#ff8a7a", 20);
     }
     if (combo === 16) banner = { text: "ノリノリ！", sub: "スコア2倍・当たり判定アップ", t: 1.6 };
     maxCombo = Math.max(maxCombo, combo);
 
-    // 出番の合図（金色の「合図」マークをタップ）
-    const beatT = timing.beatAt(t);
-    const shownCue = cues.find(c => !c.done && beatT >= c.b - CUE_LEAD && beatT < c.b + 1);
-    const onCueMark = !!shownCue && Math.hypot(x - cueMark(shownCue.row).x, y - cueMark(shownCue.row).y) <= 40;
-    if (onBeat && !best.count && onCueMark) {
-      const cue = shownCue.b === best.b ? shownCue : null;
-      if (cue) {
-        cue.done = true; cue.ok = true; cueOk++;
-        chaos = Math.max(0, chaos - 10);
-        score += Math.round(500 * (fever ? 2 : 1));
-        popup(x, y - 60, ROW_LABEL[cue.row] + " 入った！ +500", "#ffe08a", 18);
-        sfxCue(ac.currentTime);
-        flash = 0.6;
+    // テンポはあなたの拍についてくる
+    if (onBeat && !best.count) {
+      const jumped = jumps.some(j => lastJ && j.b > lastJ.b && j.b <= best.b);
+      if (lastJ && !jumped && best.b - lastJ.b > 0 && best.b - lastJ.b <= 4 && th > lastJ.t) {
+        const implied = clamp(60 * (best.b - lastJ.b) / (th - lastJ.t), A.T * 0.75, A.T * 1.3);
+        retempo(A.T + 0.5 * (implied - A.T), clamp(-(pt - best.b) * 0.4, -0.08, 0.08));
       }
+      lastJ = { b: best.b, t: th };
     }
 
-    if (canSwat) {
-      let hitAny = false;
-      const R = fever ? 62 : 48;
-      mosq.forEach(m => {
-        if (m.state === "dead" || m.state === "flee") return;
-        const d = Math.hypot(m.x - x, m.y - y);
-        if (d <= R * m.size) {
-          hitAny = true;
-          if (m.hp > 1) {
-            m.hp--;
-            const a = Math.atan2(m.y - y, m.x - x);
-            m.vx = Math.cos(a) * 380; m.vy = Math.sin(a) * 380 - 100;
-            m.state = "fly"; m.wp = randWp(); m.wpT = 0; m.timer = 2.5; m.stun = 0.4;
-            popup(m.x, m.y + 30, "しぶとい！", "#ffd0c0", 16);
-            score += 50;
-          } else {
-            m.state = "dead"; m.vy = -60; m.vx = (Math.random() - 0.5) * 80; m.t = 0;
-            swats++;
-            const base = m.kind === "big" ? 300 : m.kind === "fast" ? 250 : 150;
-            const pts = Math.round((onBeat ? base * 2.5 : base) * (fever ? 2 : 1));
-            score += pts;
-            popup(m.x, m.y + 28, (onBeat ? "拍ぴったり撃退！ +" : "撃退 +") + pts, onBeat ? "#ffe08a" : "#f5ecd6", onBeat ? 18 : 16);
-            if (Math.hypot(m.x - HEAD.x, m.y - HEAD.y) < 50) popup(HEAD.x, HEAD.y - 64, "自分の頭をぺちっ", "#ffd0c0", 15);
-          }
-          for (let k = 0; k < 14; k++) {
-            const a = Math.random() * Math.PI * 2, v = 60 + Math.random() * 160;
-            parts.push({ x: m.x, y: m.y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, t: 0, c: k % 3 ? "#f5ecd6" : "#e0b04f" });
-          }
-        } else if (d < R * 2.2 && m.state !== "suck") {
-          if (m.state === "land" || m.state === "toPlayer") { popup(m.x, m.y - 24, "追い払った！ +80", "#cfe7c8", 15); score += 80; }
-          const a = Math.atan2(m.y - y, m.x - x);
-          m.vx = Math.cos(a) * 320; m.vy = Math.sin(a) * 320;
-          m.state = "fly"; m.wp = randWp(); m.wpT = 0;
-        }
-      });
-      if (hitAny) { sfxSwat(ac.currentTime); flash = 1; }
-      // 楽団員に当たったか
+    // 出番の合図（団員の頭上の金色マーク）
+    const sc = shownCueAt(pt);
+    let onCueMark = false;
+    if (sc) {
+      const mk = cueMark(sc);
+      onCueMark = Math.hypot(x - mk.x, y - mk.y) <= 24;
+      if (onCueMark && onBeat && !best.count && sc.b === best.b) {
+        sc.done = true; sc.ok = true; cueOk++;
+        chaos = Math.max(0, chaos - 10);
+        score += Math.round(500 * (fever ? 2 : 1));
+        mk.m.joy = 2.5;
+        popup(mk.x, mk.y - 26, mk.m.name + "「はいっ！」 +500", "#ffe08a", 16);
+        sfxCue(ac.currentTime);
+        flash = 0.5;
+      }
+    }
+    g.onCueMark = onCueMark;
+    sfxSwing(ac.currentTime, 0.2);
+
+    if (!noSwat) {
+      swatAt(g, x, y, onBeat, fever, true);
       if (!onCueMark) {
         const hm = musicianAt(x, y);
         if (hm) {
           if (best.count) popup(x, y - 20, "そこは団員！", "#ffd0c0", 16);
-          else hitMusician(hm, x, y, hitAny);
+          else hitMusician(hm, x, y, g);
+        } else if (g.killed && nearestBodyGap(x, y) < 7) {
+          score += 200; popup(x, y + 26, "ギリギリ！ +200", "#ffe08a", 16);
         }
       }
     }
     if (chaos >= 100) { chaos = 100; endGame("orchestra"); }
+    return g;
   }
 
-  function cueMark(row) { return { x: 240, y: ROWS[row].y - 60 * ROWS[row].s }; }
-  // 楽団員の体（頭と胴体）に当たったか。前の列から調べる
-  function musicianAt(x, y) {
-    for (let i = musicians.length - 1; i >= 0; i--) {
-      const m = musicians[i], s = m.s;
-      if (Math.hypot(x - m.x, y - (m.y - 40 * s)) < 10.5 * s) return m;
-      if (x > m.x - 14 * s && x < m.x + 14 * s && y > m.y - 28 * s && y < m.y + 4 * s) return m;
-    }
-    return null;
+  // 蚊を叩く（first: 振り始めの点 / それ以外: 払った通り道）
+  function swatAt(g, x, y, onBeat, fever, first) {
+    const R = first ? (fever ? 62 : 48) : 28;
+    mosq.forEach(m => {
+      if (m.state === "dead" || m.state === "flee") return;
+      const d = Math.hypot(m.x - x, m.y - y);
+      if (m.state === "land") {
+        if (first && d <= 15) {
+          // ピンポイント：団員には当たらない
+          killMosquito(m, onBeat, fever, 600, "神業！ ピンポイント撃退");
+          g.killed++; g.safeLand = true;
+          m.target.joy = 1.5;
+        } else if (first && d < R * 2.2 && !musicianAt(x, y)) {
+          popup(m.x, m.y - 24, "追い払った！ +80", "#cfe7c8", 15); score += 80;
+          m.state = "fly"; m.wp = randWp(); m.wpT = 0;
+          const a = Math.atan2(m.y - y, m.x - x); m.vx = Math.cos(a) * 300; m.vy = Math.sin(a) * 300;
+        } else if (!first && d <= 18) {
+          killMosquito(m, onBeat, fever, 150, "なぎ払い撃退"); g.killed++;
+        }
+        return;
+      }
+      if (d <= R * m.size) {
+        if (m.hp > 1) {
+          m.hp--;
+          const a = Math.atan2(m.y - y, m.x - x);
+          m.vx = Math.cos(a) * 380; m.vy = Math.sin(a) * 380 - 100;
+          m.state = "fly"; m.wp = randWp(); m.wpT = 0; m.timer = 2.5; m.stun = 0.4;
+          popup(m.x, m.y + 30, "しぶとい！", "#ffd0c0", 16);
+          score += 50;
+        } else {
+          killMosquito(m, onBeat, fever, m.kind === "big" ? 300 : m.kind === "fast" ? 250 : 150, first ? null : "なぎ払い");
+          g.killed++;
+        }
+        if (first) { sfxSwat(ac.currentTime); flash = 1; }
+      } else if (first && d < R * 2.2 && m.state !== "suck") {
+        // 惜しい！ 35%の確率で団員の頭に逃げこむ
+        const a = Math.atan2(m.y - y, m.x - x);
+        m.vx = Math.cos(a) * 320; m.vy = Math.sin(a) * 320;
+        m.state = "fly"; m.wp = randWp(); m.wpT = 0;
+        if (state === "play" && Math.random() < 0.35) hideInOrchestra(m);
+      }
+    });
   }
-  function hitMusician(m, x, y, withMosquito) {
-    m.hurt = 1.6; bonks++;
+
+  function killMosquito(m, onBeat, fever, base, label) {
+    m.state = "dead"; m.vy = -60; m.vx = (Math.random() - 0.5) * 80; m.t = 0;
+    swats++;
+    const pts = Math.round((onBeat ? base * 2.5 : base) * (fever ? 2 : 1));
+    score += pts;
+    popup(m.x, m.y + 28, (label || (onBeat ? "拍ぴったり撃退！" : "撃退")) + " +" + pts, onBeat ? "#ffe08a" : "#f5ecd6", 16);
+    if (Math.hypot(m.x - HEAD.x, m.y - HEAD.y) < 50) popup(HEAD.x, HEAD.y - 70, "自分の頭をぺちっ", "#ffd0c0", 15);
+    for (let k = 0; k < 14; k++) {
+      const a = Math.random() * Math.PI * 2, v = 60 + Math.random() * 160;
+      parts.push({ x: m.x, y: m.y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, t: 0, c: k % 3 ? "#f5ecd6" : "#e0b04f" });
+    }
+    sfxSwat(ac.currentTime);
+  }
+
+  function moveSwing(g, x, y) {
+    const dx = x - g.last.x, dy = y - g.last.y, dl = Math.hypot(dx, dy);
+    if (dl < 1) return;
+    const steps = Math.ceil(dl / 6);
+    for (let i = 1; i <= steps; i++) {
+      const px = g.last.x + dx * i / steps, py = g.last.y + dy * i / steps;
+      g.path.push({ x: px, y: py });
+      g.maxD = Math.max(g.maxD, Math.hypot(px - g.x0, py - g.y0));
+      if (!g.count) swatAt(g, px, py, g.onBeat, combo >= 16, false);
+      if (!g.bonked && !(g.onCueMark && Math.hypot(px - g.x0, py - g.y0) < 20)) {
+        const hm = musicianAt(px, py);
+        if (hm) {
+          if (g.count) { if (!g.warnedCount) { popup(px, py - 20, "そこは団員！", "#ffd0c0", 16); g.warnedCount = true; } }
+          else hitMusician(hm, px, py, g, true);
+        }
+      }
+    }
+    g.last = { x, y };
+    hand.tx = x; hand.ty = y; hand.amt = 1;
+  }
+
+  function finishGesture(g) {
+    if (g.done) return;
+    g.done = true;
+    const size = clamp((g.maxD - 8) / 110, 0, 1);
+    g.size = size;
+    if (g.onBeat && !g.count) {
+      const want = 0.12 + 0.88 * size;
+      level = clamp(level + 0.55 * (want - level), 0, 1);
+    }
+    swooshes.push({ path: g.path.slice(), t: 0, ok: g.onBeat, size });
+    if (ac && size > 0.15) sfxSwing(ac.currentTime, size);
+  }
+
+  function hitMusician(m, x, y, g, sweep) {
+    if (g) { if (g.bonked) return; g.bonked = true; }
+    m.hurt = 1.6; m.angry = 4.5; bonks++;
     chaos += 12; combo = 0;
-    layerMess[m.type] = Math.max(layerMess[m.type] || -1, vt + 1.5);
-    popup(x, y + 22, withMosquito ? "団員ごと叩いた！" : "ゴツン！", "#ff8a7a", withMosquito ? 18 : 22);
-    popup(m.x + 30, m.y - 80 * m.s, "いたっ！", "#ffd0c0", 15);
+    maestro.sorry = 2;
+    layerMess[m.type] = Math.max(layerMess[m.type] || -99, beatNow + 3);
+    popup(x, y + 22, sweep ? "払った棒がゴツン！" : (g && g.killed ? "団員ごと叩いた！" : "ゴツン！"), "#ff8a7a", 18);
+    popup(m.x + 34, m.y - 82 * m.s, m.name + "「いたっ！」", "#ffd0c0", 14);
     sfxBonk(ac.currentTime);
     if (chaos >= 100) { chaos = 100; endGame("orchestra"); }
+  }
+
+  function cutOff(th, auto) {
+    if (state !== "fermata") return;
+    const held = posAt(th) - chart.lastTap;
+    const t = ac.currentTime;
+    orchDyn.gain.cancelScheduledValues(t);
+    orchDyn.gain.setTargetAtTime(0, t, 0.07);
+    stopHolds(t, 0.07);
+    let pts = 0;
+    if (auto) { cutResult = "のばしすぎ"; popup(240, 430, "のばしすぎ…", "#ff8a7a", 22); }
+    else if (held < 1.5) { cutResult = "早すぎ"; pts = 100; popup(240, 430, "締めが早すぎ…", "#ff8a7a", 22); }
+    else { cutResult = "見事"; pts = 1000; popup(240, 430, "見事な締め！ +1000", "#ffe08a", 26); }
+    score += pts;
+    hand.tx = 300; hand.ty = 600; hand.amt = 1;
+    applause(t + 0.35, cutResult === "見事" ? 1 : 0.6);
+    maestro.joy = 4;
+    musicians.forEach(m => { m.joy = 3; });
+    endGame("clear");
   }
 
   // ======================================================
@@ -1104,7 +1340,15 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
       ? { x: 40 + Math.random() * 400, y: 150 + Math.random() * 170 }
       : { x: 50 + Math.random() * 380, y: 340 + Math.random() * 190 };
   }
-  const LAND_TIME = 2.4;
+  function hideInOrchestra(m) {
+    let best = null, bd = 1e9;
+    musicians.forEach(mm => {
+      if (mm.hurt > 0 || mm.itch > 0) return;
+      const d = Math.hypot(mm.x - m.x, mm.y - m.y) + Math.random() * 60;
+      if (d < bd) { bd = d; best = mm; }
+    });
+    if (best) { m.state = "toPlayer"; m.target = best; }
+  }
 
   function spawnMosquito(cfg) {
     const r = Math.random();
@@ -1113,7 +1357,7 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
     const sp = cfg.speed * (kind === "fast" ? 1.55 : kind === "big" ? 0.7 : 1);
     mosq.push({
       kind, hp: kind === "big" ? 2 : 1, size: kind === "big" ? 1.5 : 1, sp,
-      x: left ? -20 : W + 20, y: 330 + Math.random() * 170, land: cfg.land === undefined ? 0.35 : cfg.land,
+      x: left ? -20 : W + 20, y: 330 + Math.random() * 170, land: cfg.land === undefined ? 0.4 : cfg.land,
       vx: left ? 80 : -80, vy: 0,
       state: "fly", timer: (3 + Math.random() * 3) / sp,
       wp: randWp(), wpT: 0, suck: 0, t: 0, flap: Math.random() * 10, stun: 0,
@@ -1134,24 +1378,22 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
       if (m.wpT > (m.kind === "fast" ? 0.8 : 1.6) || Math.hypot(tx - m.x, ty - m.y) < 20) { m.wp = randWp(); m.wpT = 0; }
       m.timer -= dt;
       if (m.timer <= 0) {
-        const cands = musicians.filter(mm => !(mm.hurt > 0) && !(mm.itch > 0));
-        if (state === "play" && cands.length && Math.random() < m.land) {
-          m.state = "toPlayer"; m.target = cands[Math.floor(Math.random() * cands.length)];
-        } else m.state = "approach";
+        if (state === "play" && Math.random() < m.land) hideInOrchestra(m);
+        if (m.state === "fly") m.state = "approach";
       }
     } else if (m.state === "toPlayer") {
-      const hx = m.target.x + 3 * m.target.s, hy = m.target.y - 50 * m.target.s;
-      tx = hx; ty = hy; v = 75 * m.sp;
+      const tg = m.target, hx = tg.x + 4 * tg.s, hy = tg.y - 56 * tg.s;
+      tx = hx; ty = hy; v = 80 * m.sp;
       if (Math.hypot(hx - m.x, hy - m.y) < 10) { m.state = "land"; m.suck = 0; }
     } else if (m.state === "land") {
-      const tg = m.target, hx = tg.x + 3 * tg.s, hy = tg.y - 50 * tg.s;
+      const tg = m.target, hx = tg.x + 4 * tg.s, hy = tg.y - 56 * tg.s;
       m.x += (hx - m.x) * Math.min(1, dt * 8); m.y += (hy - m.y) * Math.min(1, dt * 8);
       m.suck += dt;
       if (m.suck >= LAND_TIME && state === "play") {
         tg.itch = 3;
-        layerMess[tg.type] = Math.max(layerMess[tg.type] || -1, vt + 2.5);
+        layerMess[tg.type] = Math.max(layerMess[tg.type] || -99, beatNow + 5);
         chaos = Math.min(100, chaos + 5); combo = 0;
-        popup(tg.x, tg.y - 64 * tg.s, "かゆい！", "#ff8a7a", 17);
+        popup(tg.x, tg.y - 70 * tg.s, tg.name + "「かゆい！」", "#ff8a7a", 15);
         sfxBite(ac.currentTime);
         m.state = "fly"; m.wp = randWp(); m.wpT = 0; m.timer = (3 + Math.random() * 3) / m.sp;
       }
@@ -1165,9 +1407,9 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
       m.suck += dt;
       if (m.suck >= SUCK_TIME && state === "play") {
         lives--; chaos = Math.min(100, chaos + 6); combo = 0;
-        bites.push({ x: BALD.x + (Math.random() - 0.5) * 30, y: BALD.y + 4 + (Math.random() - 0.5) * 10 });
-        popup(HEAD.x, HEAD.y - 64, "チクッ！", "#ff6a5a", 26);
-        redFlash = 1;
+        bites.push({ x: BALD.x + (Math.random() - 0.5) * 30, y: BALD.y + 6 + (Math.random() - 0.5) * 10 });
+        popup(HEAD.x, HEAD.y - 70, "チクッ！", "#ff6a5a", 26);
+        redFlash = 1; maestro.bite = 2.5;
         sfxBite(ac.currentTime);
         m.state = "flee";
         if (lives <= 0) endGame("itch");
@@ -1190,85 +1432,134 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
   // ======================================================
   //  更新
   // ======================================================
+  function warn(kind, text) {
+    if (beatNow - warnAt[kind] < 4) return;
+    warnAt[kind] = beatNow;
+    popup(240, kind === "tempo" ? 500 : 530, text, "#ffc9a8", 17);
+  }
+
+  function schedule() {
+    const horizon = ac.currentTime + 0.12;
+    jumps.forEach(j => {
+      if (!j.done && posAt(horizon) >= j.b) {
+        j.done = true;
+        const tj = timeAt(j.b);
+        A0 = A; A = { t: tj, p: j.b, T: j.bpm };
+        lastJ = null;
+      }
+    });
+    const pH = posAt(horizon);
+    while (evPtr < events.length && events[evPtr].b < pH) {
+      const e = events[evPtr++];
+      const mess = (layerMess[e.layer] || -99) > e.b;
+      let m = e.m, jt = Math.random() * 0.01, det = (Math.random() - 0.5) * chaos * 0.8;
+      if (Math.random() < chaos / 120 + (mess ? 0.45 : 0)) {
+        m += [-6, -3, -1, 1, 2, 5][Math.floor(Math.random() * 6)];
+        jt = Math.random() * 0.08; det += (Math.random() - 0.5) * 80;
+      }
+      const accent = Math.abs(e.b - Math.round(e.b)) < 0.01 && Math.round(e.b) % song.meter === 0 ? 1.12 : 1;
+      playNote(Math.max(ac.currentTime, timeAt(e.b) + jt), m, e.d * 60 / A.T, e.inst, e.v * accent, det, e.hold);
+    }
+    while (clickPtr < taps.length && taps[clickPtr].b < pH) {
+      const tb = taps[clickPtr++];
+      click(Math.max(ac.currentTime, timeAt(tb.b)), tb.count && tb.b === -4, tb.count ? 0.3 : 0.035);
+    }
+    schedT = horizon;
+  }
+
   function update(dt) {
     if (!ac) {
       if (state === "title") mosq.forEach(m => updateMosquito(m, dt));
       return;
     }
     syncClock();
-    vt = songTimeAt(performance.now());
+    vtc = heardAt(performance.now());
+    if (state === "play" || state === "fermata") schedule();
+    if (A) beatNow = posAt(vtc);
+
+    // 音量と明るさは指揮の大きさで決まる
+    if (orchDyn && (state === "play")) {
+      const tg = 0.22 + 1.0 * Math.pow(level, 1.25);
+      orchDyn.gain.setTargetAtTime(tg, ac.currentTime, 0.12);
+      orchLP.frequency.setTargetAtTime(1400 + 10000 * Math.pow(level, 1.6), ac.currentTime, 0.12);
+    }
 
     if (state === "play") {
-      // 音の予約（少し先まで）
-      const horizon = ac.currentTime + 0.15;
-      while (evPtr < events.length && startAt + events[evPtr].t < horizon) {
-        const e = events[evPtr++];
-        const mess = (layerMess[e.layer] || -1) > e.t;
-        let m = e.m, jt = 0, det = (Math.random() - 0.5) * chaos * 0.8;
-        if (Math.random() < chaos / 120 + (mess ? 0.45 : 0)) {
-          m += [-6, -3, -1, 1, 2, 5][Math.floor(Math.random() * 6)];
-          jt = Math.random() * 0.08; det += (Math.random() - 0.5) * 80;
-        }
-        playNote(Math.max(ac.currentTime, startAt + e.t + jt), m, e.dur, e.inst, e.v, det);
-      }
-      // カウントの音（カウントイン中は大きく、本番中は小さく）
-      while (clickPtr < taps.length && startAt + taps[clickPtr].t < horizon) {
-        const tb = taps[clickPtr++];
-        click(startAt + tb.t, tb.count && tb.b === -4, tb.count ? 0.35 : 0.06);
-      }
-      if (chaos > 55 && Math.random() < (chaos - 55) / 900) {
-        noise(ac.currentTime + 0.05, 0.5, 0.1, 6000, "highpass");
-      }
-
-      // 振り忘れの判定
-      while (tapPtr < taps.length && vt > taps[tapPtr].t + GOOD) {
+      if (gest && !gest.done && performance.now() - gest.t0 > GESTURE_MS) finishGesture(gest);
+      // 通りすぎた拍ごとに、振り忘れ・テンポ・音量を評価
+      while (tapPtr < taps.length && beatNow > taps[tapPtr].b + GOOD * A.T / 60) {
         const tb = taps[tapPtr];
-        if (!tb.hit && !tb.count) {
-          chaos += 5; combo = 0;
-          popup(240, 330, "合図がない…", "#e8b3a8", 15);
+        if (!tb.count) {
+          if (!tb.hit) {
+            chaos += 5; combo = 0;
+            popup(240, 338, "合図がない…", "#e8b3a8", 15);
+            retempo(A.T + 0.3 * (targetBpm(tb.b) - A.T));
+            lastJ = null;
+          } else if (Math.abs(A.T - targetBpm(tb.b)) > 0.5) {
+            retempo(A.T + 0.06 * (targetBpm(tb.b) - A.T));
+          }
+          const tgt = targetBpm(tb.b), r = A.T / tgt;
+          tempoChecks++;
+          if (Math.abs(r - 1) <= 0.07) { tempoOk++; score += 10; }
+          else if (Math.abs(r - 1) > 0.16) { chaos += 2; warn("tempo", r < 1 ? "テンポが遅い！ 早めに振って" : "テンポが速い！ ゆっくり振って"); }
+          const dv = dynMap.at(tb.b), mk = dynMap.mark(tb.b);
+          dynChecks++;
+          if (Math.abs(level - dv) <= 0.2) { dynOk++; score += 10; }
+          else if (Math.abs(level - dv) > 0.33) { chaos += 1.5; warn("dyn", level < dv ? "もっと大きく払って！（" + mk + "）" : "もっと小さく、トンと（" + mk + "）"); }
         }
         cues.forEach(c => {
           if (!c.done && c.b === tb.b) {
             c.done = true;
             chaos += 10;
-            layerMess[c.row] = timing.timeOf(c.b + 8);
-            popup(240, ROWS[c.row].y - 66 * ROWS[c.row].s, ROW_LABEL[c.row] + "が入りそびれた！", "#ff8a7a", 17);
+            layerMess[c.row] = c.b + 8;
+            const m = rowList(c.row)[c.who];
+            m.angry = 3;
+            popup(m.x, m.y - 80 * m.s, m.name + "「入れなかった…」", "#ff8a7a", 15);
           }
         });
         tapPtr++;
       }
       if (chaos >= 100) { chaos = 100; endGame("orchestra"); }
 
-      // 振り方の切り替え案内
-      const beatNow = timing.beatAt(vt);
-      const e = everyAt(Math.max(0, beatNow + 4));
-      chart.tempo.forEach(tp => {
-        if (tp.label && !tp.shown && beatNow >= tp.b - 6 && beatNow < tp.b) {
-          tp.shown = true;
-          banner = { text: "テンポ急変！ ♩=" + Math.round(timing.bpmAt(tp.b - 0.01)) + " → " + tp.bpm, sub: tp.label, t: 3.2 };
+      // 強弱記号が変わったら知らせる
+      const mk = dynMap.mark(Math.max(0, beatNow));
+      if (beatNow >= -1 && mk !== lastMark) {
+        lastMark = mk;
+        popup(240, 560, mk + "　" + ({ pp: "とても小さく", p: "小さく", mp: "少し小さく", mf: "少し大きく", f: "大きく", ff: "とても大きく", "cresc.": "だんだん大きく", "dim.": "だんだん小さく" }[mk] || ""), "#ffe08a", 22);
+      }
+      // テンポ急変の予告
+      jumps.forEach(j => {
+        if (!j.warned && beatNow >= j.b - 6 && beatNow < j.b) {
+          j.warned = true;
+          banner = { text: "テンポ急変！ ♩=" + Math.round(A.T) + " → " + j.bpm, sub: j.label, t: 3.2 };
         }
       });
-      const tempoNear = chart.tempo.some(tp => tp.label && Math.abs(tp.b - (beatNow + 4)) < 7);
-      if (beatNow > -1 && e !== lastEvery && tempoNear) lastEvery = e;
+      const e = everyAt(Math.max(0, beatNow + 4));
+      const nearJump = jumps.some(j => Math.abs(j.b - (beatNow + 4)) < 7);
       if (beatNow > -1 && e !== lastEvery) {
         lastEvery = e;
-        banner = { text: e === 2 ? "2拍に1回振る" : "1拍ずつ振る", sub: "テンポが速くなってきた！", t: 2 };
+        if (!nearJump) banner = { text: e === 2 ? "2拍に1回振る" : "1拍ずつ振る", sub: "テンポが速くなってきた！", t: 2 };
       }
 
       // 蚊の出現
-      if (vt >= 0 && vt < endTime - 3) {
+      if (beatNow >= 0 && beatNow < chart.lastTap - 6) {
         const cfg = chart.spawn(Math.max(0, beatNow) / chart.lastTap);
         spawnTimer -= dt;
         const alive = mosq.filter(m => m.state !== "dead" && m.state !== "flee").length;
         if (alive < cfg.max && spawnTimer <= 0) { spawnMosquito(cfg); spawnTimer = 1.3; }
       }
-      if (vt > endTime) endGame("clear");
+      // 最後の音：のばして、締める
+      if (beatNow >= chart.lastTap + 0.3) {
+        state = "fermata"; fermataT = vtc;
+        mosq.forEach(m => { if (m.state !== "dead") m.state = "flee"; });
+        banner = { text: "のばして…", sub: "好きなところでタップして音を止めよう（2拍以上）", t: 4 };
+      }
     }
+    if (state === "fermata" && vtc - fermataT > 7) cutOff(vtc, true);
 
     if (state !== "title" && state !== "result") mosq = mosq.filter(m => updateMosquito(m, dt));
     if (state === "ending" || state === "over") {
       endTimer -= dt;
-      if (state === "ending") mosq.forEach(m => { if (m.state !== "dead") m.state = "flee"; });
       if (endTimer <= 0) showResult();
     }
     if (state === "title") mosq.forEach(m => updateMosquito(m, dt));
@@ -1281,26 +1572,29 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
         const d = Math.hypot(m.x - HEAD.x, m.y - HEAD.y);
         if (d < nd) { nd = d; near = m; }
       });
-      const target = near ? 0.02 + 0.12 * Math.max(0, 1 - nd / 520) : 0;
+      const target = near ? 0.02 + 0.11 * Math.max(0, 1 - nd / 520) : 0;
       buzz.g.gain.setTargetAtTime(target, ac.currentTime, 0.05);
       if (near) {
         const f = (near.state === "suck" ? 610 : near.state === "approach" ? 580 : 540) * (near.kind === "big" ? 0.7 : near.kind === "fast" ? 1.2 : 1);
         buzz.o1.frequency.setTargetAtTime(f, ac.currentTime, 0.1);
         buzz.o2.frequency.setTargetAtTime(f + 16, ac.currentTime, 0.1);
-        if (buzz.pan) buzz.pan.pan.setTargetAtTime(Math.max(-1, Math.min(1, (near.x - 240) / 240)), ac.currentTime, 0.05);
+        if (buzz.pan) buzz.pan.pan.setTargetAtTime(clamp((near.x - 240) / 240, -1, 1), ac.currentTime, 0.05);
       }
     }
 
     hand.amt = Math.max(0, hand.amt - dt * 3.2);
-    musicians.forEach(m => { if (m.hurt > 0) m.hurt -= dt; if (m.itch > 0) m.itch -= dt; });
-    pops.forEach(p => p.t += dt); pops = pops.filter(p => p.t < 0.9);
-    swooshes.forEach(s => s.t += dt); swooshes = swooshes.filter(s => s.t < 0.35);
+    musicians.forEach(m => {
+      m.hurt = Math.max(0, m.hurt - dt); m.angry = Math.max(0, m.angry - dt);
+      m.itch = Math.max(0, m.itch - dt); m.joy = Math.max(0, m.joy - dt);
+    });
+    maestro.bite = Math.max(0, maestro.bite - dt); maestro.sorry = Math.max(0, maestro.sorry - dt); maestro.joy = Math.max(0, maestro.joy - dt);
+    pops.forEach(p => p.t += dt); pops = pops.filter(p => p.t < 1.1);
+    swooshes.forEach(s => s.t += dt); swooshes = swooshes.filter(s => s.t < 0.4);
     parts.forEach(p => { p.t += dt; p.x += p.vx * dt; p.y += p.vy * dt; p.vy += 300 * dt; }); parts = parts.filter(p => p.t < 0.6);
     flash = Math.max(0, flash - dt * 5);
     redFlash = Math.max(0, redFlash - dt * 2.5);
     banner.t = Math.max(0, banner.t - dt);
   }
-  let clickPtr = 0;
 
   // ======================================================
   //  描画
@@ -1308,7 +1602,6 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
   function drawBackground() {
     const c = bgx;
     c.setTransform(scale, 0, 0, scale, 0, 0);
-    // カーテン
     const cg = c.createLinearGradient(0, 0, 0, 150);
     cg.addColorStop(0, "#2a0a10"); cg.addColorStop(1, "#4a1420");
     c.fillStyle = cg; c.fillRect(0, 0, W, 150);
@@ -1325,23 +1618,19 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
     c.beginPath(); c.moveTo(0, 60);
     for (let x = 0; x < W; x += 40) c.quadraticCurveTo(x + 20, 86, x + 40, 60);
     c.stroke();
-    // 舞台の床
     const fg = c.createLinearGradient(0, 140, 0, H);
     fg.addColorStop(0, "#4e2f1a"); fg.addColorStop(0.45, "#7a4a2a"); fg.addColorStop(1, "#3a2213");
     c.fillStyle = fg; c.fillRect(0, 140, W, H - 140);
     c.strokeStyle = "rgba(0,0,0,0.2)"; c.lineWidth = 1;
     for (let i = -12; i <= 12; i++) { c.beginPath(); c.moveTo(240 + i * 22, 140); c.lineTo(240 + i * 70, H); c.stroke(); }
-    // ひな壇（後ろの列ほど高い）
     [[140, 196, "#5d3920"], [196, 262, "#68412a"]].forEach(([y0, y1, col]) => {
       c.fillStyle = col; c.fillRect(0, y0, W, y1 - y0);
       c.fillStyle = "rgba(0,0,0,0.35)"; c.fillRect(0, y1 - 7, W, 7);
       c.fillStyle = "rgba(255,220,160,0.18)"; c.fillRect(0, y1 - 8, W, 1.5);
     });
-    // 照明
     const lg = c.createRadialGradient(240, 220, 10, 240, 240, 320);
     lg.addColorStop(0, "rgba(255,230,170,0.22)"); lg.addColorStop(1, "rgba(255,230,170,0)");
     c.fillStyle = lg; c.fillRect(0, 0, W, H);
-    // 指揮台
     c.fillStyle = "#24140c";
     c.beginPath(); c.moveTo(150, 690); c.lineTo(330, 690); c.lineTo(350, H); c.lineTo(130, H); c.closePath(); c.fill();
     c.strokeStyle = "#e0b04f"; c.lineWidth = 1.5;
@@ -1351,300 +1640,318 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
     c.fillStyle = vg; c.fillRect(0, 0, W, H);
   }
 
-  // ---------- 楽団員（正面向き・座った人） ----------
+  // ---------- 楽団員（ちびキャラ・正面向き） ----------
   function limb(c, pts, w, col) {
     c.strokeStyle = col; c.lineWidth = w; c.lineCap = "round"; c.lineJoin = "round";
     c.beginPath(); c.moveTo(pts[0][0], pts[0][1]);
     for (let i = 1; i < pts.length; i++) c.lineTo(pts[i][0], pts[i][1]);
     c.stroke();
   }
-  function handAt(c, x, y, skin) { c.fillStyle = skin; c.beginPath(); c.arc(x, y, 2.4, 0, Math.PI * 2); c.fill(); }
+  function handAt(c, x, y, skin) { c.fillStyle = skin; c.beginPath(); c.arc(x, y, 2.6, 0, Math.PI * 2); c.fill(); }
   function shade(hex, f) {
     const n = parseInt(hex.slice(1), 16);
     const r = Math.round(((n >> 16) & 255) * f), g = Math.round(((n >> 8) & 255) * f), b = Math.round((n & 255) * f);
     return "rgb(" + Math.min(255, r) + "," + Math.min(255, g) + "," + Math.min(255, b) + ")";
   }
+  const HY = -43;  // 頭の中心
 
   function drawHairBack(c, m) {
     c.fillStyle = m.hair;
     if (m.style === "long") {
-      c.beginPath(); c.moveTo(-10, -44); c.quadraticCurveTo(-12, -30, -10, -24); c.lineTo(10, -24); c.quadraticCurveTo(12, -30, 10, -44); c.closePath(); c.fill();
+      c.beginPath(); c.moveTo(-13.5, HY - 4); c.quadraticCurveTo(-16, HY + 12, -13, HY + 17); c.lineTo(13, HY + 17); c.quadraticCurveTo(16, HY + 12, 13.5, HY - 4); c.closePath(); c.fill();
     } else if (m.style === "bob") {
-      c.beginPath(); c.ellipse(0, -39, 10.2, 10.5, 0, 0, Math.PI * 2); c.fill();
+      c.beginPath(); c.ellipse(0, HY + 1, 14.8, 14, 0, 0, Math.PI * 2); c.fill();
     } else if (m.style === "bun") {
-      c.beginPath(); c.arc(0, -51, 4.2, 0, Math.PI * 2); c.fill();
+      c.beginPath(); c.arc(0, HY - 15, 5.8, 0, Math.PI * 2); c.fill();
     }
   }
   function drawHairFront(c, m) {
     c.fillStyle = m.hair;
     if (m.style === "bald") {
-      c.beginPath(); c.ellipse(-7.6, -41, 2.2, 3.8, 0.2, 0, Math.PI * 2); c.fill();
-      c.beginPath(); c.ellipse(7.6, -41, 2.2, 3.8, -0.2, 0, Math.PI * 2); c.fill();
-      c.fillStyle = "rgba(255,255,255,0.3)"; c.beginPath(); c.ellipse(-2.5, -47, 3, 1.5, -0.3, 0, Math.PI * 2); c.fill();
+      c.beginPath(); c.ellipse(-11.6, HY + 1, 3.4, 5.6, 0.2, 0, Math.PI * 2); c.fill();
+      c.beginPath(); c.ellipse(11.6, HY + 1, 3.4, 5.6, -0.2, 0, Math.PI * 2); c.fill();
+      c.fillStyle = "rgba(255,255,255,0.35)"; c.beginPath(); c.ellipse(-4, HY - 8.5, 4, 2, -0.3, 0, Math.PI * 2); c.fill();
       return;
     }
     if (m.style === "curly") {
-      for (let i = 0; i < 7; i++) {
-        const a = Math.PI + (i / 6) * Math.PI;
-        c.beginPath(); c.arc(Math.cos(a) * 7.5, -42 + Math.sin(a) * 7.5, 3.4, 0, Math.PI * 2); c.fill();
+      for (let i = 0; i < 9; i++) {
+        const a = Math.PI * 1.02 + (i / 8) * Math.PI * 0.96;
+        c.beginPath(); c.arc(Math.cos(a) * 11.5, HY - 1 + Math.sin(a) * 11.5, 4.6, 0, Math.PI * 2); c.fill();
       }
       return;
     }
-    c.beginPath(); c.ellipse(0, -43.2, 8.9, 7, 0, Math.PI, Math.PI * 2); c.fill();
+    c.beginPath(); c.ellipse(0, HY - 3, 13.2, 10.5, 0, Math.PI, Math.PI * 2); c.fill();
     if (m.style === "part") {
-      c.beginPath(); c.moveTo(-8.6, -43); c.quadraticCurveTo(-2, -46, 8.4, -42); c.lineTo(8.6, -44); c.quadraticCurveTo(0, -51, -8.6, -44); c.fill();
+      c.beginPath(); c.moveTo(-13, HY - 2); c.quadraticCurveTo(-3, HY - 7, 12.8, HY - 1); c.lineTo(13, HY - 4); c.quadraticCurveTo(0, HY - 14, -13, HY - 4); c.fill();
     } else if (m.style === "short") {
-      c.fillRect(-8.6, -44, 17.2, 1.8);
-      c.fillRect(-8.8, -44, 1.8, 5); c.fillRect(7, -44, 1.8, 5);
+      c.fillRect(-13, HY - 4, 26, 2.4);
+      c.fillRect(-13.2, HY - 4, 2.4, 7); c.fillRect(10.8, HY - 4, 2.4, 7);
     } else {
-      // 女性の前髪
-      c.beginPath(); c.moveTo(-8.8, -43); c.quadraticCurveTo(-3, -42, 1, -45); c.quadraticCurveTo(5, -42, 8.8, -42); c.lineTo(8.8, -45); c.lineTo(-8.8, -45); c.fill();
-      c.fillRect(-9.4, -44, 2.2, m.style === "bun" ? 6 : 10); c.fillRect(7.2, -44, 2.2, m.style === "bun" ? 6 : 10);
+      c.beginPath(); c.moveTo(-13.2, HY - 2); c.quadraticCurveTo(-5, HY - 1, 1, HY - 6); c.quadraticCurveTo(7, HY - 1, 13.2, HY - 1); c.lineTo(13.2, HY - 5); c.lineTo(-13.2, HY - 5); c.fill();
+      c.fillRect(-14, HY - 4, 3, m.style === "bun" ? 8 : 15); c.fillRect(11, HY - 4, 3, m.style === "bun" ? 8 : 15);
+    }
+    if (m.ribbon) {
+      c.fillStyle = "#e0566a";
+      const rx = m.style === "bun" ? 0 : 9, ry = m.style === "bun" ? HY - 20 : HY - 9;
+      c.beginPath(); c.moveTo(rx, ry); c.lineTo(rx - 5, ry - 3); c.lineTo(rx - 5, ry + 3); c.closePath();
+      c.moveTo(rx, ry); c.lineTo(rx + 5, ry - 3); c.lineTo(rx + 5, ry + 3); c.closePath(); c.fill();
+      c.fillStyle = "#b23a4c"; c.beginPath(); c.arc(rx, ry, 1.3, 0, Math.PI * 2); c.fill();
     }
   }
 
   function drawFace(c, m, f) {
-    // f: { look, mood, blink, playingBrass, puff }
     const skin = m.skin;
-    // 耳・顔
-    c.fillStyle = shade(skin, 0.92);
-    c.beginPath(); c.ellipse(-8.3, -40, 1.8, 2.6, 0, 0, Math.PI * 2); c.fill();
-    c.beginPath(); c.ellipse(8.3, -40, 1.8, 2.6, 0, 0, Math.PI * 2); c.fill();
+    c.fillStyle = shade(skin, 0.93);
+    c.beginPath(); c.ellipse(-12.4, HY + 1, 2.6, 3.4, 0, 0, Math.PI * 2); c.ellipse(12.4, HY + 1, 2.6, 3.4, 0, 0, Math.PI * 2); c.fill();
     c.fillStyle = skin;
-    c.beginPath(); c.ellipse(0, -40, 8, 9.6, 0, 0, Math.PI * 2); c.fill();
-    if (f.puff) {
-      c.beginPath(); c.arc(-4.6, -35.5, 3.4, 0, Math.PI * 2); c.arc(4.6, -35.5, 3.4, 0, Math.PI * 2); c.fill();
+    c.beginPath(); c.ellipse(0, HY, 12.6, 12.2, 0, 0, Math.PI * 2); c.fill();
+    if (f.puff) { c.beginPath(); c.arc(-6.5, HY + 5.5, 4.4, 0, Math.PI * 2); c.arc(6.5, HY + 5.5, 4.4, 0, Math.PI * 2); c.fill(); }
+    // ほっぺ
+    c.fillStyle = f.mood === "angry" ? "rgba(230,70,60,0.5)" : "rgba(240,110,110,0.35)";
+    c.beginPath(); c.ellipse(-7.6, HY + 4.4, 2.8, 1.7, 0, 0, Math.PI * 2); c.ellipse(7.6, HY + 4.4, 2.8, 1.7, 0, 0, Math.PI * 2); c.fill();
+    if (m.freckles) {
+      c.fillStyle = "rgba(140,80,50,0.55)";
+      [[-8.5, 2.2], [-6.6, 3], [-7.8, 3.6], [8.5, 2.2], [6.6, 3], [7.8, 3.6]].forEach(([x, y]) => { c.beginPath(); c.arc(x, HY + y, 0.45, 0, Math.PI * 2); c.fill(); });
     }
-    // ほお
-    c.fillStyle = "rgba(220,90,80,0.18)";
-    c.beginPath(); c.arc(-4.8, -36.6, 1.8, 0, Math.PI * 2); c.arc(4.8, -36.6, 1.8, 0, Math.PI * 2); c.fill();
+    const mood = f.mood, ex = 4.6, ey = HY + 0.5;
+    const browCol = shade(m.hair === "#e2ded6" ? "#8a8680" : m.hair, 0.85);
     // まゆ
-    const worried = f.mood === "worried", happy = f.mood === "happy";
-    c.strokeStyle = shade(m.hair === "#c8c4bc" ? "#8a8680" : m.hair, 0.9); c.lineWidth = 0.9; c.lineCap = "round";
+    c.strokeStyle = browCol; c.lineWidth = 1.3; c.lineCap = "round";
     c.beginPath();
-    c.moveTo(-5, worried ? -43.2 : -44); c.lineTo(-1.6, worried ? -44.6 : -44.2);
-    c.moveTo(5, worried ? -43.2 : -44); c.lineTo(1.6, worried ? -44.6 : -44.2);
+    if (mood === "angry") { c.moveTo(-7.2, HY - 5.8); c.lineTo(-2.4, HY - 4.2); c.moveTo(7.2, HY - 5.8); c.lineTo(2.4, HY - 4.2); }
+    else if (mood === "worried" || mood === "hurt") { c.moveTo(-7, HY - 4.6); c.lineTo(-2.6, HY - 6.2); c.moveTo(7, HY - 4.6); c.lineTo(2.6, HY - 6.2); }
+    else { c.moveTo(-6.8, HY - 5.6); c.quadraticCurveTo(-4.6, HY - 6.8, -2.6, HY - 5.8); c.moveTo(6.8, HY - 5.6); c.quadraticCurveTo(4.6, HY - 6.8, 2.6, HY - 5.8); }
     c.stroke();
     // 目
-    c.fillStyle = "#1a1210"; c.strokeStyle = "#1a1210";
-    if (f.mood === "hurt") {
-      c.lineWidth = 0.9;
+    c.strokeStyle = "#2a1a16"; c.fillStyle = "#2a1a16"; c.lineWidth = 1.2;
+    if (mood === "hurt") {
       c.beginPath();
-      [-3.2, 3.2].forEach(ex => { c.moveTo(ex - 1.3, -41.6); c.lineTo(ex + 1.3, -39.2); c.moveTo(ex + 1.3, -41.6); c.lineTo(ex - 1.3, -39.2); });
+      c.moveTo(-ex - 2, ey - 2); c.lineTo(-ex + 1.5, ey); c.lineTo(-ex - 2, ey + 2);
+      c.moveTo(ex + 2, ey - 2); c.lineTo(ex - 1.5, ey); c.lineTo(ex + 2, ey + 2);
       c.stroke();
-    } else if (f.blink || happy) {
-      c.lineWidth = 0.8;
+    } else if (mood === "happy" || mood === "sleepy" || f.blink) {
       c.beginPath();
-      if (happy) { c.arc(-3.2, -40.4, 1.3, Math.PI * 1.1, Math.PI * 1.9); c.moveTo(4.5, -40.6); c.arc(3.2, -40.4, 1.3, Math.PI * 1.1, Math.PI * 1.9); }
-      else { c.moveTo(-4.4, -40.4); c.lineTo(-2, -40.4); c.moveTo(2, -40.4); c.lineTo(4.4, -40.4); }
+      if (mood === "happy") { c.arc(-ex, ey + 1, 2.4, Math.PI * 1.15, Math.PI * 1.85); c.moveTo(ex + 2.2, ey); c.arc(ex, ey + 1, 2.4, Math.PI * 1.15, Math.PI * 1.85); }
+      else { c.arc(-ex, ey - 1, 2.3, Math.PI * 0.15, Math.PI * 0.85); c.moveTo(ex + 2.2, ey - 0.4); c.arc(ex, ey - 1, 2.3, Math.PI * 0.15, Math.PI * 0.85); }
       c.stroke();
     } else {
-      c.fillStyle = "#fbf7ef";
-      c.beginPath(); c.ellipse(-3.2, -40.4, 1.6, 1.2, 0, 0, Math.PI * 2); c.ellipse(3.2, -40.4, 1.6, 1.2, 0, 0, Math.PI * 2); c.fill();
-      c.fillStyle = "#1a1210";
-      c.beginPath(); c.arc(-3.2 + f.look, -40.1, 0.95, 0, Math.PI * 2); c.arc(3.2 + f.look, -40.1, 0.95, 0, Math.PI * 2); c.fill();
+      const big = mood === "expect" ? 1.18 : 1;
+      c.fillStyle = "#fffaf2";
+      c.beginPath(); c.ellipse(-ex, ey, 2.9 * big, 3.4 * big, 0, 0, Math.PI * 2); c.ellipse(ex, ey, 2.9 * big, 3.4 * big, 0, 0, Math.PI * 2); c.fill();
+      c.fillStyle = "#2a1a16";
+      const lx = f.look * 1.1;
+      c.beginPath(); c.ellipse(-ex + lx, ey + 0.5, 2.1 * big, 2.6 * big, 0, 0, Math.PI * 2); c.ellipse(ex + lx, ey + 0.5, 2.1 * big, 2.6 * big, 0, 0, Math.PI * 2); c.fill();
+      c.fillStyle = "#ffffff";
+      c.beginPath(); c.arc(-ex + lx - 0.8, ey - 0.8, 0.95, 0, Math.PI * 2); c.arc(ex + lx - 0.8, ey - 0.8, 0.95, 0, Math.PI * 2); c.fill();
+      if (mood === "expect") {
+        c.beginPath(); c.arc(-ex + lx + 0.8, ey + 1.2, 0.5, 0, Math.PI * 2); c.arc(ex + lx + 0.8, ey + 1.2, 0.5, 0, Math.PI * 2); c.fill();
+      }
     }
     // 鼻
-    c.strokeStyle = shade(skin, 0.75); c.lineWidth = 0.8;
-    c.beginPath(); c.moveTo(0.2, -39.4); c.lineTo(0.9, -37.2); c.lineTo(-0.3, -37); c.stroke();
+    c.fillStyle = shade(skin, 0.8);
+    c.beginPath(); c.ellipse(0, HY + 3.4, 1.1, 0.8, 0, 0, Math.PI * 2); c.fill();
+    // ひげ
+    if (m.mustache) {
+      c.fillStyle = m.hair === "#e2ded6" ? "#f2efe8" : shade(m.hair, 0.9);
+      c.beginPath(); c.ellipse(-2.6, HY + 5.4, 3, 1.5, 0.25, 0, Math.PI * 2); c.ellipse(2.6, HY + 5.4, 3, 1.5, -0.25, 0, Math.PI * 2); c.fill();
+    }
     // 口
     if (!f.playingBrass) {
-      c.strokeStyle = "#7a2c2a"; c.lineWidth = 0.9;
-      c.beginPath();
-      if (f.mood === "hurt") { c.fillStyle = "#5a1a18"; c.ellipse(0, -34.4, 1.6, 1.3, 0, 0, Math.PI * 2); c.fill(); }
-      else if (happy) c.arc(0, -35.4, 2.2, 0.15 * Math.PI, 0.85 * Math.PI);
-      else if (worried) { c.moveTo(-1.8, -34.2); c.quadraticCurveTo(0, -35.6, 1.8, -34.2); }
-      else { c.moveTo(-1.6, -34.6); c.lineTo(1.6, -34.6); }
-      c.stroke();
+      const my = HY + 7.4;
+      c.strokeStyle = "#7a2c2a"; c.lineWidth = 1.1;
+      if (mood === "happy") {
+        c.fillStyle = "#7a2228"; c.beginPath(); c.moveTo(-3, my - 0.6); c.quadraticCurveTo(0, my + 4.4, 3, my - 0.6); c.closePath(); c.fill();
+        c.fillStyle = "#ee8a8a"; c.beginPath(); c.ellipse(0, my + 1.6, 1.4, 0.9, 0, 0, Math.PI * 2); c.fill();
+      } else if (mood === "hurt") {
+        c.fillStyle = "#7a2228"; c.beginPath(); c.ellipse(0, my + 0.5, 1.8, 2.2, 0, 0, Math.PI * 2); c.fill();
+      } else if (mood === "angry") {
+        c.beginPath(); c.moveTo(-2.4, my + 0.8); c.lineTo(2.4, my + 0.8); c.stroke();
+      } else if (mood === "worried") {
+        c.beginPath(); c.moveTo(-2.8, my + 0.6); c.quadraticCurveTo(-1.4, my - 0.6, 0, my + 0.6); c.quadraticCurveTo(1.4, my + 1.8, 2.8, my + 0.6); c.stroke();
+      } else if (mood === "sleepy") {
+        c.fillStyle = "#7a2228"; c.beginPath(); c.ellipse(0, my + 0.6, 1.1, 1.3, 0, 0, Math.PI * 2); c.fill();
+      } else {
+        c.beginPath(); c.arc(0, my - 1.4, 2.3, 0.2 * Math.PI, 0.8 * Math.PI); c.stroke();
+      }
     }
-    // めがね
     if (m.glasses) {
-      c.strokeStyle = "#2a2220"; c.lineWidth = 0.7;
-      c.beginPath(); c.arc(-3.3, -40.3, 2.5, 0, Math.PI * 2); c.moveTo(5.8, -40.3); c.arc(3.3, -40.3, 2.5, 0, Math.PI * 2);
-      c.moveTo(-0.8, -40.5); c.lineTo(0.8, -40.5); c.stroke();
+      c.strokeStyle = "#3a2a24"; c.lineWidth = 0.9;
+      c.beginPath(); c.arc(-ex, ey, 4, 0, Math.PI * 2); c.moveTo(ex + 4, ey); c.arc(ex, ey, 4, 0, Math.PI * 2);
+      c.moveTo(-0.6, ey - 0.4); c.lineTo(0.6, ey - 0.4); c.stroke();
     }
   }
 
+  function angerMark(c, x, y, s) {
+    c.strokeStyle = "#e2483d"; c.lineWidth = 1.6 * s; c.lineCap = "round";
+    c.beginPath();
+    [[-1, -1], [1, -1], [1, 1], [-1, 1]].forEach(([a, b]) => { c.moveTo(x + a * 1.2 * s, y + b * 3.6 * s); c.quadraticCurveTo(x + a * 1.2 * s, y + b * 1.2 * s, x + a * 3.6 * s, y + b * 1.2 * s); });
+    c.stroke();
+  }
+
   function drawMusician(m, o) {
-    // o: { bob, jit, tilt, beatPh, glow, playing, mood, look, blink }
     const c = ctx, s = m.s;
     c.save();
     c.translate(m.x + o.jit.x, m.y + o.jit.y);
     c.rotate(o.tilt);
     c.scale(s, s);
     if (o.glow > 0) {
-      const g = c.createRadialGradient(0, -16, 6, 0, -16, 50);
-      g.addColorStop(0, "rgba(255,224,138," + 0.75 * o.glow + ")"); g.addColorStop(1, "rgba(255,224,138,0)");
-      c.fillStyle = g; c.beginPath(); c.arc(0, -16, 50, 0, Math.PI * 2); c.fill();
+      const g = c.createRadialGradient(0, -22, 6, 0, -22, 56);
+      g.addColorStop(0, "rgba(255,224,138," + 0.8 * o.glow + ")"); g.addColorStop(1, "rgba(255,224,138,0)");
+      c.fillStyle = g; c.beginPath(); c.arc(0, -22, 56, 0, Math.PI * 2); c.fill();
     }
-    const skin = m.skin, suit = m.suit, suitHi = shade(suit === "#141013" ? "#2a2028" : suit, 1.6);
+    const skin = m.skin, suit = m.suit, suitHi = shade(suit === "#1a1418" ? "#2a2028" : suit, 1.7);
     const isCello = m.type === "cello";
-    const knee = isCello ? 15 : 9;
+    const knee = isCello ? 13 : 7.5;
 
     // 椅子
-    c.fillStyle = "#2b1a10";
-    c.fillRect(-16, 1, 32, 4);
-    c.strokeStyle = "#2b1a10"; c.lineWidth = 2;
-    c.beginPath(); c.moveTo(-14, 5); c.lineTo(-15, 40); c.moveTo(14, 5); c.lineTo(15, 40); c.stroke();
-
+    c.fillStyle = "#3a2414"; c.fillRect(-15, 0, 30, 4);
+    c.strokeStyle = "#3a2414"; c.lineWidth = 2;
+    c.beginPath(); c.moveTo(-13, 4); c.lineTo(-14, 32); c.moveTo(13, 4); c.lineTo(14, 32); c.stroke();
     // 脚
     if (m.female && !isCello) {
       c.fillStyle = suit;
-      c.beginPath(); c.moveTo(-13, -2); c.lineTo(-16, 41); c.lineTo(16, 41); c.lineTo(13, -2); c.closePath(); c.fill();
+      c.beginPath(); c.moveTo(-12, -2); c.lineTo(-14.5, 30); c.quadraticCurveTo(0, 32, 14.5, 30); c.lineTo(12, -2); c.closePath(); c.fill();
       c.fillStyle = "#0a0808";
-      c.beginPath(); c.ellipse(-7, 42.5, 4, 2, 0, 0, Math.PI * 2); c.ellipse(7, 42.5, 4, 2, 0, 0, Math.PI * 2); c.fill();
+      c.beginPath(); c.ellipse(-6.5, 31.5, 4.4, 2.3, 0, 0, Math.PI * 2); c.ellipse(6.5, 31.5, 4.4, 2.3, 0, 0, Math.PI * 2); c.fill();
     } else {
-      const pants = m.female ? suit : "#0f0d10";
-      limb(c, [[-7, 2], [-knee, 16], [-knee - 1, 39]], 8.5, pants);
-      limb(c, [[7, 2], [knee, 16], [knee + 1, 39]], 8.5, pants);
+      const pants = m.female ? suit : "#100e12";
+      limb(c, [[-6, 1], [-knee, 12], [-knee - 0.5, 28]], 8, pants);
+      limb(c, [[6, 1], [knee, 12], [knee + 0.5, 28]], 8, pants);
       c.fillStyle = "#0a0808";
-      c.beginPath(); c.ellipse(-knee - 2, 42, 5, 2.4, 0, 0, Math.PI * 2); c.ellipse(knee + 2, 42, 5, 2.4, 0, 0, Math.PI * 2); c.fill();
-      c.fillStyle = "rgba(255,255,255,0.25)";
-      c.beginPath(); c.ellipse(-knee - 3, 41.2, 2, 0.7, 0, 0, Math.PI * 2); c.ellipse(knee + 1, 41.2, 2, 0.7, 0, 0, Math.PI * 2); c.fill();
+      c.beginPath(); c.ellipse(-knee - 1.5, 31, 5, 2.6, 0, 0, Math.PI * 2); c.ellipse(knee + 1.5, 31, 5, 2.6, 0, 0, Math.PI * 2); c.fill();
+      c.fillStyle = "rgba(255,255,255,0.3)";
+      c.beginPath(); c.ellipse(-knee - 2.5, 30, 2, 0.7, 0, 0, Math.PI * 2); c.ellipse(knee + 0.5, 30, 2, 0.7, 0, 0, Math.PI * 2); c.fill();
     }
-
-    // チェロ本体（脚の間）
-    const bowPh = Math.sin(o.beatPh * Math.PI);
+    // チェロ（脚の間）
+    const bowPh = Math.sin(o.beatPh * Math.PI) * (0.4 + 0.6 * o.level);
     if (isCello) {
-      c.save(); c.translate(3, 14); c.rotate(0.18);
-      c.fillStyle = "#6e3414";
-      c.beginPath(); c.ellipse(0, 6, 10.5, 9, 0, 0, Math.PI * 2); c.ellipse(0, -7, 8.5, 7.5, 0, 0, Math.PI * 2); c.fill();
-      c.fillStyle = "#8a4a1f";
-      c.beginPath(); c.ellipse(-2, 4, 6, 5, 0, 0, Math.PI * 2); c.fill();
+      c.save(); c.translate(2, 9); c.rotate(0.28);
+      c.fillStyle = "#7a3a16";
+      c.beginPath(); c.ellipse(0, 5, 10.5, 8.8, 0, 0, Math.PI * 2); c.ellipse(0, -6.5, 8.4, 7.2, 0, 0, Math.PI * 2); c.fill();
+      c.fillStyle = "#9a5222"; c.beginPath(); c.ellipse(-2, 3, 6, 5, 0, 0, Math.PI * 2); c.fill();
       c.strokeStyle = "#2a1408"; c.lineWidth = 0.8;
       c.beginPath(); c.moveTo(-4, -2); c.quadraticCurveTo(-5, 1, -4, 4); c.moveTo(4, -2); c.quadraticCurveTo(5, 1, 4, 4); c.stroke();
-      c.strokeStyle = "#1a0e08"; c.lineWidth = 2.6;
-      c.beginPath(); c.moveTo(0, -12); c.lineTo(0, -50); c.stroke();
-      c.fillStyle = "#1a0e08"; c.beginPath(); c.arc(0, -52, 2.6, 0, Math.PI * 2); c.fill();
-      c.strokeStyle = "#555"; c.lineWidth = 1;
-      c.beginPath(); c.moveTo(0, 15); c.lineTo(0, 28); c.stroke();
+      c.strokeStyle = "#1a0e08"; c.lineWidth = 2.8;
+      c.beginPath(); c.moveTo(0, -12); c.lineTo(0, -56); c.stroke();
+      c.fillStyle = "#1a0e08"; c.beginPath(); c.arc(0, -58, 2.8, 0, Math.PI * 2); c.fill();
+      c.strokeStyle = "#666"; c.lineWidth = 1; c.beginPath(); c.moveTo(0, 14); c.lineTo(0, 24); c.stroke();
       c.restore();
     }
 
-    // 上半身（拍で少し揺れる）
+    // 上半身（拍と音量で揺れる）
     c.translate(0, o.bob);
-    // 胴体
+    c.rotate(o.sway);
     c.fillStyle = suit;
     c.beginPath();
-    c.moveTo(-14, 2); c.lineTo(-15, -20); c.quadraticCurveTo(-15, -27, -8, -27.5);
-    c.lineTo(8, -27.5); c.quadraticCurveTo(15, -27, 15, -20); c.lineTo(14, 2); c.closePath(); c.fill();
+    c.moveTo(-13, 2); c.lineTo(-13.6, -19); c.quadraticCurveTo(-13.6, -28, -7, -29);
+    c.lineTo(7, -29); c.quadraticCurveTo(13.6, -28, 13.6, -19); c.lineTo(13, 2); c.closePath(); c.fill();
     if (m.female) {
       c.fillStyle = skin;
-      c.beginPath(); c.moveTo(-6, -27.5); c.quadraticCurveTo(0, -18, 6, -27.5); c.closePath(); c.fill();
-      c.fillStyle = "#e8dcc0"; c.beginPath(); c.arc(0, -22.5, 0.9, 0, Math.PI * 2); c.fill();
+      c.beginPath(); c.moveTo(-5.5, -29); c.quadraticCurveTo(0, -20, 5.5, -29); c.closePath(); c.fill();
+      c.fillStyle = "#f4ead2";
+      for (let i = -2; i <= 2; i++) { c.beginPath(); c.arc(i * 1.8, -24.6 + Math.abs(i) * -0.9, 0.75, 0, Math.PI * 2); c.fill(); }
     } else {
-      c.fillStyle = "#f4f1ea";
-      c.beginPath(); c.moveTo(-5, -27.5); c.lineTo(5, -27.5); c.lineTo(0, -10); c.closePath(); c.fill();
+      c.fillStyle = "#f6f3ec";
+      c.beginPath(); c.moveTo(-4.6, -29); c.lineTo(4.6, -29); c.lineTo(0, -13); c.closePath(); c.fill();
       c.strokeStyle = suitHi; c.lineWidth = 1.2;
-      c.beginPath(); c.moveTo(-5.5, -27); c.lineTo(-1, -9); c.moveTo(5.5, -27); c.lineTo(1, -9); c.stroke();
+      c.beginPath(); c.moveTo(-5, -28.5); c.lineTo(-1, -12); c.moveTo(5, -28.5); c.lineTo(1, -12); c.stroke();
       c.fillStyle = "#0a0808";
-      c.beginPath(); c.moveTo(0, -25); c.lineTo(-3.4, -27); c.lineTo(-3.4, -23); c.closePath();
-      c.moveTo(0, -25); c.lineTo(3.4, -27); c.lineTo(3.4, -23); c.closePath(); c.fill();
-      c.fillStyle = "#f4f1ea"; c.fillRect(-0.5, -19, 1, 1); c.fillRect(-0.5, -15, 1, 1);
+      c.beginPath(); c.moveTo(0, -26.6); c.lineTo(-3.8, -28.8); c.lineTo(-3.8, -24.4); c.closePath();
+      c.moveTo(0, -26.6); c.lineTo(3.8, -28.8); c.lineTo(3.8, -24.4); c.closePath(); c.fill();
     }
-    // 首
-    c.fillStyle = shade(skin, 0.9); c.fillRect(-2.6, -32, 5.2, 5);
 
     // 頭
     const brassUp = m.type === "brass" && o.playing;
     c.save();
-    if (m.type === "violin" && o.playing) { c.translate(2, 0.6); c.rotate(0.12); }
+    if (m.type === "violin" && o.playing) { c.translate(1.5, 0.5); c.rotate(0.1); }
+    if (o.mood === "sleepy") c.rotate(-0.12 + Math.sin(o.now * 1.5 + m.seed) * 0.04);
     drawHairBack(c, m);
     drawFace(c, m, { look: o.look, mood: o.mood, blink: o.blink, playingBrass: brassUp, puff: brassUp && o.beatPh < 0.35 });
     drawHairFront(c, m);
-    if (o.hurt || o.itch) {
-      c.fillStyle = "#e2483d"; c.beginPath(); c.arc(3, -49.5, 2.6, 0, Math.PI * 2); c.fill();
-    }
+    if (o.hurt || o.itch) { c.fillStyle = "#e2483d"; c.beginPath(); c.arc(4, HY - 12.5, 3, 0, Math.PI * 2); c.fill(); }
     if (o.hurt) {
       c.fillStyle = "#ffe08a";
       for (let k = 0; k < 3; k++) {
         const a = o.now * 5 + k * 2.1;
-        c.beginPath(); c.arc(Math.cos(a) * 11, -55 + Math.sin(a) * 3, 1.6, 0, Math.PI * 2); c.fill();
+        c.beginPath(); c.arc(Math.cos(a) * 14, HY - 17 + Math.sin(a) * 3.5, 1.9, 0, Math.PI * 2); c.fill();
       }
-    }
-    if (o.itch) {
-      // 頭をかく手
-      handAt(c, 6 + Math.sin(o.now * 25) * 1.5, -50, m.skin);
+    } else if (o.mood === "angry") angerMark(c, 12, HY - 12, 1);
+    if (o.itch) handAt(c, 7 + Math.sin(o.now * 25) * 1.6, HY - 12, skin);
+    if (o.mood === "sleepy") {
+      c.fillStyle = "rgba(245,236,214,0.85)"; c.font = "700 7px " + FONT_UI; c.textAlign = "left";
+      const zz = (o.now * 0.8 + m.seed) % 1;
+      c.globalAlpha = 1 - zz; c.fillText("z", 12 + zz * 6, HY - 12 - zz * 10); c.globalAlpha = 1;
     }
     c.restore();
 
     // 腕と楽器
-    const sL = [-12.5, -23], sR = [12.5, -23];
+    const sL = [-11.5, -24], sR = [11.5, -24];
     if (m.type === "violin") {
       if (o.playing) {
-        // バイオリン：あごの下（向かって右）
-        c.save(); c.translate(11, -29); c.rotate(0.35);
-        c.fillStyle = "#8a4a1f";
+        c.save(); c.translate(12, -27); c.rotate(0.35);
+        c.fillStyle = "#9a5222";
         c.beginPath(); c.ellipse(0, 0, 7.5, 3.6, 0, 0, Math.PI * 2); c.fill();
-        c.fillStyle = "#a8622a"; c.beginPath(); c.ellipse(-1, -0.4, 4.5, 2, 0, 0, Math.PI * 2); c.fill();
+        c.fillStyle = "#c27a3a"; c.beginPath(); c.ellipse(-1, -0.4, 4.5, 2, 0, 0, Math.PI * 2); c.fill();
         c.strokeStyle = "#1a0e08"; c.lineWidth = 1.5;
-        c.beginPath(); c.moveTo(5, -0.5); c.lineTo(17, -1.5); c.stroke();
-        c.fillStyle = "#1a0e08"; c.beginPath(); c.arc(18, -1.6, 1.4, 0, Math.PI * 2); c.fill();
+        c.beginPath(); c.moveTo(5, -0.5); c.lineTo(16, -1.5); c.stroke();
+        c.fillStyle = "#1a0e08"; c.beginPath(); c.arc(17, -1.6, 1.4, 0, Math.PI * 2); c.fill();
         c.restore();
-        // 左手（向かって右）でネックを持つ
-        limb(c, [sR, [21, -16], [26, -32]], 5.5, suit); handAt(c, 26, -32.5, skin);
-        // 右手（向かって左）で弓
-        const hx = -14 + 13 * bowPh, hy = -19 - 3 * bowPh;
-        const tx = 9, ty = -28, dl = Math.hypot(tx - hx, ty - hy);
+        limb(c, [sR, [21, -14], [26, -30]], 5, suit); handAt(c, 26, -30.5, skin);
+        const hx = -14 + 13 * bowPh, hy = -17 - 3 * bowPh;
+        const tx = 10, ty = -26, dl = Math.hypot(tx - hx, ty - hy);
         const ux = (tx - hx) / dl, uy = (ty - hy) / dl;
-        c.strokeStyle = "#d8c9a8"; c.lineWidth = 0.9;
+        c.strokeStyle = "#e6d8b8"; c.lineWidth = 0.9;
         c.beginPath(); c.moveTo(hx - ux * 3, hy - uy * 3); c.lineTo(hx + ux * 36, hy + uy * 36); c.stroke();
-        limb(c, [sL, [-19, -10], [hx, hy]], 5.5, suit); handAt(c, hx, hy, skin);
+        limb(c, [sL, [-19, -9], [hx, hy]], 5, suit); handAt(c, hx, hy, skin);
       } else {
-        // ひざの上で休み
-        c.fillStyle = "#8a4a1f";
-        c.save(); c.translate(5, 6); c.rotate(-0.2);
+        c.fillStyle = "#9a5222";
+        c.save(); c.translate(5, 4); c.rotate(-0.2);
         c.beginPath(); c.ellipse(0, 0, 3.6, 7.5, 0, 0, Math.PI * 2); c.fill();
-        c.strokeStyle = "#1a0e08"; c.lineWidth = 1.4; c.beginPath(); c.moveTo(0, -6); c.lineTo(0, -16); c.stroke();
+        c.strokeStyle = "#1a0e08"; c.lineWidth = 1.4; c.beginPath(); c.moveTo(0, -6); c.lineTo(0, -15); c.stroke();
         c.restore();
-        c.strokeStyle = "#d8c9a8"; c.lineWidth = 0.9; c.beginPath(); c.moveTo(-14, 10); c.lineTo(8, -10); c.stroke();
-        limb(c, [sL, [-16, -8], [-7, 2]], 5.5, suit); handAt(c, -7, 2, skin);
-        limb(c, [sR, [16, -8], [7, 0]], 5.5, suit); handAt(c, 7, 0, skin);
+        c.strokeStyle = "#e6d8b8"; c.lineWidth = 0.9; c.beginPath(); c.moveTo(-13, 9); c.lineTo(8, -10); c.stroke();
+        limb(c, [sL, [-15, -8], [-6, 1]], 5, suit); handAt(c, -6, 1, skin);
+        limb(c, [sR, [15, -8], [7, -1]], 5, suit); handAt(c, 7, -1, skin);
       }
     } else if (isCello) {
-      // 左手（向かって右）でネック
-      limb(c, [sR, [19, -14], [11, -19]], 5.5, suit); handAt(c, 11, -19, skin);
+      limb(c, [sR, [19, -13], [10.5, -21]], 5, suit); handAt(c, 10.5, -21, skin);
       if (o.playing) {
-        const hx = -22 + 12 * bowPh, hy = 9;
-        c.strokeStyle = "#d8c9a8"; c.lineWidth = 0.9;
-        c.beginPath(); c.moveTo(hx - 3, hy + 0.5); c.lineTo(hx + 34, hy - 2); c.stroke();
-        limb(c, [sL, [-19, -6], [hx, hy]], 5.5, suit); handAt(c, hx, hy, skin);
+        const hx = -21 + 12 * bowPh, hy = 9;
+        c.strokeStyle = "#e6d8b8"; c.lineWidth = 0.9;
+        c.beginPath(); c.moveTo(hx - 3, hy + 0.5); c.lineTo(hx + 32, hy - 2); c.stroke();
+        limb(c, [sL, [-18, -6], [hx, hy]], 5, suit); handAt(c, hx, hy, skin);
       } else {
-        c.strokeStyle = "#d8c9a8"; c.lineWidth = 0.9; c.beginPath(); c.moveTo(-12, 12); c.lineTo(-18, 36); c.stroke();
-        limb(c, [sL, [-17, -6], [-12, 12]], 5.5, suit); handAt(c, -12, 12, skin);
+        c.strokeStyle = "#e6d8b8"; c.lineWidth = 0.9; c.beginPath(); c.moveTo(-11, 10); c.lineTo(-17, 30); c.stroke();
+        limb(c, [sL, [-16, -6], [-11, 10]], 5, suit); handAt(c, -11, 10, skin);
       }
     } else {
       if (o.playing) {
-        // トランペットを口に（こちらを向いている）
-        limb(c, [sL, [-17, -14], [-4, -29]], 5.5, suit);
-        limb(c, [sR, [17, -14], [4, -29]], 5.5, suit);
-        c.strokeStyle = "#c9952e"; c.lineWidth = 2;
-        c.beginPath(); c.moveTo(0, -34); c.lineTo(0, -29); c.stroke();
-        c.fillStyle = "#e0b04f"; c.beginPath(); c.arc(0, -26, 6.5, 0, Math.PI * 2); c.fill();
-        c.fillStyle = "#8a5a12"; c.beginPath(); c.arc(0, -26, 4.2, 0, Math.PI * 2); c.fill();
-        c.fillStyle = "rgba(255,240,190,0.7)"; c.beginPath(); c.arc(-2.4, -28.4, 1.4, 0, Math.PI * 2); c.fill();
-        handAt(c, -4.5, -29, skin); handAt(c, 4.5, -29, skin);
+        limb(c, [sL, [-16, -13], [-4, -30]], 5, suit);
+        limb(c, [sR, [16, -13], [4, -30]], 5, suit);
+        c.fillStyle = "#e8b850"; c.beginPath(); c.arc(0, -31, 7, 0, Math.PI * 2); c.fill();
+        c.fillStyle = "#8a5a12"; c.beginPath(); c.arc(0, -31, 4.6, 0, Math.PI * 2); c.fill();
+        c.fillStyle = "rgba(255,244,200,0.8)"; c.beginPath(); c.arc(-2.6, -33.6, 1.5, 0, Math.PI * 2); c.fill();
+        handAt(c, -4.6, -30, skin); handAt(c, 4.6, -30, skin);
       } else {
-        c.strokeStyle = "#e0b04f"; c.lineWidth = 2;
-        c.beginPath(); c.moveTo(-9, 6); c.lineTo(9, 6); c.stroke();
-        c.fillStyle = "#e0b04f"; c.beginPath(); c.ellipse(11, 6, 2.5, 4.2, 0, 0, Math.PI * 2); c.fill();
-        limb(c, [sL, [-16, -8], [-6, 5]], 5.5, suit); handAt(c, -6, 5, skin);
-        limb(c, [sR, [16, -8], [5, 5]], 5.5, suit); handAt(c, 5, 5, skin);
+        c.strokeStyle = "#e8b850"; c.lineWidth = 2.2;
+        c.beginPath(); c.moveTo(-9, 4); c.lineTo(9, 4); c.stroke();
+        c.fillStyle = "#e8b850"; c.beginPath(); c.ellipse(11, 4, 2.6, 4.4, 0, 0, Math.PI * 2); c.fill();
+        limb(c, [sL, [-15, -8], [-6, 3]], 5, suit); handAt(c, -6, 3, skin);
+        limb(c, [sR, [15, -8], [5, 3]], 5, suit); handAt(c, 5, 3, skin);
       }
     }
     c.restore();
   }
 
-  // 2人で1台の譜面台
   function drawStands(type) {
     const c = ctx;
-    const list = musicians.filter(m => m.type === type);
+    const list = rowList(type);
     for (let i = 0; i + 1 < list.length; i += 2) {
       const a = list[i], b = list[i + 1], s = a.s;
       const x = (a.x + b.x) / 2, y = (a.y + b.y) / 2 + 10 * s;
       c.save(); c.translate(x, y); c.scale(s, s);
       c.strokeStyle = "#0e0c0c"; c.lineWidth = 1.6;
-      c.beginPath(); c.moveTo(0, -4); c.lineTo(0, 36); c.moveTo(-6, 38); c.lineTo(0, 34); c.lineTo(6, 38); c.stroke();
+      c.beginPath(); c.moveTo(0, -4); c.lineTo(0, 24); c.moveTo(-6, 26); c.lineTo(0, 22); c.lineTo(6, 26); c.stroke();
       c.fillStyle = "#151212";
       c.beginPath(); c.moveTo(-12, -14); c.lineTo(12, -14); c.lineTo(11, -2); c.lineTo(-11, -2); c.closePath(); c.fill();
       c.fillStyle = "#ece2c8"; c.fillRect(-10.5, -13, 10, 10); c.fillRect(0.5, -13, 10, 10);
@@ -1658,15 +1965,15 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
     const c = ctx;
     c.save();
     c.globalAlpha = m.state === "dead" ? Math.max(0, 1 - m.t) : 1;
-    if (ringP !== null && m.state !== "dead" && m.state !== "flee") {
-      const base = 22 * m.size;
-      const r = base + 48 * ringP;
-      const close = ringP < 0.12;
+    if (m.state === "land") {
+      // ピンポイントで叩ける範囲
+      c.strokeStyle = "rgba(255,138,122,0.85)"; c.lineWidth = 1.5; c.setLineDash([2, 3]);
+      c.beginPath(); c.arc(m.x, m.y, 15, 0, Math.PI * 2); c.stroke(); c.setLineDash([]);
+    } else if (ringP !== null && m.state !== "dead" && m.state !== "flee") {
+      const base = 22 * m.size, r = base + 48 * ringP, close = ringP < 0.12;
       c.strokeStyle = close ? "rgba(255,232,150,0.95)" : "rgba(224,176,79," + (0.35 + 0.5 * (1 - ringP)) + ")";
       c.lineWidth = close ? 3 : 2;
       c.beginPath(); c.arc(m.x, m.y, r, 0, Math.PI * 2); c.stroke();
-      c.strokeStyle = "rgba(245,236,214,0.18)"; c.lineWidth = 1;
-      c.setLineDash([3, 4]); c.beginPath(); c.arc(m.x, m.y, base, 0, Math.PI * 2); c.stroke(); c.setLineDash([]);
     }
     c.translate(m.x, m.y);
     const face = m.vx >= 0 ? 1 : -1;
@@ -1680,38 +1987,42 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
     for (let i = -1; i <= 1; i++) { c.beginPath(); c.moveTo(i * 2.5, 1); c.lineTo(i * 4 - 2, 8); c.stroke(); }
     c.fillStyle = m.kind === "big" ? "#4a2a18" : "#2a1c18";
     c.beginPath(); c.ellipse(-5, 0, 6, 2.4, 0.15, 0, Math.PI * 2); c.fill();
-    if (m.kind === "fast") {
-      c.fillStyle = "#f5ecd6";
-      for (let i = 0; i < 3; i++) c.fillRect(-9 + i * 3, -2, 1.2, 4);
-    }
+    if (m.kind === "fast") { c.fillStyle = "#f5ecd6"; for (let i = 0; i < 3; i++) c.fillRect(-9 + i * 3, -2, 1.2, 4); }
     c.fillStyle = "#3a2a24"; c.beginPath(); c.arc(2.5, -0.5, 2.8, 0, Math.PI * 2); c.fill();
+    c.fillStyle = "#fff"; c.beginPath(); c.arc(3.4, -1.2, 0.9, 0, Math.PI * 2); c.fill();
     c.strokeStyle = "#2a1c18"; c.lineWidth = 1;
-    c.beginPath(); c.moveTo(5, 0); c.lineTo(11, m.state === "suck" ? 4 : 1.5); c.stroke();
+    c.beginPath(); c.moveTo(5, 0); c.lineTo(11, (m.state === "suck" || m.state === "land") ? 4 : 1.5); c.stroke();
     c.restore();
     if (m.state === "suck" || m.state === "land") {
       const p = m.suck / (m.state === "land" ? LAND_TIME : SUCK_TIME);
-      c.strokeStyle = "#e2483d"; c.lineWidth = 4;
-      c.beginPath(); c.arc(m.x, m.y, 16, -Math.PI / 2, -Math.PI / 2 + p * Math.PI * 2); c.stroke();
+      c.strokeStyle = "#e2483d"; c.lineWidth = 3;
+      c.beginPath(); c.arc(m.x, m.y, m.state === "land" ? 19 : 16, -Math.PI / 2, -Math.PI / 2 + p * Math.PI * 2); c.stroke();
     }
   }
 
+  // ---------- マエストロ（後ろ姿） ----------
   function drawConductor(bob, fever) {
     const c = ctx;
-    const shR = { x: 272, y: 642 }, shL = { x: 208, y: 642 };
+    const shR = { x: 270, y: 640 }, shL = { x: 210, y: 640 };
     if (fever) {
-      const g = c.createRadialGradient(240, 620, 10, 240, 620, 140);
+      const g = c.createRadialGradient(240, 620, 10, 240, 620, 150);
       g.addColorStop(0, "rgba(255,224,138,0.35)"); g.addColorStop(1, "rgba(255,224,138,0)");
-      c.fillStyle = g; c.fillRect(100, 480, 280, 240);
+      c.fillStyle = g; c.fillRect(90, 470, 300, 250);
     }
-    const lh = { x: 168, y: 612 + bob * 10 };
-    c.strokeStyle = "#0d0a0b"; c.lineWidth = 15; c.lineCap = "round";
+    const lh = { x: 166, y: 612 + bob * 12 };
+    c.strokeStyle = "#141018"; c.lineWidth = 16; c.lineCap = "round";
     c.beginPath(); c.moveTo(shL.x, shL.y); c.lineTo(lh.x, lh.y); c.stroke();
-    c.fillStyle = "#f1c9a5"; c.beginPath(); c.arc(lh.x, lh.y, 7, 0, Math.PI * 2); c.fill();
-    c.fillStyle = "#0d0a0b";
-    c.beginPath(); c.moveTo(196, 640); c.quadraticCurveTo(240, 618, 284, 640); c.lineTo(318, H); c.lineTo(162, H); c.closePath(); c.fill();
-    c.strokeStyle = "#2a2226"; c.lineWidth = 1.5;
-    c.beginPath(); c.moveTo(240, 632); c.lineTo(240, H); c.stroke();
-    const rest = { x: 318, y: 590 + bob * 12 };
+    c.fillStyle = "#fbf8f0"; c.beginPath(); c.arc(lh.x, lh.y, 8, 0, Math.PI * 2); c.fill();
+    // 燕尾服（丸い体）
+    c.fillStyle = "#141018";
+    c.beginPath(); c.moveTo(196, 642); c.quadraticCurveTo(240, 612, 284, 642); c.quadraticCurveTo(318, 690, 306, H); c.lineTo(174, H); c.quadraticCurveTo(162, 690, 196, 642); c.closePath(); c.fill();
+    // しっぽ
+    const wag = Math.sin(performance.now() / 120) * hand.amt * 6;
+    c.beginPath(); c.moveTo(186, 700); c.quadraticCurveTo(168 - wag, 712, 172 - wag, H); c.lineTo(196, H); c.closePath(); c.fill();
+    c.beginPath(); c.moveTo(294, 700); c.quadraticCurveTo(312 + wag, 712, 308 + wag, H); c.lineTo(284, H); c.closePath(); c.fill();
+    c.strokeStyle = "#2a2430"; c.lineWidth = 1.5; c.beginPath(); c.moveTo(240, 632); c.lineTo(240, H); c.stroke();
+    // 右手と指揮棒
+    const rest = { x: 318, y: 588 + bob * 14 };
     const e = hand.amt * hand.amt * (3 - 2 * hand.amt);
     const dxT = hand.tx - shR.x, dyT = hand.ty - shR.y, dlT = Math.hypot(dxT, dyT) || 1;
     const reach = Math.min(96, dlT);
@@ -1719,29 +2030,132 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
     const rh = { x: rest.x + (sh.x - rest.x) * e, y: rest.y + (sh.y - rest.y) * e };
     const ddx = (hand.tx - rh.x) * e + 40 * (1 - e), ddy = (hand.ty - rh.y) * e - 60 * (1 - e);
     const dd = Math.hypot(ddx, ddy) || 1;
-    const tip = { x: rh.x + ddx / dd * 78, y: rh.y + ddy / dd * 78 };
-    c.strokeStyle = "#0d0a0b"; c.lineWidth = 15;
+    const tip = { x: rh.x + ddx / dd * 80, y: rh.y + ddy / dd * 80 };
+    c.strokeStyle = "#141018"; c.lineWidth = 16;
     c.beginPath(); c.moveTo(shR.x, shR.y); c.lineTo(rh.x, rh.y); c.stroke();
-    c.strokeStyle = fever ? "#ffe08a" : "#f8f3e6"; c.lineWidth = 3;
+    c.strokeStyle = fever ? "#ffe08a" : "#fbf8f0"; c.lineWidth = 3;
     c.beginPath(); c.moveTo(rh.x, rh.y); c.lineTo(tip.x, tip.y); c.stroke();
-    c.fillStyle = "#f1c9a5"; c.beginPath(); c.arc(rh.x, rh.y, 7, 0, Math.PI * 2); c.fill();
+    c.fillStyle = "#c9a26a"; c.beginPath(); c.arc(rh.x + ddx / dd * 6, rh.y + ddy / dd * 6, 3.2, 0, Math.PI * 2); c.fill();
+    c.fillStyle = "#fbf8f0"; c.beginPath(); c.arc(rh.x, rh.y, 8, 0, Math.PI * 2); c.fill();
     c.lineCap = "butt";
-    c.fillStyle = "#f2efe6";
-    c.beginPath(); c.moveTo(226, 628); c.lineTo(254, 628); c.lineTo(250, 636); c.lineTo(230, 636); c.closePath(); c.fill();
-    c.fillStyle = "#e9bf98"; c.beginPath(); c.arc(HEAD.x, HEAD.y, HEAD.r, 0, Math.PI * 2); c.fill();
-    c.fillStyle = "#cfcac2";
-    c.beginPath(); c.arc(HEAD.x, HEAD.y + 2, HEAD.r + 1, Math.PI * 0.05, Math.PI * 0.95); c.fill();
-    c.beginPath(); c.ellipse(HEAD.x - 22, HEAD.y - 4, 8, 14, 0.3, 0, Math.PI * 2); c.fill();
-    c.beginPath(); c.ellipse(HEAD.x + 22, HEAD.y - 4, 8, 14, -0.3, 0, Math.PI * 2); c.fill();
-    c.fillStyle = "rgba(255,255,255,0.35)";
-    c.beginPath(); c.ellipse(BALD.x - 6, BALD.y - 6, 9, 5, -0.4, 0, Math.PI * 2); c.fill();
-    c.fillStyle = "#e9bf98";
-    c.beginPath(); c.ellipse(HEAD.x - 27, HEAD.y + 2, 4, 7, 0, 0, Math.PI * 2); c.fill();
-    c.beginPath(); c.ellipse(HEAD.x + 27, HEAD.y + 2, 4, 7, 0, 0, Math.PI * 2); c.fill();
-    bites.forEach(b => {
-      c.fillStyle = "rgba(226,72,61,0.85)"; c.beginPath(); c.arc(b.x, b.y, 5, 0, Math.PI * 2); c.fill();
-      c.fillStyle = "rgba(255,170,160,0.9)"; c.beginPath(); c.arc(b.x - 1.5, b.y - 1.5, 1.8, 0, Math.PI * 2); c.fill();
+    c.fillStyle = "#f6f3ec";
+    c.beginPath(); c.moveTo(224, 630); c.lineTo(256, 630); c.lineTo(251, 638); c.lineTo(229, 638); c.closePath(); c.fill();
+    // 頭：つるつるのてっぺんと、もこもこの白髪
+    c.fillStyle = "#f0c8a0"; c.beginPath(); c.arc(HEAD.x, HEAD.y, HEAD.r, 0, Math.PI * 2); c.fill();
+    c.fillStyle = "#e89a8a";
+    c.beginPath(); c.ellipse(HEAD.x - 30, HEAD.y + 2, 5, 8, 0, 0, Math.PI * 2); c.ellipse(HEAD.x + 30, HEAD.y + 2, 5, 8, 0, 0, Math.PI * 2); c.fill();
+    c.fillStyle = "#f4f2ee";
+    [[-26, -2, 10], [-30, 10, 10], [-20, 16, 11], [-6, 22, 11], [8, 22, 11], [21, 16, 11], [30, 10, 10], [26, -2, 10], [-33, -10, 7], [33, -10, 7]].forEach(([x, y, r]) => {
+      c.beginPath(); c.arc(HEAD.x + x, HEAD.y + y, r, 0, Math.PI * 2); c.fill();
     });
+    c.fillStyle = "rgba(255,255,255,0.5)";
+    c.beginPath(); c.ellipse(BALD.x - 8, BALD.y - 10, 11, 6, -0.4, 0, Math.PI * 2); c.fill();
+    // めがねのつる
+    c.strokeStyle = "#5a4030"; c.lineWidth = 1.6;
+    c.beginPath(); c.moveTo(HEAD.x - 26, HEAD.y - 2); c.lineTo(HEAD.x - 31, HEAD.y + 1); c.moveTo(HEAD.x + 26, HEAD.y - 2); c.lineTo(HEAD.x + 31, HEAD.y + 1); c.stroke();
+    bites.forEach(b => {
+      c.fillStyle = "rgba(226,72,61,0.9)"; c.beginPath(); c.arc(b.x, b.y, 5.5, 0, Math.PI * 2); c.fill();
+      c.fillStyle = "rgba(255,170,160,0.9)"; c.beginPath(); c.arc(b.x - 1.5, b.y - 1.5, 2, 0, Math.PI * 2); c.fill();
+    });
+    // 汗
+    if (state === "play" && (chaos > 55 || maestro.sorry > 0)) {
+      const t = performance.now() / 300;
+      c.fillStyle = "#8ccaf0";
+      [-1, 1].forEach((sd, i) => {
+        const p = (t + i * 0.5) % 1;
+        c.globalAlpha = 1 - p;
+        c.beginPath(); c.ellipse(HEAD.x + sd * (34 + p * 14), HEAD.y - 20 + p * 10, 2.4, 3.6, 0, 0, Math.PI * 2); c.fill();
+      });
+      c.globalAlpha = 1;
+    }
+  }
+
+  // ---------- マエストロの顔（左下の肖像） ----------
+  function drawPortrait() {
+    const c = ctx, cx = 58, cy = 650, R = 38;
+    c.save();
+    c.fillStyle = "#3b0f17"; c.beginPath(); c.arc(cx, cy, R, 0, Math.PI * 2); c.fill();
+    c.strokeStyle = "#e0b04f"; c.lineWidth = 2.5; c.stroke();
+    c.beginPath(); c.arc(cx, cy, R - 1, 0, Math.PI * 2); c.clip();
+    let mood = "calm";
+    if (state === "over") mood = "panic";
+    else if (maestro.joy > 0 || state === "ending" || state === "result") mood = "joy";
+    else if (maestro.bite > 0) mood = "itch";
+    else if (maestro.sorry > 0) mood = "sorry";
+    else if (chaos > 60) mood = "panic";
+    else if (combo >= 16) mood = "fever";
+    else if (combo >= 6) mood = "bliss";
+    const y0 = cy + 6;
+    // 服
+    c.fillStyle = "#141018"; c.beginPath(); c.ellipse(cx, cy + 40, 30, 16, 0, 0, Math.PI * 2); c.fill();
+    c.fillStyle = "#f6f3ec"; c.beginPath(); c.moveTo(cx - 6, cy + 26); c.lineTo(cx + 6, cy + 26); c.lineTo(cx, cy + 36); c.closePath(); c.fill();
+    c.fillStyle = "#0a0808"; c.beginPath(); c.moveTo(cx, cy + 28); c.lineTo(cx - 5, cy + 25); c.lineTo(cx - 5, cy + 31); c.closePath(); c.moveTo(cx, cy + 28); c.lineTo(cx + 5, cy + 25); c.lineTo(cx + 5, cy + 31); c.closePath(); c.fill();
+    // 顔
+    c.fillStyle = "#f0c8a0"; c.beginPath(); c.ellipse(cx, y0 - 4, 20, 22, 0, 0, Math.PI * 2); c.fill();
+    c.fillStyle = "#f4f2ee";
+    [[-20, -6, 8], [-22, 4, 7], [20, -6, 8], [22, 4, 7], [-16, -14, 6], [16, -14, 6]].forEach(([x, y, r]) => { c.beginPath(); c.arc(cx + x, y0 + y, r, 0, Math.PI * 2); c.fill(); });
+    c.fillStyle = "rgba(255,255,255,0.5)"; c.beginPath(); c.ellipse(cx - 6, y0 - 21, 6, 3, -0.3, 0, Math.PI * 2); c.fill();
+    if (maestro.bite > 0 || bites.length) { c.fillStyle = "#e2483d"; c.beginPath(); c.arc(cx + 7, y0 - 20, 3, 0, Math.PI * 2); c.fill(); }
+    // ほっぺ
+    c.fillStyle = "rgba(240,110,110,0.4)"; c.beginPath(); c.ellipse(cx - 11, y0 + 2, 4, 2.5, 0, 0, Math.PI * 2); c.ellipse(cx + 11, y0 + 2, 4, 2.5, 0, 0, Math.PI * 2); c.fill();
+    // 目
+    const ex = 7, ey = y0 - 6;
+    c.strokeStyle = "#2a1a16"; c.fillStyle = "#2a1a16"; c.lineWidth = 1.8; c.lineCap = "round";
+    if (mood === "bliss" || mood === "joy") {
+      c.beginPath(); c.arc(cx - ex, ey + 1.5, 3.4, Math.PI * 1.15, Math.PI * 1.85); c.moveTo(cx + ex + 3.2, ey); c.arc(cx + ex, ey + 1.5, 3.4, Math.PI * 1.15, Math.PI * 1.85); c.stroke();
+    } else if (mood === "fever") {
+      c.fillStyle = "#e0a020";
+      [-ex, ex].forEach(dx => {
+        c.beginPath();
+        for (let i = 0; i < 10; i++) { const a = -Math.PI / 2 + i * Math.PI / 5, r = i % 2 ? 1.8 : 4.4; c.lineTo(cx + dx + Math.cos(a) * r, ey + Math.sin(a) * r); }
+        c.closePath(); c.fill();
+      });
+    } else if (mood === "itch") {
+      c.beginPath(); c.moveTo(cx - ex - 3, ey - 2); c.lineTo(cx - ex + 2, ey); c.lineTo(cx - ex - 3, ey + 2); c.stroke();
+      c.fillStyle = "#fffaf2"; c.beginPath(); c.arc(cx + ex, ey, 3.6, 0, Math.PI * 2); c.fill();
+      c.fillStyle = "#2a1a16"; c.beginPath(); c.arc(cx + ex, ey + 0.5, 2, 0, Math.PI * 2); c.fill();
+    } else {
+      const big = mood === "panic" ? 4.4 : 3.6;
+      c.fillStyle = "#fffaf2"; c.beginPath(); c.arc(cx - ex, ey, big, 0, Math.PI * 2); c.arc(cx + ex, ey, big, 0, Math.PI * 2); c.fill();
+      c.fillStyle = "#2a1a16"; const pr = mood === "panic" ? 1.4 : 2.2;
+      c.beginPath(); c.arc(cx - ex, ey + 0.6, pr, 0, Math.PI * 2); c.arc(cx + ex, ey + 0.6, pr, 0, Math.PI * 2); c.fill();
+    }
+    // まゆ（白くてもじゃもじゃ）
+    c.strokeStyle = "#f4f2ee"; c.lineWidth = 3;
+    c.beginPath();
+    if (mood === "panic" || mood === "sorry") { c.moveTo(cx - 12, ey - 6); c.lineTo(cx - 3, ey - 9); c.moveTo(cx + 12, ey - 6); c.lineTo(cx + 3, ey - 9); }
+    else { c.moveTo(cx - 12, ey - 8); c.quadraticCurveTo(cx - 7, ey - 11, cx - 3, ey - 8); c.moveTo(cx + 12, ey - 8); c.quadraticCurveTo(cx + 7, ey - 11, cx + 3, ey - 8); }
+    c.stroke();
+    // めがね
+    c.strokeStyle = "#5a4030"; c.lineWidth = 1.2;
+    c.beginPath(); c.arc(cx - ex, ey, 5.6, 0, Math.PI * 2); c.moveTo(cx + ex + 5.6, ey); c.arc(cx + ex, ey, 5.6, 0, Math.PI * 2); c.moveTo(cx - 1.4, ey); c.lineTo(cx + 1.4, ey); c.stroke();
+    // 鼻
+    c.fillStyle = "#e0a888"; c.beginPath(); c.ellipse(cx, y0 + 1, 3, 2.4, 0, 0, Math.PI * 2); c.fill();
+    // 口ひげ
+    c.fillStyle = "#f4f2ee";
+    c.beginPath(); c.ellipse(cx - 6, y0 + 6, 7, 3.4, 0.3, 0, Math.PI * 2); c.ellipse(cx + 6, y0 + 6, 7, 3.4, -0.3, 0, Math.PI * 2); c.fill();
+    c.beginPath(); c.arc(cx - 13, y0 + 3, 2.4, 0, Math.PI * 2); c.arc(cx + 13, y0 + 3, 2.4, 0, Math.PI * 2); c.fill();
+    // 口
+    const my = y0 + 11;
+    if (mood === "joy" || mood === "fever") {
+      c.fillStyle = "#7a2228"; c.beginPath(); c.moveTo(cx - 5, my - 1); c.quadraticCurveTo(cx, my + 7, cx + 5, my - 1); c.closePath(); c.fill();
+    } else if (mood === "panic") {
+      c.fillStyle = "#7a2228"; c.beginPath(); c.ellipse(cx, my + 1.5, 3, 3.6, 0, 0, Math.PI * 2); c.fill();
+    } else if (mood === "sorry" || mood === "itch") {
+      c.strokeStyle = "#7a2228"; c.lineWidth = 1.4;
+      c.beginPath(); c.moveTo(cx - 4, my + 1); c.quadraticCurveTo(cx - 2, my - 1, cx, my + 1); c.quadraticCurveTo(cx + 2, my + 3, cx + 4, my + 1); c.stroke();
+    }
+    c.restore();
+    // 吹き出し
+    const say = mood === "sorry" ? "すまん！" : mood === "itch" ? "かゆっ" : mood === "panic" ? "ひぃ" : mood === "fever" ? "ノッてきた" : mood === "joy" ? "ブラボー！" : "";
+    if (say && state !== "title") {
+      c.font = "800 12px " + FONT_D; c.textAlign = "left"; c.textBaseline = "middle";
+      const w = c.measureText(say).width + 14;
+      c.fillStyle = "rgba(245,236,214,0.95)";
+      c.beginPath(); c.moveTo(cx + 30, cy - 34); c.lineTo(cx + 22, cy - 26); c.lineTo(cx + 36, cy - 30); c.closePath(); c.fill();
+      c.fillRect(cx + 28, cy - 48, w, 20);
+      c.fillStyle = "#1a0b0d"; c.fillText(say, cx + 35, cy - 38);
+    }
   }
 
   function heart(x, y, s, filled) {
@@ -1756,66 +2170,80 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
     else { c.strokeStyle = "rgba(245,236,214,0.4)"; c.lineWidth = 1.5; c.stroke(); }
   }
 
-  function drawHUD(beatNow) {
+  // 目標（金の三角）と、いまの値（白い針）を並べたゲージ
+  function gauge(x, y, w, label, value, target, text, good) {
     const c = ctx;
-    c.fillStyle = "rgba(15,4,6,0.72)"; c.fillRect(0, 0, W, 58);
+    c.textAlign = "left"; c.textBaseline = "alphabetic";
+    c.font = "700 10px " + FONT_UI; c.fillStyle = "rgba(245,236,214,0.85)";
+    c.fillText(label, x, y - 4);
+    c.textAlign = "right"; c.fillStyle = good ? "#8fcf9f" : "#ffc9a8";
+    c.fillText(text, x + w, y - 4);
+    c.fillStyle = "rgba(245,236,214,0.15)"; c.fillRect(x, y, w, 6);
+    const tx = x + w * clamp(target, 0, 1), vx = x + w * clamp(value, 0, 1);
+    c.fillStyle = good ? "rgba(143,207,159,0.55)" : "rgba(255,160,130,0.45)";
+    c.fillRect(Math.min(tx, vx), y, Math.abs(vx - tx), 6);
+    c.fillStyle = "#e0b04f";
+    c.beginPath(); c.moveTo(tx, y + 7); c.lineTo(tx - 4, y + 13); c.lineTo(tx + 4, y + 13); c.closePath(); c.fill();
+    c.fillStyle = "#fbf8f0"; c.fillRect(vx - 1.5, y - 2, 3, 10);
+  }
+
+  function drawHUD() {
+    const c = ctx;
+    c.fillStyle = "rgba(15,4,6,0.78)"; c.fillRect(0, 0, W, 88);
     c.strokeStyle = "rgba(224,176,79,0.5)"; c.lineWidth = 1;
-    c.beginPath(); c.moveTo(0, 58.5); c.lineTo(W, 58.5); c.stroke();
-    const prog = Math.max(0, Math.min(1, beatNow / chart.lastTap));
+    c.beginPath(); c.moveTo(0, 88.5); c.lineTo(W, 88.5); c.stroke();
+    const prog = clamp(beatNow / chart.lastTap, 0, 1);
     c.fillStyle = "rgba(224,176,79,0.25)"; c.fillRect(0, 0, W, 3);
     c.fillStyle = "#e0b04f"; c.fillRect(0, 0, W * prog, 3);
     c.font = "700 11px " + FONT_UI; c.fillStyle = "#f5ecd6"; c.textBaseline = "alphabetic"; c.textAlign = "left";
-    c.fillText("オケの乱れ", 14, 22);
-    c.fillStyle = "rgba(245,236,214,0.15)"; c.fillRect(14, 30, 120, 10);
+    c.fillText("オケの乱れ", 14, 20);
+    c.fillStyle = "rgba(245,236,214,0.15)"; c.fillRect(14, 27, 120, 9);
     const cr = chaos / 100;
     c.fillStyle = cr < 0.5 ? "#8fcf9f" : cr < 0.8 ? "#e8b84a" : "#e2483d";
-    c.fillRect(14, 30, 120 * cr, 10);
-    c.strokeStyle = "rgba(245,236,214,0.5)"; c.strokeRect(14.5, 30.5, 119, 9);
-    c.fillStyle = "#f5ecd6"; c.fillText(Math.round(chaos) + "%", 140, 39);
-    // 拍のランプ（小節内の位置）
-    const meter = song.meter;
-    const bi = Math.floor(beatNow + 0.0001);
-    const pos = ((bi % meter) + meter) % meter;
-    const frac = beatNow - bi;
+    c.fillRect(14, 27, 120 * cr, 9);
+    c.strokeStyle = "rgba(245,236,214,0.5)"; c.strokeRect(14.5, 27.5, 119, 8);
+    c.fillStyle = "#f5ecd6"; c.fillText(Math.round(chaos) + "%", 140, 35);
+    const meter = song.meter, bi = Math.floor(beatNow + 0.0001), pos = ((bi % meter) + meter) % meter, frac = beatNow - bi;
     for (let i = 0; i < meter; i++) {
       const x = 240 - (meter - 1) * 8 + i * 16;
       const on = i === pos && frac < 0.25;
       c.fillStyle = on ? (i === 0 ? "#ffe08a" : "#f5ecd6") : "rgba(245,236,214,0.2)";
-      c.beginPath(); c.arc(x, 20, i === 0 ? 5.5 : 4.5, 0, Math.PI * 2); c.fill();
+      c.beginPath(); c.arc(x, 18, i === 0 ? 5.5 : 4.5, 0, Math.PI * 2); c.fill();
     }
-    // テンポ表示
-    const bpm = Math.round(timing.bpmAt(Math.max(0, beatNow)));
-    const ahead = timing.bpmAt(Math.max(0, beatNow) + 4);
-    const mark = ahead > bpm + 1 ? "accel." : ahead < bpm - 1 ? "rit." : "";
+    const tgt = targetBpm(Math.max(0, beatNow)), ahead = targetBpm(Math.max(0, beatNow) + 4);
+    const mark = ahead > tgt + 1 ? "accel." : ahead < tgt - 1 ? "rit." : "";
     c.textAlign = "center"; c.font = "500 10px " + FONT_UI; c.fillStyle = "rgba(245,236,214,0.8)";
-    c.fillText("♩= " + bpm + (everyAt(Math.max(0, beatNow)) === 2 ? "  2拍に1回" : ""), 240, 40);
-    if (mark) { c.font = "italic 800 13px " + FONT_D; c.fillStyle = "#ffe08a"; c.fillText(mark, 240, 54); }
-    for (let i = 0; i < 3; i++) heart(W - 66 + i * 20, 12, 14, i < lives);
+    c.fillText(everyAt(Math.max(0, beatNow)) === 2 ? "2拍に1回" : "1拍ずつ", 240, 38);
+    if (mark) { c.font = "italic 800 13px " + FONT_D; c.fillStyle = "#ffe08a"; c.fillText(mark, 240, 52); }
+    for (let i = 0; i < 3; i++) heart(W - 66 + i * 20, 9, 14, i < lives);
     c.textAlign = "right"; c.font = "700 13px " + FONT_UI; c.fillStyle = "#f5ecd6";
-    c.fillText(score.toLocaleString("ja-JP"), W - 14, 46);
+    c.fillText(score.toLocaleString("ja-JP"), W - 14, 40);
     if (combo >= 4) {
       c.font = "700 10px " + FONT_UI; c.fillStyle = combo >= 16 ? "#ffe08a" : "#f5ecd6";
-      c.fillText(combo + " コンボ" + (combo >= 16 ? " ノリノリ" : ""), W - 14, 56);
+      c.fillText(combo + " コンボ" + (combo >= 16 ? " ノリノリ" : ""), W - 14, 53);
     }
+    // テンポと音量のゲージ
+    const r = A.T / tgt, tempoGood = Math.abs(r - 1) <= 0.07;
+    gauge(14, 70, 200, "テンポ ♩=" + Math.round(A.T), (r - 0.7) / 0.6, 0.5, "目標 " + Math.round(tgt) + (mark ? " " + mark : ""), tempoGood);
+    const dv = dynMap.at(Math.max(0, beatNow)), mk = dynMap.mark(Math.max(0, beatNow));
+    gauge(W - 214, 70, 200, "音量（振りの大きさ）", level, dv, "楽譜 " + mk, Math.abs(level - dv) <= 0.2);
   }
 
-  function nextTapAfter(t) {
-    for (let i = Math.max(0, tapPtr - 1); i < taps.length; i++) if (taps[i].t >= t) return i;
+  function nextTapAfter(p) {
+    for (let i = Math.max(0, tapPtr - 1); i < taps.length; i++) if (taps[i].b >= p) return i;
     return -1;
   }
 
   function draw() {
     const c = ctx;
-    const playing = state !== "title" && chart;
-    const t = playing ? vt : 0;
-    let ringP = null, beatPh = 0, beatNow = -4;
+    const playing = state !== "title" && !!chart && !!A;
+    let ringP = null, beatPh = 0;
     if (playing) {
-      beatNow = timing.beatAt(t);
       beatPh = beatNow - Math.floor(beatNow);
-      const ni = nextTapAfter(t);
+      const ni = nextTapAfter(beatNow);
       if (ni >= 0) {
-        const prev = ni > 0 ? taps[ni - 1].t : taps[ni].t - 0.6;
-        ringP = Math.max(0, Math.min(1, (taps[ni].t - t) / Math.max(0.2, taps[ni].t - prev)));
+        const prevB = ni > 0 ? taps[ni - 1].b : taps[ni].b - 1;
+        ringP = clamp((taps[ni].b - beatNow) / Math.max(0.5, taps[ni].b - prevB), 0, 1);
       }
     }
     let sx = 0, sy = 0;
@@ -1826,77 +2254,90 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
     c.setTransform(scale, 0, 0, scale, sx * scale, sy * scale);
     c.drawImage(bg, 0, 0, W, H);
 
-    // 出番の合図
-    let activeCue = null;
-    if (playing && state === "play") {
-      activeCue = cues.find(cu => !cu.done && beatNow >= cu.b - CUE_LEAD && beatNow < cu.b + 1);
-    }
+    const activeCue = playing && state === "play" ? shownCueAt(beatNow) : null;
     const bob = playing ? Math.pow(1 - beatPh, 3) : 0;
     const now = performance.now() / 1000;
-    const mood = state === "play" && chaos > 50 ? "worried" : state === "play" && combo >= 16 ? "happy" : (state === "result" && endReason === "clear") ? "happy" : "neutral";
+    const lv = playing ? level : 0.5;
+    const baseMood = state === "play" && chaos > 50 ? "worried" : state === "play" && combo >= 16 ? "happy" : (state === "ending" || (state === "result" && endReason === "clear")) ? "happy" : "neutral";
     const live = mosq.filter(mm => mm.state !== "dead");
     ["brass", "cello", "violin"].forEach(type => {
       const resting = playing && cues.some(cu => cu.rest && cu.row === type && beatNow < cu.b - 2);
-      musicians.forEach(m => {
-        if (m.type !== type) return;
+      rowList(type).forEach(m => {
         const jAmp = reduceMotion ? 0 : chaos * 0.05;
-        const mess = playing && (layerMess[m.type] || -1) > t;
+        const mess = playing && (layerMess[m.type] || -99) > beatNow;
         const jit = { x: Math.sin(m.seed + now * 17) * (jAmp + (mess ? 3 : 0)), y: Math.cos(m.seed * 2 + now * 13) * jAmp };
         const tilt = chaos > 45 ? Math.sin(m.seed + now * 3) * (chaos - 45) / 300 : 0;
-        const glow = activeCue && activeCue.row === m.type ? 0.5 + 0.5 * Math.pow(1 - beatPh, 2) : 0;
-        // 一番近い蚊のほうを見る（いなければ指揮者を見る）
+        const isCueMan = activeCue && activeCue.row === m.type && rowList(m.type)[activeCue.who] === m;
+        const glow = isCueMan ? 0.55 + 0.45 * Math.pow(1 - beatPh, 2) : (activeCue && activeCue.row === m.type ? 0.18 : 0);
         let look = (240 - m.x) / 240 * 0.6, nd = 170;
-        live.forEach(mm => { const d = Math.hypot(mm.x - m.x, mm.y - m.y); if (d < nd) { nd = d; look = Math.max(-0.8, Math.min(0.8, (mm.x - m.x) / 30)); } });
+        live.forEach(mm => { const d = Math.hypot(mm.x - m.x, mm.y - m.y); if (d < nd) { nd = d; look = clamp((mm.x - m.x) / 30, -0.9, 0.9); } });
         const blink = ((now + m.seed) % 4.3) < 0.13;
         const hurt = m.hurt > 0, itch = m.itch > 0;
-        drawMusician(m, { bob: -bob * 2.5, jit, tilt, beatPh, glow, playing: !resting && !hurt, mood: hurt ? "hurt" : (mess || itch) ? "worried" : mood, look, blink, hurt, itch, now });
+        let mood = baseMood;
+        if (hurt) mood = "hurt";
+        else if (m.angry > 0) mood = "angry";
+        else if (m.joy > 0) mood = "happy";
+        else if (itch || mess) mood = "worried";
+        else if (isCueMan) mood = "expect";
+        else if (resting && m.sleepy) mood = "sleepy";
+        const sway = playing && !resting ? Math.sin(beatNow * Math.PI / (song.meter === 2 ? 1 : 2) + m.seed) * 0.05 * lv : 0;
+        drawMusician(m, { bob: -bob * (1.5 + 2.5 * lv), jit, tilt, beatPh, glow, playing: !resting && !hurt, mood, look, blink, hurt, itch, now, level: lv, sway });
       });
       drawStands(type);
     });
     if (activeCue) {
       const left = Math.ceil(activeCue.b - beatNow);
-      const mk = cueMark(activeCue.row), go = left <= 1;
+      const mk = cueMark(activeCue), go = left <= 1;
       c.textAlign = "center"; c.textBaseline = "middle";
-      c.fillStyle = "rgba(15,4,6,0.8)"; c.fillRect(mk.x - 105, mk.y - 60, 210, 24);
-      c.font = "800 15px " + FONT_D;
-      c.fillStyle = go ? "#ffe08a" : "#f5ecd6";
-      c.fillText(ROW_LABEL[activeCue.row] + "の出番 " + (go ? "今！" : "あと" + left + "拍"), mk.x, mk.y - 48);
-      c.fillStyle = "rgba(15,4,6,0.65)"; c.beginPath(); c.arc(mk.x, mk.y, 28, 0, Math.PI * 2); c.fill();
-      c.strokeStyle = "#e0b04f"; c.lineWidth = 3; c.beginPath(); c.arc(mk.x, mk.y, 28, 0, Math.PI * 2); c.stroke();
+      c.font = "800 13px " + FONT_D;
+      const txt = mk.m.name + "の出番 " + (go ? "今！" : "あと" + left + "拍");
+      const tw = c.measureText(txt).width + 16;
+      c.fillStyle = "rgba(15,4,6,0.85)"; c.fillRect(clamp(mk.x - tw / 2, 4, W - tw - 4), mk.y - 44, tw, 20);
+      c.fillStyle = go ? "#ffe08a" : "#f5ecd6"; c.fillText(txt, clamp(mk.x, tw / 2 + 4, W - tw / 2 - 4), mk.y - 34);
+      c.fillStyle = "rgba(15,4,6,0.7)"; c.beginPath(); c.arc(mk.x, mk.y, 17, 0, Math.PI * 2); c.fill();
+      c.strokeStyle = "#e0b04f"; c.lineWidth = 2.5; c.beginPath(); c.arc(mk.x, mk.y, 17, 0, Math.PI * 2); c.stroke();
       if (go) {
-        const p = Math.max(0, Math.min(1, activeCue.b - beatNow));
+        const p = clamp(activeCue.b - beatNow, 0, 1);
         c.strokeStyle = "rgba(255,232,150," + (1 - p * 0.6) + ")"; c.lineWidth = 2.5;
-        c.beginPath(); c.arc(mk.x, mk.y, 28 + 40 * p, 0, Math.PI * 2); c.stroke();
+        c.beginPath(); c.arc(mk.x, mk.y, 17 + 34 * p, 0, Math.PI * 2); c.stroke();
       }
-      c.font = "800 14px " + FONT_D; c.fillStyle = "#ffe08a"; c.fillText("合図", mk.x, mk.y + 1);
+      c.font = "800 11px " + FONT_D; c.fillStyle = "#ffe08a"; c.fillText("合図", mk.x, mk.y + 1);
     }
 
-    if (chaos > 0) { c.fillStyle = "rgba(226,72,61," + (chaos / 100 * 0.22) + ")"; c.fillRect(0, 60, W, 290); }
+    if (chaos > 0) { c.fillStyle = "rgba(226,72,61," + (chaos / 100 * 0.2) + ")"; c.fillRect(0, 88, W, 260); }
 
     drawConductor(playing ? 1 - bob : 0, state === "play" && combo >= 16);
     mosq.forEach(m => drawMosquito(m, state === "play" ? ringP : null));
 
     swooshes.forEach(s => {
-      const p = s.t / 0.35;
-      c.strokeStyle = s.q === "perfect" || s.q === "good" ? "rgba(255,232,150," + (1 - p) + ")" : "rgba(255,138,122," + (1 - p) + ")";
-      c.lineWidth = 4 * (1 - p) + 1;
-      c.beginPath(); c.arc(s.x, s.y, 14 + p * 30, -2.6, -0.5); c.stroke();
+      const p = s.t / 0.4;
+      c.strokeStyle = s.ok ? "rgba(255,232,150," + (1 - p) + ")" : "rgba(255,138,122," + (1 - p) + ")";
+      c.lineCap = "round"; c.lineJoin = "round";
+      if (s.path.length > 2) {
+        c.lineWidth = (3 + 6 * s.size) * (1 - p) + 1;
+        c.beginPath(); c.moveTo(s.path[0].x, s.path[0].y);
+        s.path.forEach(q => c.lineTo(q.x, q.y)); c.stroke();
+      } else {
+        c.lineWidth = 4 * (1 - p) + 1;
+        c.beginPath(); c.arc(s.path[0].x, s.path[0].y, 12 + p * 26, -2.6, -0.5); c.stroke();
+      }
+      c.lineCap = "butt";
     });
     parts.forEach(p => { c.globalAlpha = 1 - p.t / 0.6; c.fillStyle = p.c; c.fillRect(p.x - 1.5, p.y - 1.5, 3, 3); });
     c.globalAlpha = 1;
     pops.forEach(p => {
-      c.globalAlpha = 1 - p.t / 0.9; c.textAlign = "center"; c.textBaseline = "middle";
+      c.globalAlpha = clamp(1.4 - p.t / 0.8, 0, 1); c.textAlign = "center"; c.textBaseline = "middle";
       c.font = "800 " + p.size + "px " + FONT_D;
+      const px = clamp(p.x, 70, W - 70);
       c.lineWidth = 4; c.strokeStyle = "rgba(20,6,8,0.85)";
-      c.strokeText(p.text, p.x, p.y - p.t * 30);
-      c.fillStyle = p.color; c.fillText(p.text, p.x, p.y - p.t * 30);
+      c.strokeText(p.text, px, p.y - p.t * 26);
+      c.fillStyle = p.color; c.fillText(p.text, px, p.y - p.t * 26);
     });
     c.globalAlpha = 1;
 
     if (playing) {
-      // 下部の拍ガイド（指揮者の右に、次の拍まで縮む輪）
       if (state === "play" && ringP !== null) {
-        const gx = 410, gy = 640;
+        const gx = 420, gy = 652;
         c.strokeStyle = "rgba(245,236,214,0.25)"; c.lineWidth = 2;
         c.beginPath(); c.arc(gx, gy, 14, 0, Math.PI * 2); c.stroke();
         c.strokeStyle = ringP < 0.12 ? "#ffe08a" : "rgba(224,176,79,0.8)"; c.lineWidth = 3;
@@ -1907,22 +2348,28 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
       if (beatNow < 0 && state === "play") {
         c.textAlign = "center"; c.textBaseline = "middle";
         c.font = "800 22px " + FONT_D; c.fillStyle = "#f5ecd6";
-        c.fillText("拍に合わせてタップ", 240, 410);
-        c.font = "500 13px " + FONT_UI; c.fillStyle = "rgba(245,236,214,0.8)";
-        c.fillText("カウント4つ。楽団員のいない所で振ってみよう", 240, 440);
+        c.fillText("拍に合わせてタップ", 240, 420);
+        c.font = "500 13px " + FONT_UI; c.fillStyle = "rgba(245,236,214,0.85)";
+        c.fillText("トンと軽く＝小さく、サッと払う＝大きく", 240, 448);
       }
       if (banner.t > 0) {
-        const a = Math.min(1, banner.t * 2);
-        c.globalAlpha = a; c.textAlign = "center"; c.textBaseline = "middle";
-        c.fillStyle = "rgba(15,4,6,0.65)"; c.fillRect(0, 344, W, 58);
+        c.globalAlpha = Math.min(1, banner.t * 2); c.textAlign = "center"; c.textBaseline = "middle";
+        c.fillStyle = "rgba(15,4,6,0.7)"; c.fillRect(0, 346, W, 58);
         c.font = "800 21px " + FONT_D; c.fillStyle = "#ffe08a";
-        c.fillText(banner.text, 240, 366);
+        c.fillText(banner.text, 240, 368);
         c.font = "500 12px " + FONT_UI; c.fillStyle = "#f5ecd6";
-        c.fillText(banner.sub, 240, 389);
+        c.fillText(banner.sub, 240, 391);
         c.globalAlpha = 1;
       }
-      drawHUD(beatNow);
+      if (state === "fermata") {
+        const held = posAt(vtc) - chart.lastTap;
+        c.textAlign = "center"; c.textBaseline = "middle";
+        c.font = "800 18px " + FONT_D; c.fillStyle = held >= 1.5 ? "#ffe08a" : "#f5ecd6";
+        c.fillText(held >= 1.5 ? "いまだ！ 好きなところでタップ" : "まだのばして…", 240, 470);
+      }
+      drawHUD();
     }
+    drawPortrait();
 
     if (flash > 0) { c.fillStyle = "rgba(255,240,200," + flash * 0.25 + ")"; c.fillRect(0, 0, W, H); }
     if (redFlash > 0) { c.fillStyle = "rgba(226,72,61," + redFlash * 0.3 + ")"; c.fillRect(0, 0, W, H); }
@@ -1947,13 +2394,13 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
   function startCalib() {
     initAudio();
     if (ac.state === "suspended") ac.resume();
-    startAt = ac.currentTime + 0.5;
+    calib.start = ac.currentTime + 0.5;
     clockOffset = null; syncClock();
     calib.running = true; calib.diffs = []; calib.clicks = [];
     const iv = 60 / CAL_BPM;
     for (let i = 0; i < CAL_N; i++) {
-      calib.clicks.push(i * iv);
-      click(startAt + i * iv, i % 4 === 0, 0.4);
+      calib.clicks.push(calib.start + i * iv);
+      click(calib.start + i * iv, i % 4 === 0, 0.4);
     }
     document.getElementById("calibPad").textContent = "音に合わせてタップ";
     document.getElementById("calibMsg").textContent = "最初の4回は聞くだけでもOK。そのあと音に合わせてタップし続けてください。";
@@ -1969,8 +2416,7 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
       pad.textContent = "もう一度はかる";
       return;
     }
-    const med = d[Math.floor(d.length / 2)];
-    calibMs = Math.round(med * 1000);
+    calibMs = Math.round(d[Math.floor(d.length / 2)] * 1000);
     updateCalibText();
     document.getElementById("calibMsg").textContent = "測定しました。" + (Math.abs(calibMs) < 15 ? "ほぼズレなし。いい環境です。" : calibMs > 0 ? "音が遅れて聞こえる環境のようです。自動で補正します。" : "タップが早めのようです。自動で補正します。");
     pad.textContent = "もう一度はかる";
@@ -1979,7 +2425,7 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
     e.preventDefault();
     if (!calib.running) { startCalib(); return; }
     syncClock();
-    const t = songTimeAt(evTime(e), false);
+    const t = heardAt(evTime(e), false);
     let bd = 1e9;
     calib.clicks.forEach((ct, i) => { if (i >= 4 && Math.abs(t - ct) < Math.abs(bd)) bd = t - ct; });
     if (Math.abs(bd) < 0.3) calib.diffs.push(bd);
@@ -2016,11 +2462,11 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
       list.appendChild(b);
     });
   }
-
   document.getElementById("retryBtn").addEventListener("click", () => startGame(song));
   document.getElementById("menuBtn").addEventListener("click", () => {
-    state = "title";
+    state = "title"; A = null; chart = null;
     mosq = [titleMosquito()]; bites = []; chaos = 0;
+    musicians.forEach(m => { m.hurt = 0; m.angry = 0; m.itch = 0; m.joy = 0; });
     document.getElementById("resultCard").hidden = true;
     document.getElementById("titleCard").hidden = false;
   });
@@ -2043,11 +2489,10 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
   window.addEventListener("resize", resize);
 
   function titleMosquito() {
-    return { kind: "normal", hp: 1, size: 1, sp: 1, x: 120, y: 420, vx: 40, vy: 0, state: "fly", timer: 1e9, wp: randWp(), wpT: 0, suck: 0, t: 0, flap: 0, stun: 0 };
+    return { kind: "normal", hp: 1, size: 1, sp: 1, x: 120, y: 420, vx: 40, vy: 0, state: "fly", timer: 1e9, wp: randWp(), wpT: 0, suck: 0, t: 0, flap: 0, stun: 0, land: 0 };
   }
   mosq.push(titleMosquito());
   prefetchSamples();
-  // 最初のタップで楽器の音の準備を始めておく
   document.addEventListener("pointerdown", () => { initAudio(); decodeSamples(); }, { once: true, capture: true });
   renderSongList();
   updateCalibText();
@@ -2055,7 +2500,15 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
   requestAnimationFrame(loop);
 
   // テスト用（ゲームには影響しません）
-  window.__maestro = { get state() { return state; }, get score() { return score; }, get chaos() { return chaos; }, get lives() { return lives; }, get taps() { return taps; }, get mosq() { return mosq; }, get cues() { return cues; }, get vt() { return vt; }, get samples() { return samplesState; }, get bonks() { return bonks; }, rows: ROWS, songs: SONGS, cueMark, musicianAt };
+  window.__maestro = {
+    get state() { return state; }, get score() { return score; }, get chaos() { return chaos; }, get lives() { return lives; },
+    get taps() { return taps; }, get mosq() { return mosq; }, get cues() { return cues; }, get vt() { return vtc; },
+    get beat() { return beatNow; }, get tempo() { return A ? A.T : 0; }, get level() { return level; },
+    get samples() { return samplesState; }, get bonks() { return bonks; }, get lastTap() { return chart ? chart.lastTap : 0; },
+    get stats() { return { tempoOk, tempoChecks, dynOk, dynChecks, cutResult, cueOk, perfects, goods, songTaps }; },
+    timeAt: p => timeAt(p), targetBpm: b => targetBpm(b), dynAt: b => dynMap.at(b),
+    rows: ROWS, songs: SONGS, cueMark, musicianAt, rowList,
+  };
 })();
 </script>
 </body>
