@@ -214,6 +214,12 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
           <button type="button" data-d="hard" aria-pressed="false">むずかしい</button>
         </div>
         <p class="diff-note" id="diffNote"></p>
+        <h3>拍の音（カチカチ）</h3>
+        <div class="diff" id="clickRow" role="group" aria-label="拍の音">
+          <button type="button" data-c="big" aria-pressed="true">大きめ</button>
+          <button type="button" data-c="small" aria-pressed="false">小さめ</button>
+          <button type="button" data-c="off" aria-pressed="false">なし</button>
+        </div>
         <h3>曲をえらぶ</h3>
         <p class="tour" id="tourLine"></p>
         <div class="songs" id="songList"></div>
@@ -331,6 +337,8 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
   let diffKey = store.get("maestro.diff", "normal");
   if (!["easy", "normal", "hard"].includes(diffKey)) diffKey = "normal";
   let DIFF = null;
+  let clickKey = store.get("maestro.click", "big");
+  if (!["big", "small", "off"].includes(clickKey)) clickKey = "big";
 
   const canvas = document.getElementById("stage");
   const ctx = canvas.getContext("2d");
@@ -1151,7 +1159,7 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
   let fermataT = 0, maestro = { bite: 0, sorry: 0, joy: 0 };
   let gest = null;
   let preps = [], prep = null, pendingPrep = null, prepOk = 0, prepTotal = 0, snaps = [], tempoMarks = [];
-  let bitten = 0, rowItch = {};
+  let bitten = 0, rowItch = {}, offsets = [];
   let crowd = 50, crowdHigh = false, shakeT = 0, bossSpawned = false, queenKilled = false;
 
   function everyText(e) { return e === 1 ? "1拍ずつ" : e === song.meter ? "1小節に1回" : e + "拍に1回"; }
@@ -1237,7 +1245,7 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
     banner = { text: song.title, sub: song.composer, t: 2.4 };
     prep = preps[0]; pendingPrep = null; prepOk = 0; prepTotal = 0;
     crowd = 50; crowdHigh = false; shakeT = 0; bossSpawned = false; queenKilled = false;
-    bitten = 0; rowItch = {}; musicians.forEach(m => { m.bumps = 0; m.alarm = 0; });
+    bitten = 0; rowItch = {}; offsets = []; musicians.forEach(m => { m.bumps = 0; m.alarm = 0; });
     state = "prep";
     ["titleCard", "resultCard", "calibCard"].forEach(id => document.getElementById(id).hidden = true);
   }
@@ -1463,6 +1471,7 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
     }
     if (!best) return g;
     const eSec = (pt - best.b) * 60 / A.T;
+    if (!best.count && Math.abs(eSec) < 0.35) { offsets.push({ e: eSec, t: 0 }); if (offsets.length > 10) offsets.shift(); }
     const ae = Math.abs(eSec);
     let q;
     if (ae <= GOOD && !best.hit) { best.hit = true; q = ae <= PERFECT ? "perfect" : "good"; }
@@ -1872,7 +1881,9 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
     }
     while (clickPtr < taps.length && taps[clickPtr].b < pH) {
       const tb = taps[clickPtr++];
-      click(Math.max(ac.currentTime, timeAt(tb.b)), tb.count && tb.b === -4, tb.count ? 0.3 : 0.035);
+      const down = Math.round(tb.b) % song.meter === 0;
+      const cv = clickKey === "big" ? (down ? 0.16 : 0.1) : clickKey === "small" ? 0.035 : 0;
+      if (cv > 0) click(Math.max(ac.currentTime, timeAt(tb.b)), down, cv);
     }
     schedT = horizon;
   }
@@ -1904,6 +1915,7 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
       // 通りすぎた拍ごとに、振り忘れ・テンポ・音量を評価
       while (tapPtr < taps.length && A.T > 0 && beatNow > taps[tapPtr].b + GOOD * A.T / 60) {
         const tb = taps[tapPtr];
+        if (!tb.hit) tb.missed = true;
         if (!tb.count) {
           if (!tb.hit) {
             addChaos(5); combo = 0; crowdUp(-1);
@@ -2035,6 +2047,7 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
     swooshes.forEach(s => s.t += dt); swooshes = swooshes.filter(s => s.t < 0.4);
     parts.forEach(p => { p.t += dt; p.x += p.vx * dt; p.y += p.vy * dt; p.vy += 300 * dt; }); parts = parts.filter(p => p.t < 0.6);
     flash = Math.max(0, flash - dt * 5);
+    offsets.forEach(o => o.t += dt);
     shakeT = Math.max(0, shakeT - dt);
     if (state === "play" && chaos > 60) crowdUp(-0.6 * dt);
     redFlash = Math.max(0, redFlash - dt * 2.5);
@@ -2700,11 +2713,15 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
     c.fillStyle = "#f5ecd6"; c.fillText(Math.round(chaos) + "%", 140, 35);
     const meter = song.meter, bi = Math.floor(beatNow + 0.0001), pos = ((bi % meter) + meter) % meter, frac = beatNow - bi;
     for (let i = 0; i < meter; i++) {
-      const x = 240 - (meter - 1) * 8 + i * 16;
-      const on = i === pos && frac < 0.25;
-      c.fillStyle = on ? (i === 0 ? "#ffe08a" : "#f5ecd6") : "rgba(245,236,214,0.2)";
-      c.beginPath(); c.arc(x, 18, i === 0 ? 5.5 : 4.5, 0, Math.PI * 2); c.fill();
+      const x = 240 - (meter - 1) * 12 + i * 24;
+      const on = i === pos && frac < 0.3 && beatNow >= 0 && state === "play";
+      c.fillStyle = on ? (i === 0 ? "#ffe08a" : "#f5ecd6") : "rgba(245,236,214,0.16)";
+      c.beginPath(); c.arc(x, 19, on ? 10 : 8.5, 0, Math.PI * 2); c.fill();
+      c.fillStyle = on ? "#1a0b0d" : "rgba(245,236,214,0.55)";
+      c.font = "800 11px " + FONT_UI; c.textAlign = "center"; c.textBaseline = "middle";
+      c.fillText(String(i + 1), x, 19.5);
     }
+    c.textBaseline = "alphabetic";
     const tgt = targetBpm(Math.max(0, beatNow)), ahead = targetBpm(Math.max(0, beatNow) + 4);
     const mark = ahead > tgt + 1 ? "accel." : ahead < tgt - 1 ? "rit." : "";
     c.textAlign = "center"; c.font = "500 10px " + FONT_UI; c.fillStyle = "rgba(245,236,214,0.8)";
@@ -2768,6 +2785,110 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
     c.beginPath(); c.arc(x, y + 4, 7, Math.PI, 0); c.stroke();
     c.beginPath(); c.arc(x, y + 2, 1.8, 0, Math.PI * 2); c.fill();
   }
+  // ---------- 拍のレーン：玉が金の線に重なった瞬間にタップ ----------
+  function drawBeatTrack() {
+    const c = ctx, Y = 500, XH = 104, SPD = 100, XL = 70, XR = 476;
+    const S = laneSamples();
+    const T0 = A && A.T > 0 ? A.T : (prep ? prep.target : targetBpm(Math.max(0, beatNow)));
+    const timeOf = b => {
+      if (b < beatNow) return (b - beatNow) * 60 / T0;
+      for (let i = 1; i < S.length; i++) if (!S[i].wait && S[i - 1].b <= b && S[i].b >= b && S[i].b > S[i - 1].b) return S[i - 1].t + (b - S[i - 1].b) / (S[i].b - S[i - 1].b) * (S[i].t - S[i - 1].t);
+      return null;
+    };
+    c.save();
+    // 帯
+    c.fillStyle = "rgba(15,4,6,0.6)"; c.fillRect(4, Y - 22, XR - 4, 44);
+    c.strokeStyle = "rgba(224,176,79,0.35)"; c.lineWidth = 1; c.strokeRect(4.5, Y - 21.5, XR - 5, 43);
+    // 左：いまのテンポ
+    const tg = targetBpm(Math.max(0, beatNow)), up = targetBpm(Math.max(0, beatNow) + 3) - tg;
+    c.textAlign = "center"; c.textBaseline = "middle";
+    c.font = "700 9px " + FONT_UI; c.fillStyle = "rgba(245,236,214,0.7)"; c.fillText("テンポ", 36, Y - 12);
+    c.font = "800 18px " + FONT_UI;
+    const cur = A && A.T > 0 ? Math.round(A.T) : null;
+    c.fillStyle = cur ? (Math.abs(cur / tg - 1) <= 0.07 ? "#8fcf9f" : "#ffc9a8") : "#f5ecd6";
+    c.fillText(cur ? String(cur) : "待ち", 36, Y + 4);
+    if (up > 1.5 || up < -1.5) {
+      c.fillStyle = up > 0 ? "#ffb070" : "#8cc8ff";
+      c.beginPath();
+      if (up > 0) { c.moveTo(60, Y - 4); c.lineTo(54, Y + 4); c.lineTo(66, Y + 4); }
+      else { c.moveTo(60, Y + 6); c.lineTo(54, Y - 2); c.lineTo(66, Y - 2); }
+      c.closePath(); c.fill();
+    }
+    c.font = "700 8px " + FONT_UI; c.fillStyle = "rgba(245,236,214,0.6)"; c.fillText("目標 " + Math.round(state === "prep" && prep ? prep.target : tg), 36, Y + 17);
+    // 玉
+    c.beginPath(); c.rect(XL, Y - 22, XR - XL, 44); c.clip();
+    // 止まる場所
+    S.forEach(q => {
+      if (!q.waitStart) return;
+      const x = XH + q.t * SPD;
+      if (x > XR + 10) return;
+      fermataSign(c, x, Y - 18, "#ffe08a");
+      c.font = "700 8px " + FONT_UI; c.fillStyle = "#ffe08a"; c.textAlign = "center"; c.fillText(q.b >= chart.lastTap - 0.01 ? "締め" : "予備拍", x, Y + 16);
+    });
+    // 拍ではない拍（2拍に1回などのとき）の小さな点
+    for (let b = Math.ceil(beatNow - 2); b <= beatNow + 16; b++) {
+      if (b < 0 || b > chart.lastTap) continue;
+      const t = timeOf(b); if (t === null) continue;
+      const x = XH + t * SPD; if (x > XR + 14) break;
+      if (taps.some(q => q.b === b)) continue;
+      c.fillStyle = "rgba(245,236,214,0.3)"; c.beginPath(); c.arc(x, Y, 2.5, 0, Math.PI * 2); c.fill();
+    }
+    // タップする拍の玉
+    for (let i = Math.max(0, tapPtr - 4); i < taps.length; i++) {
+      const tb = taps[i], t = timeOf(tb.b);
+      if (t === null) continue;
+      const x = XH + t * SPD;
+      if (x > XR + 16) break;
+      if (x < XL - 16) continue;
+      const down = Math.round(tb.b) % song.meter === 0, e = everyAt(tb.b);
+      const num = e > 1 ? 1 : ((Math.round(tb.b) % song.meter) + song.meter) % song.meter + 1;
+      const r = down ? 13 : 10;
+      const cue = cues.find(cu => !cu.atPrep && cu.prepB === tb.b && !cu.done);
+      let fill = down ? "#ffe08a" : "#f5ecd6", alpha = 1;
+      if (tb.hit) { fill = "#8fcf9f"; alpha = Math.max(0, 1 + t * 2); }
+      else if (tb.missed) { fill = "#e2483d"; alpha = Math.max(0, 1 + t * 1.5); }
+      c.globalAlpha = alpha;
+      c.fillStyle = fill; c.beginPath(); c.arc(x, Y, r, 0, Math.PI * 2); c.fill();
+      c.strokeStyle = "rgba(20,6,8,0.6)"; c.lineWidth = 1.5; c.stroke();
+      c.fillStyle = "#1a0b0d"; c.font = "800 " + (down ? 13 : 11) + "px " + FONT_UI; c.textAlign = "center"; c.textBaseline = "middle";
+      c.fillText(String(num), x, Y + 0.5);
+      if (cue) {
+        c.strokeStyle = "#ffe08a"; c.lineWidth = 2; c.beginPath(); c.arc(x, Y, r + 4, 0, Math.PI * 2); c.stroke();
+        c.font = "800 8px " + FONT_D; c.fillStyle = "#ffe08a"; c.fillText("合図", x, Y - r - 7);
+      }
+      c.globalAlpha = 1;
+    }
+    c.restore();
+    // 金の線（ここで叩く）。拍の瞬間に光る
+    const nb = nextTapAfter(beatNow - 0.001), pb = nb > 0 ? taps[nb - 1] : null;
+    const since = pb && A && A.T > 0 ? (beatNow - pb.b) * 60 / A.T : 9;
+    const glow = state === "play" ? Math.max(0, 1 - since / 0.18) : 0;
+    c.fillStyle = "rgba(255,224,138," + (0.55 + 0.45 * glow) + ")";
+    c.fillRect(XH - 2, Y - 22, 4, 44);
+    c.strokeStyle = "rgba(255,224,138," + (0.5 + 0.5 * glow) + ")"; c.lineWidth = 2 + 3 * glow;
+    c.beginPath(); c.arc(XH, Y, 15 + 4 * glow, 0, Math.PI * 2); c.stroke();
+    if (state === "prep") {
+      c.font = "800 11px " + FONT_D; c.fillStyle = "#ffe08a"; c.textAlign = "left"; c.textBaseline = "middle";
+      c.fillText("← 予備拍を2回タップすると流れ出します", XH + 22, Y);
+    }
+    // 早い・遅いメーター
+    const MY = Y + 30, MW = 90;
+    c.fillStyle = "rgba(15,4,6,0.6)"; c.fillRect(XH - MW / 2 - 30, MY - 7, MW + 60, 14);
+    c.font = "700 8px " + FONT_UI; c.textAlign = "center"; c.textBaseline = "middle";
+    c.fillStyle = "#8cc8ff"; c.fillText("早い", XH - MW / 2 - 15, MY);
+    c.fillStyle = "#ffb070"; c.fillText("遅い", XH + MW / 2 + 15, MY);
+    c.fillStyle = "rgba(245,236,214,0.2)"; c.fillRect(XH - MW / 2, MY - 1, MW, 2);
+    c.fillStyle = "rgba(143,207,159,0.35)"; c.fillRect(XH - MW / 2 * PERFECT / 0.2, MY - 4, MW * PERFECT / 0.2, 8);
+    c.fillStyle = "#ffe08a"; c.fillRect(XH - 1, MY - 5, 2, 10);
+    offsets.forEach((o, i) => {
+      const x = XH + clamp(o.e / 0.2, -1, 1) * MW / 2;
+      c.globalAlpha = Math.max(0.15, 1 - o.t / 6) * (0.4 + 0.6 * (i + 1) / offsets.length);
+      c.fillStyle = Math.abs(o.e) <= PERFECT ? "#8fcf9f" : Math.abs(o.e) <= GOOD ? "#f5ecd6" : "#e2483d";
+      c.fillRect(x - 1.5, MY - 5, 3, 10);
+    });
+    c.globalAlpha = 1;
+  }
+
   function drawScoreLane() {
     const c = ctx, X0 = 50, X1 = 472, Y0 = 58, YT = 88, YD0 = 92, YD = 122;
     const tx = t => X0 + (t + LANE_BACK) / (LANE_BACK + LANE_AHEAD) * (X1 - X0);
@@ -2974,6 +3095,7 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
     if (chaos > 0) { c.fillStyle = "rgba(226,72,61," + (chaos / 100 * 0.2) + ")"; c.fillRect(0, 88, W, 260); }
 
     drawConductor(playing ? 1 - bob : 0, state === "play" && combo >= 16);
+    if (playing && state === "play") drawBeatTrack();
     mosq.forEach(m => drawMosquito(m, state === "play" ? ringP : null));
 
     swooshes.forEach(s => {
@@ -3129,6 +3251,11 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
       list.appendChild(b);
     });
   }
+  function renderClick() {
+    document.querySelectorAll("#clickRow button").forEach(b => b.setAttribute("aria-pressed", b.dataset.c === clickKey ? "true" : "false"));
+  }
+  document.querySelectorAll("#clickRow button").forEach(b => b.addEventListener("click", () => { clickKey = b.dataset.c; store.set("maestro.click", clickKey); renderClick(); }));
+  renderClick();
   function renderDiff() {
     document.querySelectorAll("#diffRow button").forEach(b => b.setAttribute("aria-pressed", b.dataset.d === diffKey ? "true" : "false"));
     document.getElementById("diffNote").textContent = DIFFS[diffKey].note;
