@@ -252,7 +252,7 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
             <li><b>蚊は団員をねらいます。</b>団員の頭のまわりを回ってから止まり、刺します。刺された団員はしばらくかいて弾けなくなり、<b>その分だけ音が欠けて、音程も外れます</b>。</li>
             <li>出番の直前の団員やソリストはねらわれやすい。かいている最中に出番が来ると、合図が失敗します。</li>
             <li>蚊の上で振れば撃退。拍ぴったりならボーナス。たまにマエストロの頭もねらわれます。</li>
-            <li><b>団員を叩くとゴツン！</b>大きく払うと、指揮棒の通り道にいる団員にも当たります。</li>
+            <li><b>関係ない団員を叩くと −400点。</b>続けて叩くと減点が増えます。蚊ごと叩いてしまったときは −150点。大きく払うと、指揮棒の通り道にいる団員にも当たります。</li>
             <li>団員に止まった蚊は、<b>蚊だけをピンポイントで</b>叩けば団員に当たりません（神業ボーナス）。近くの何もない所を振れば追い払えます。</li>
             <li>拍から外れて振る・テンポや音量が楽譜から大きく外れると、オーケストラが乱れます。</li>
             <li>終盤には王冠をかぶった<b>女王蚊</b>が出る曲も。手下を呼び、<b>拍ぴったりの一撃しか効きません</b>。</li>
@@ -1172,6 +1172,7 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
   let gest = null;
   let preps = [], prep = null, pendingPrep = null, prepOk = 0, prepTotal = 0, snaps = [], tempoMarks = [];
   let bitten = 0, rowItch = {}, offsets = [], layerSpans = {}, lateOk = 0;
+  let bonkPenalty = 0, bonkStreak = 0, lastBonkAt = -99, scoreFlash = 0;
   let crowd = 50, crowdHigh = false, shakeT = 0, bossSpawned = false, queenKilled = false;
 
   function everyText(e) { return e === 1 ? "1拍ずつ" : e === song.meter ? "1小節に1回" : e + "拍に1回"; }
@@ -1298,7 +1299,8 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
     banner = { text: song.title, sub: song.composer, t: 2.4 };
     prep = preps[0]; pendingPrep = null; prepOk = 0; prepTotal = 0;
     crowd = 50; crowdHigh = false; shakeT = 0; bossSpawned = false; queenKilled = false;
-    bitten = 0; rowItch = {}; offsets = []; lateOk = 0; musicians.forEach(m => { m.bumps = 0; m.alarm = 0; });
+    bitten = 0; rowItch = {}; offsets = []; lateOk = 0;
+    bonkPenalty = 0; bonkStreak = 0; lastBonkAt = -99; scoreFlash = 0; musicians.forEach(m => { m.bumps = 0; m.alarm = 0; });
     state = "prep";
     ["titleCard", "resultCard", "calibCard"].forEach(id => document.getElementById(id).hidden = true);
   }
@@ -1352,7 +1354,7 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
     $("resCues").textContent = cueOk + "/" + cues.length + (lateOk ? "（遅れ" + lateOk + "）" : "");
     $("resCut").textContent = cutResult;
     $("resSwats").textContent = swats + " 匹";
-    $("resBonk").textContent = bonks + " 人";
+    $("resBonk").textContent = bonks + " 人" + (bonkPenalty ? "（−" + bonkPenalty.toLocaleString("ja-JP") + "）" : "");
     $("resBitten").textContent = bitten + " 回";
     $("resCrowd").textContent = Math.round(crowd) + "%";
     const cleared = endReason === "clear";
@@ -1638,7 +1640,7 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
           const a = Math.atan2(m.y - y, m.x - x); m.vx = Math.cos(a) * 380; m.vy = Math.sin(a) * 380; m.stun = 0.45;
           m.state = "fly"; m.wp = randWp(); m.wpT = 0; m.timer = 4;
         } else {
-          killMosquito(m, true, fever, 1200, "女王蚊を撃退！！");
+          killMosquito(g, m, true, fever, 1200, "女王蚊を撃退！！");
           queenKilled = true; g.killed++; crowdUp(20); shakeT = 0.4;
           banner = { text: "女王蚊を撃退！", sub: "客席から大きな拍手", t: 2.4 };
           cheer(ac.currentTime + 0.1, 1);
@@ -1648,7 +1650,7 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
       if (m.state === "land") {
         if (first && d <= (DIFF ? DIFF.pin : 15)) {
           // ピンポイント：団員には当たらない
-          killMosquito(m, onBeat, fever, 600, "神業！ ピンポイント撃退");
+          killMosquito(g, m, onBeat, fever, 600, "神業！ ピンポイント撃退");
           g.killed++; g.safeLand = true;
           m.target.joy = 1.5;
         } else if (first && d < R * 2.2 && !musicianAt(x, y)) {
@@ -1656,7 +1658,7 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
           m.state = "fly"; m.wp = randWp(); m.wpT = 0;
           const a = Math.atan2(m.y - y, m.x - x); m.vx = Math.cos(a) * 300; m.vy = Math.sin(a) * 300;
         } else if (!first && d <= 18) {
-          killMosquito(m, onBeat, fever, 150, "なぎ払い撃退"); g.killed++;
+          killMosquito(g, m, onBeat, fever, 150, "なぎ払い撃退"); g.killed++;
         }
         return;
       }
@@ -1669,7 +1671,7 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
           popup(m.x, m.y + 30, "しぶとい！", "#ffd0c0", 16);
           score += 50;
         } else {
-          killMosquito(m, onBeat, fever, m.kind === "big" ? 300 : m.kind === "fast" ? 250 : 150, first ? null : "なぎ払い");
+          killMosquito(g, m, onBeat, fever, m.kind === "big" ? 300 : m.kind === "fast" ? 250 : 150, first ? null : "なぎ払い");
           g.killed++;
           if (onBeat) crowdUp(3);
         }
@@ -1684,7 +1686,8 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
     });
   }
 
-  function killMosquito(m, onBeat, fever, base, label) {
+  function killMosquito(g, m, onBeat, fever, base, label) {
+    if (g && m.target && (m.state === "land" || m.state === "circle" || m.state === "toPlayer")) (g.victims = g.victims || new Set()).add(m.target);
     m.state = "dead"; m.vy = -60; m.vx = (Math.random() - 0.5) * 80; m.t = 0;
     swats++;
     const pts = Math.round((onBeat ? base * 2.5 : base) * (fever ? 2 : 1));
@@ -1735,13 +1738,20 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
 
   function hitMusician(m, x, y, g, sweep) {
     if (g) { if (g.bonked) return; g.bonked = true; }
+    // 減点：関係ない団員は大きく、蚊ごと叩いたときは小さく。続けて叩くと増える
+    const related = !!(g && g.victims && g.victims.has(m));
+    const nowS = performance.now() / 1000;
+    bonkStreak = nowS - lastBonkAt < 6 ? bonkStreak + 1 : 1;
+    lastBonkAt = nowS;
+    const pen = Math.round((related ? 150 : 400) * (1 + 0.5 * (bonkStreak - 1)));
+    score -= pen; bonkPenalty += pen; scoreFlash = 1;
+    popup(x, y + 4, "−" + pen.toLocaleString("ja-JP") + (bonkStreak >= 2 ? "（" + bonkStreak + "連続）" : ""), "#ff5a4a", 24);
     m.hurt = 1.6; m.angry = 4.5; bonks++; shakeT = 0.15;
     crowdUp(1); if (Math.random() < 0.6) { popup(240, 690, "（客席から笑い）", "#f5ecd6", 13); if (ac) cheer(ac.currentTime + 0.1, 0.35); }
     addChaos(12); combo = 0;
     maestro.sorry = 2;
     layerMess[m.type] = Math.max(layerMess[m.type] || -99, beatNow + 3);
-    popup(x, y + 22, sweep ? "払った棒がゴツン！" : (g && g.killed ? "団員ごと叩いた！" : "ゴツン！"), "#ff8a7a", 18);
-    popup(m.x + 34, m.y - 82 * m.s, m.name + "「いたっ！」", "#ffd0c0", 14);
+    popup(x, y + 30, (related ? "蚊ごと叩いた" : "関係ない団員にゴツン") + "　" + m.name + "「いたっ！」", "#ffb0a0", 14);
     sfxBonk(ac.currentTime);
     if (chaos >= 100) { chaos = 100; endGame("orchestra"); }
   }
@@ -2111,6 +2121,7 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
     swooshes.forEach(s => s.t += dt); swooshes = swooshes.filter(s => s.t < 0.4);
     parts.forEach(p => { p.t += dt; p.x += p.vx * dt; p.y += p.vy * dt; p.vy += 300 * dt; }); parts = parts.filter(p => p.t < 0.6);
     flash = Math.max(0, flash - dt * 5);
+    scoreFlash = Math.max(0, scoreFlash - dt * 1.5);
     offsets.forEach(o => o.t += dt);
     shakeT = Math.max(0, shakeT - dt);
     if (state === "play" && chaos > 60) crowdUp(-0.6 * dt);
@@ -2775,6 +2786,7 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
     c.fillRect(14, 27, 120 * cr, 9);
     c.strokeStyle = "rgba(245,236,214,0.5)"; c.strokeRect(14.5, 27.5, 119, 8);
     c.fillStyle = "#f5ecd6"; c.fillText(Math.round(chaos) + "%", 140, 35);
+    if (bonks) { c.font = "700 10px " + FONT_UI; c.fillStyle = "#ff8a7a"; c.fillText("ミス叩き " + bonks + "回  −" + bonkPenalty.toLocaleString("ja-JP"), 14, 50); }
     const meter = song.meter, bi = Math.floor(beatNow + 0.0001), pos = ((bi % meter) + meter) % meter, frac = beatNow - bi;
     for (let i = 0; i < meter; i++) {
       const x = 240 - (meter - 1) * 12 + i * 24;
@@ -2795,6 +2807,7 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
     c.fillStyle = bitten ? "#ff8a7a" : "rgba(245,236,214,0.7)";
     c.fillText("刺された団員 " + bitten, W - 14, 20);
     c.textAlign = "right"; c.font = "700 13px " + FONT_UI; c.fillStyle = "#f5ecd6";
+    if (scoreFlash > 0) { c.fillStyle = "rgba(255,90,74," + (0.4 + 0.6 * scoreFlash) + ")"; c.font = "800 " + (13 + 4 * scoreFlash) + "px " + FONT_UI; }
     c.fillText(score.toLocaleString("ja-JP"), W - 14, 40);
     if (combo >= 4) {
       c.font = "700 10px " + FONT_UI; c.fillStyle = combo >= 16 ? "#ffe08a" : "#f5ecd6";
@@ -3183,7 +3196,7 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
     pops.forEach(p => {
       c.globalAlpha = clamp(1.4 - p.t / 0.8, 0, 1); c.textAlign = "center"; c.textBaseline = "middle";
       c.font = "800 " + p.size + "px " + FONT_D;
-      const px = clamp(p.x, 70, W - 70);
+      const pw = c.measureText(p.text).width / 2 + 8, px = clamp(p.x, Math.min(pw, W / 2), Math.max(W - pw, W / 2));
       c.lineWidth = 4; c.strokeStyle = "rgba(20,6,8,0.85)";
       c.strokeText(p.text, px, p.y - p.t * 26);
       c.fillStyle = p.color; c.fillText(p.text, px, p.y - p.t * 26);
