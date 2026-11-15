@@ -1,0 +1,1023 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>マエストロと蚊</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@600;800&family=Zen+Kaku+Gothic+New:wght@500;700&display=swap">
+<style>
+/* Layout: one portrait concert-hall stage (2:3 canvas) centred on the screen; menus float over it like a programme card. */
+:root {
+  --curtain: #3b0f17;
+  --curtain-deep: #170609;
+  --gold: #e0b04f;
+  --gold-soft: #b88a35;
+  --ivory: #f5ecd6;
+  --ink: #1a0b0d;
+  --danger: #e2483d;
+  --display: "Shippori Mincho B1", "Hiragino Mincho ProN", "Yu Mincho", serif;
+  --ui: "Zen Kaku Gothic New", "Hiragino Sans", "Yu Gothic", sans-serif;
+  color-scheme: dark;
+}
+html, body { height: 100%; }
+[hidden] { display: none !important; }
+body {
+  margin: 0;
+  background: var(--curtain-deep);
+  color: var(--ivory);
+  font-family: var(--ui);
+  overflow: hidden;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+#wrap {
+  height: 100%;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 8px;
+}
+#frame { position: relative; max-width: 100%; }
+#stage {
+  display: block;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+  border-radius: 6px;
+  box-shadow: 0 0 0 1px rgba(224, 176, 79, 0.35), 0 20px 60px rgba(0, 0, 0, 0.6);
+  cursor: crosshair;
+}
+.card {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+  background: rgba(23, 6, 9, 0.78);
+  border-radius: 6px;
+}
+.card-inner {
+  width: 100%;
+  max-width: 340px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  text-align: left;
+  background: var(--ivory);
+  color: var(--ink);
+  padding: 24px 22px 22px;
+  border-radius: 4px;
+  box-shadow: inset 0 0 0 1px var(--gold-soft), inset 0 0 0 5px var(--ivory), inset 0 0 0 6px var(--gold-soft);
+}
+.eyebrow {
+  font-size: 11px;
+  letter-spacing: 0.25em;
+  color: #8a5a1a;
+  margin: 0;
+}
+h1, h2 {
+  font-family: var(--display);
+  font-weight: 800;
+  margin: 0;
+  line-height: 1.15;
+  text-wrap: balance;
+}
+h1 { font-size: 36px; }
+h2 { font-size: 26px; }
+.lead { margin: 0; font-size: 14px; line-height: 1.7; }
+ol {
+  margin: 0;
+  padding-left: 1.3em;
+  font-size: 13px;
+  line-height: 1.65;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.stats {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 4px 12px;
+  font-size: 14px;
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+.stats dt { color: #6b4a3a; }
+.stats dd { margin: 0; font-weight: 700; text-align: right; }
+.rank {
+  font-family: var(--display);
+  font-size: 15px;
+  line-height: 1.6;
+  margin: 0;
+  border-top: 1px solid #d8c7a0;
+  padding-top: 10px;
+}
+.rank b { font-size: 30px; color: #9b1c22; margin-right: 8px; vertical-align: -3px; }
+button {
+  font-family: var(--ui);
+  font-weight: 700;
+  font-size: 17px;
+  padding: 13px 18px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--curtain);
+  color: var(--ivory);
+  cursor: pointer;
+  box-shadow: inset 0 0 0 2px var(--gold);
+}
+button:hover { background: #561722; }
+button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
+.note { margin: 0; font-size: 11px; color: #6b4a3a; text-align: center; }
+</style>
+</head>
+<body>
+<div id="wrap">
+  <div id="frame">
+    <canvas id="stage" aria-label="ゲーム画面"></canvas>
+
+    <div class="card" id="titleCard">
+      <div class="card-inner">
+        <p class="eyebrow">PROGRAMME · 本日の演目</p>
+        <h1>マエストロと蚊</h1>
+        <p class="lead">満員のコンサートホール。本番の真っ最中に、一匹の蚊がマエストロの頭をねらっています。</p>
+        <ol>
+          <li><b>拍に合わせてタップ</b>すると、指揮棒を振ります。</li>
+          <li><b>蚊の上で振れば撃退。</b>蚊のまわりの金の輪が縮みきった瞬間が拍です。</li>
+          <li>拍から<b>ズレて振ると、オーケストラが乱れます</b>。乱れが100%で暴走。</li>
+          <li>頭を<b>3回刺されて</b>もアウト。曲はだんだん速くなります。</li>
+        </ol>
+        <button id="startBtn" type="button">演奏をはじめる</button>
+        <p class="note">音が出ます。パソコンではクリック、スペースキーで拍だけ取れます。</p>
+      </div>
+    </div>
+
+    <div class="card" id="resultCard" hidden>
+      <div class="card-inner">
+        <p class="eyebrow" id="resEyebrow">終演</p>
+        <h2 id="resTitle">ブラボー！</h2>
+        <p class="lead" id="resSub"></p>
+        <dl class="stats">
+          <dt>スコア</dt><dd id="resScore">0</dd>
+          <dt>撃退した蚊</dt><dd id="resSwats">0</dd>
+          <dt>拍ぴったり</dt><dd id="resAcc">0%</dd>
+          <dt>最大コンボ</dt><dd id="resCombo">0</dd>
+        </dl>
+        <p class="rank" id="resRank"></p>
+        <button id="retryBtn" type="button">もう一度指揮する</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(() => {
+  "use strict";
+
+  // ---------- 基本設定 ----------
+  const W = 480, H = 720;
+  const FONT_UI = '"Zen Kaku Gothic New","Hiragino Sans","Yu Gothic",sans-serif';
+  const FONT_D = '"Shippori Mincho B1","Hiragino Mincho ProN","Yu Mincho",serif';
+  const PERFECT = 0.075, GOOD = 0.16;      // 判定の幅（秒）
+  const HIT_R = 48;                         // 蚊に当たる半径
+  const HEAD = { x: 240, y: 598, r: 27 };
+  const BALD = { x: 240, y: 580 };
+  const SUCK_TIME = 1.4;                    // 刺されるまでの時間
+  const SECTIONS = [
+    { bpm: 84,  beats: 24, mosq: 1, speed: 1.0,  name: "第1楽章  アンダンテ" },
+    { bpm: 100, beats: 24, mosq: 2, speed: 1.25, name: "第2楽章  モデラート" },
+    { bpm: 116, beats: 28, mosq: 2, speed: 1.5,  name: "第3楽章  アレグロ" },
+    { bpm: 132, beats: 32, mosq: 3, speed: 1.8,  name: "終楽章  プレスト" },
+  ];
+  const reduceMotion = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  const canvas = document.getElementById("stage");
+  const ctx = canvas.getContext("2d");
+  const frame = document.getElementById("frame");
+  const wrap = document.getElementById("wrap");
+  const bg = document.createElement("canvas");
+  const bgx = bg.getContext("2d");
+  let scale = 1;
+
+  // ---------- 画面サイズ ----------
+  function resize() {
+    const r = wrap.getBoundingClientRect();
+    const cs = getComputedStyle(wrap);
+    const aw = r.width - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+    const ah = r.height - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+    const s = Math.max(0.3, Math.min(aw / W, ah / H));
+    frame.style.width = W * s + "px";
+    frame.style.height = H * s + "px";
+    const dpr = Math.min(window.devicePixelRatio || 1, 2.5);
+    canvas.width = Math.round(W * s * dpr);
+    canvas.height = Math.round(H * s * dpr);
+    bg.width = canvas.width; bg.height = canvas.height;
+    scale = s * dpr;
+    drawBackground();
+  }
+
+  // ---------- 楽団員 ----------
+  const SKIN = ["#f1c9a5", "#e0ac84", "#c98f66", "#f5d6b8", "#a86f4c"];
+  const HAIR = ["#2a1a12", "#4a3020", "#111", "#7a5a3a", "#bdb6ad", "#5b2a1a"];
+  const musicians = [];
+  (function makeOrchestra() {
+    const rows = [
+      { y: 150, n: 9, s: 0.62, type: "brass", rx: 185 },
+      { y: 205, n: 8, s: 0.78, type: "cello", rx: 195 },
+      { y: 262, n: 7, s: 0.95, type: "violin", rx: 200 },
+    ];
+    let k = 0;
+    rows.forEach(row => {
+      for (let i = 0; i < row.n; i++) {
+        const xn = (i / (row.n - 1)) * 2 - 1;
+        musicians.push({
+          x: 240 + row.rx * xn,
+          y: row.y + 26 * xn * xn,
+          s: row.s, type: row.type,
+          skin: SKIN[(k * 7) % SKIN.length],
+          hair: HAIR[(k * 5) % HAIR.length],
+          dress: k % 3 === 0 ? "#2b1a26" : "#16100f",
+          seed: Math.random() * 100,
+        });
+        k++;
+      }
+    });
+  })();
+
+  // ---------- 音 ----------
+  const AC = window.AudioContext || window.webkitAudioContext;
+  let ac = null, master = null, noiseBuf = null, buzz = null;
+
+  function initAudio() {
+    if (ac) return;
+    ac = new AC();
+    master = ac.createGain();
+    master.gain.value = 0.6;
+    const comp = ac.createDynamicsCompressor();
+    master.connect(comp); comp.connect(ac.destination);
+    noiseBuf = ac.createBuffer(1, ac.sampleRate, ac.sampleRate);
+    const d = noiseBuf.getChannelData(0);
+    for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+
+    // 蚊の羽音
+    const o1 = ac.createOscillator(), o2 = ac.createOscillator();
+    o1.type = "sawtooth"; o2.type = "sawtooth";
+    o1.frequency.value = 540; o2.frequency.value = 556;
+    const lfo = ac.createOscillator(), lfoG = ac.createGain();
+    lfo.frequency.value = 7; lfoG.gain.value = 18;
+    lfo.connect(lfoG); lfoG.connect(o1.frequency); lfoG.connect(o2.frequency);
+    const bp = ac.createBiquadFilter(); bp.type = "bandpass"; bp.frequency.value = 1100; bp.Q.value = 1.2;
+    const g = ac.createGain(); g.gain.value = 0;
+    const pan = ac.createStereoPanner ? ac.createStereoPanner() : null;
+    o1.connect(bp); o2.connect(bp); bp.connect(g);
+    if (pan) { g.connect(pan); pan.connect(master); } else g.connect(master);
+    o1.start(); o2.start(); lfo.start();
+    buzz = { o1, o2, g, pan };
+  }
+
+  const mtof = m => 440 * Math.pow(2, (m - 69) / 12);
+
+  function tone(t, midi, dur, type, vol, opt = {}) {
+    const o = ac.createOscillator();
+    o.type = type;
+    o.frequency.value = mtof(midi);
+    if (opt.detune) o.detune.value = opt.detune;
+    const g = ac.createGain();
+    const atk = opt.atk || 0.008;
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.linearRampToValueAtTime(vol, t + atk);
+    if (opt.hold) g.gain.setValueAtTime(vol, t + Math.max(atk, dur - (opt.rel || 0.2)));
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    let node = o;
+    if (opt.lp) {
+      const f = ac.createBiquadFilter(); f.type = "lowpass"; f.frequency.value = opt.lp;
+      o.connect(f); node = f;
+    }
+    node.connect(g); g.connect(master);
+    o.start(t); o.stop(t + dur + 0.05);
+  }
+
+  function noise(t, dur, vol, freq, type = "bandpass", q = 1) {
+    const s = ac.createBufferSource(); s.buffer = noiseBuf;
+    const f = ac.createBiquadFilter(); f.type = type; f.frequency.value = freq; f.Q.value = q;
+    const g = ac.createGain();
+    g.gain.setValueAtTime(vol, t);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    s.connect(f); f.connect(g); g.connect(master);
+    s.start(t, Math.random() * 0.5); s.stop(t + dur + 0.02);
+  }
+
+  // オリジナルの短い曲（ハ長調）
+  const PROG = [[48, 60, 64, 67], [45, 57, 60, 64], [41, 57, 60, 65], [43, 55, 59, 62]];
+  const MEL = [
+    [76, 79, 84, 79], [81, 76, 72, 76], [77, 81, 84, 81], [79, 74, 71, 74],
+    [76, 74, 72, 76], [72, 76, 81, 79], [81, 79, 77, 81], [79, 77, 76, 74],
+  ];
+
+  function wrongness() { return Math.random() < chaos / 115; }
+
+  function scheduleBeat(i) {
+    const b = beats[i];
+    const t = startAt + b.t;
+    // 拍のカウント音（木の音）
+    tone(t, b.count ? (b.n === -4 ? 96 : 91) : 91, 0.05, "triangle", b.count ? 0.35 : 0.07);
+    if (b.count) return;
+    const measure = Math.floor(b.n / 4), pos = b.n % 4;
+    const ch = PROG[measure % 4];
+    let mel = MEL[measure % 8][pos];
+    let jt = 0, det = 0;
+    if (wrongness()) { mel += [-6, -3, -1, 1, 2, 5][Math.floor(Math.random() * 6)]; jt = (Math.random() - 0.5) * 0.12; det = (Math.random() - 0.5) * 80; }
+    tone(t + Math.max(0, jt), mel, b.iv * 0.9, "triangle", 0.22, { detune: det });
+    tone(t + Math.max(0, jt), mel + 12, b.iv * 0.5, "sine", 0.05);
+    const cd = () => (Math.random() - 0.5) * chaos * 1.6;
+    if (pos === 0) {
+      tone(t, ch[0], b.iv * 1.9, "triangle", 0.3, { lp: 600 });
+      for (let k = 1; k < 4; k++) {
+        tone(t, ch[k], b.iv * 4, "sawtooth", 0.045, { lp: 1100, atk: 0.09, hold: true, rel: 0.3, detune: cd() });
+      }
+    }
+    if (pos === 2) tone(t, ch[0] + 7, b.iv * 1.8, "triangle", 0.24, { lp: 600 });
+    if (chaos > 55 && Math.random() < (chaos - 55) / 90) {
+      noise(t + Math.random() * b.iv, 0.5, 0.12, 6000, "highpass");
+      tone(t + Math.random() * b.iv * 0.5, 40 + Math.floor(Math.random() * 30), 0.4, "square", 0.05, { lp: 900 });
+    }
+    if (i === beats.length - 1) {
+      const e = startAt + songEnd;
+      [36, 48, 60, 64, 67, 72, 76].forEach(m => tone(e, m, 2.8, m < 50 ? "triangle" : "sawtooth", m < 50 ? 0.3 : 0.05, { lp: 1400, atk: 0.05, hold: true, rel: 1.2 }));
+      noise(e, 1.6, 0.12, 7000, "highpass");
+    }
+  }
+
+  function sfxSwing(t) { noise(t, 0.12, 0.08, 2500, "bandpass", 0.6); }
+  function sfxSwat(t) { noise(t, 0.09, 0.45, 1800, "bandpass", 0.8); tone(t, 40, 0.12, "sine", 0.4); }
+  function sfxBite(t) {
+    const o = ac.createOscillator(), g = ac.createGain();
+    o.type = "square"; o.frequency.setValueAtTime(1900, t); o.frequency.exponentialRampToValueAtTime(700, t + 0.18);
+    g.gain.setValueAtTime(0.12, t); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.2);
+    o.connect(g); g.connect(master); o.start(t); o.stop(t + 0.22);
+  }
+
+  // ---------- ゲームの状態 ----------
+  let state = "title";
+  let beats = [], songEnd = 0, startAt = 0, nextSched = 0, missPtr = 0, bp = 0;
+  let chaos = 0, lives = 3, score = 0, combo = 0, maxCombo = 0;
+  let swats = 0, perfects = 0, goods = 0, songBeats = 0;
+  let mosq = [], pops = [], parts = [], swooshes = [];
+  let spawnTimer = 0, flash = 0, redFlash = 0, bites = [];
+  let hand = { tx: 330, ty: 520, amt: 0 };
+  let lastSection = -1, sectionBanner = 0, sectionName = "";
+  let endTimer = 0;
+
+  function buildBeats() {
+    beats = [];
+    let t = 0;
+    const ci = 60 / SECTIONS[0].bpm;
+    for (let i = 0; i < 4; i++) { beats.push({ t, count: true, sec: 0, n: i - 4, iv: ci, hit: false, done: false }); t += ci; }
+    let n = 0;
+    SECTIONS.forEach((s, si) => {
+      const iv = 60 / s.bpm;
+      for (let i = 0; i < s.beats; i++) { beats.push({ t, count: false, sec: si, n: n++, iv, hit: false, done: false }); t += iv; }
+    });
+    songEnd = t;
+    songBeats = n;
+  }
+
+  function now() { return ac ? ac.currentTime - startAt : 0; }
+
+  function startGame() {
+    initAudio();
+    if (ac.state === "suspended") ac.resume();
+    buildBeats();
+    startAt = ac.currentTime + 0.6;
+    nextSched = 0; missPtr = 0; bp = 0;
+    chaos = 0; lives = 3; score = 0; combo = 0; maxCombo = 0;
+    swats = 0; perfects = 0; goods = 0;
+    mosq = []; pops = []; parts = []; swooshes = []; bites = [];
+    spawnTimer = 0; flash = 0; redFlash = 0; lastSection = -1; endTimer = 0;
+    hand = { tx: 330, ty: 520, amt: 0 };
+    state = "play";
+    document.getElementById("titleCard").hidden = true;
+    document.getElementById("resultCard").hidden = true;
+    canvas.focus && canvas.focus();
+  }
+
+  function endGame(reason) {
+    if (state !== "play") return;
+    state = reason === "clear" ? "ending" : "over";
+    endTimer = reason === "clear" ? 2.2 : 1.2;
+    endReason = reason;
+    if (reason !== "clear" && ac) {
+      const t = ac.currentTime;
+      if (reason === "orchestra") {
+        for (let i = 0; i < 9; i++) tone(t + i * 0.04, 40 + Math.floor(Math.random() * 40), 1.2, "sawtooth", 0.06, { lp: 1500, detune: Math.random() * 100 });
+        noise(t, 1.2, 0.25, 5000, "highpass");
+      } else {
+        sfxBite(t); sfxBite(t + 0.15);
+      }
+    }
+  }
+  let endReason = "";
+
+  function showResult() {
+    state = "result";
+    const acc = songBeats ? (perfects + goods) / songBeats : 0;
+    const accP = Math.round(acc * 100);
+    const $ = id => document.getElementById(id);
+    $("resScore").textContent = score.toLocaleString("ja-JP");
+    $("resSwats").textContent = swats + " 匹";
+    $("resAcc").textContent = accP + "%";
+    $("resCombo").textContent = maxCombo;
+    let rank, comment;
+    if (endReason === "clear") {
+      $("resEyebrow").textContent = "終演 · FINE";
+      $("resTitle").textContent = "ブラボー！";
+      $("resSub").textContent = "最後まで指揮しきりました。客席から拍手が鳴りやみません。";
+      if (acc >= 0.85 && lives === 3) { rank = "S"; comment = "スタンディングオベーション。蚊にも音楽にも一切のすきを見せませんでした。"; }
+      else if (acc >= 0.7) { rank = "A"; comment = "見事な本番。新聞の批評欄でほめられそうです。"; }
+      else { rank = "B"; comment = "なんとか終演。団員たちは少しだけ首をかしげています。"; }
+    } else if (endReason === "orchestra") {
+      $("resEyebrow").textContent = "中断 · ORCHESTRA";
+      $("resTitle").textContent = "オーケストラ暴走";
+      $("resSub").textContent = "指揮棒の振りすぎで、テンポがばらばらになりました。";
+      rank = "C"; comment = "蚊を追うのは拍に合わせて。輪が縮みきる瞬間をねらいましょう。";
+    } else {
+      $("resEyebrow").textContent = "中断 · かゆみ";
+      $("resTitle").textContent = "かゆくて指揮どころではない";
+      $("resSub").textContent = "頭を3か所刺されてしまいました。";
+      rank = "C"; comment = "頭に止まった蚊も、拍に合わせて振れば追い払えます。";
+    }
+    $("resRank").innerHTML = "<b>" + rank + "</b>" + comment;
+    $("resultCard").hidden = false;
+    $("retryBtn").focus();
+  }
+
+  // ---------- 入力 ----------
+  function toLogical(e) {
+    const r = canvas.getBoundingClientRect();
+    return { x: (e.clientX - r.left) / r.width * W, y: (e.clientY - r.top) / r.height * H };
+  }
+
+  canvas.addEventListener("pointerdown", e => {
+    e.preventDefault();
+    const p = toLogical(e);
+    swing(p.x, p.y, true);
+  });
+  window.addEventListener("keydown", e => {
+    if (e.code === "Space" && state === "play") { e.preventDefault(); if (!e.repeat) swing(330, 470, false); }
+  });
+
+  function popup(x, y, text, color, size = 20) {
+    pops.push({ x, y, text, color, size, t: 0 });
+  }
+
+  function swing(x, y, canSwat) {
+    if (state !== "play" || !ac) return;
+    const t = now();
+    let best = 0, bd = 1e9;
+    for (let i = 0; i < beats.length; i++) {
+      const d = Math.abs(t - beats[i].t);
+      if (d < bd) { bd = d; best = i; }
+    }
+    const b = beats[best];
+    let q;
+    if (bd <= GOOD && !b.hit) { b.hit = true; q = bd <= PERFECT ? "perfect" : "good"; }
+    else if (bd <= GOOD) q = "extra";
+    else q = "off";
+
+    hand.tx = x; hand.ty = y; hand.amt = 1;
+    swooshes.push({ x, y, t: 0, q });
+    sfxSwing(ac.currentTime);
+
+    const mult = 1 + Math.min(combo, 40) / 20;
+    if (b.count) {
+      if (q === "perfect" || q === "good") popup(x, y - 30, String(b.n + 5), "#f5ecd6", 26);
+    } else if (q === "perfect") {
+      perfects++; combo++; chaos = Math.max(0, chaos - 4); score += Math.round(20 * mult);
+      popup(x, y - 34, "ぴったり", "#ffe08a", 20);
+    } else if (q === "good") {
+      goods++; combo++; chaos = Math.max(0, chaos - 2); score += Math.round(10 * mult);
+      popup(x, y - 34, "いい感じ", "#cfe7c8", 18);
+    } else if (q === "extra") {
+      combo = 0; chaos += 8;
+      popup(x, y - 34, "振りすぎ！", "#ff8a7a", 20);
+    } else {
+      combo = 0; chaos += 10;
+      popup(x, y - 34, "ズレた！", "#ff8a7a", 20);
+    }
+    maxCombo = Math.max(maxCombo, combo);
+
+    if (canSwat) {
+      const onBeat = q === "perfect" || q === "good";
+      let hitAny = false;
+      mosq.forEach(m => {
+        if (m.state === "dead" || m.state === "flee") return;
+        const d = Math.hypot(m.x - x, m.y - y);
+        if (d <= HIT_R) {
+          hitAny = true;
+          m.state = "dead"; m.vy = -60; m.vx = (Math.random() - 0.5) * 80; m.t = 0;
+          swats++;
+          const pts = onBeat ? 400 : 150;
+          score += pts;
+          popup(m.x, m.y + 26, onBeat ? "拍ぴったり撃退！ +" + pts : "撃退 +" + pts, onBeat ? "#ffe08a" : "#f5ecd6", onBeat ? 18 : 16);
+          for (let k = 0; k < 14; k++) {
+            const a = Math.random() * Math.PI * 2, v = 60 + Math.random() * 160;
+            parts.push({ x: m.x, y: m.y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, t: 0, c: k % 3 ? "#f5ecd6" : "#e0b04f" });
+          }
+          if (m.y > HEAD.y - 50 && Math.hypot(m.x - HEAD.x, m.y - HEAD.y) < 50) popup(HEAD.x, HEAD.y - 60, "自分の頭をぺちっ", "#ffd0c0", 15);
+        } else if (d < HIT_R * 2.2 && m.state !== "suck") {
+          // 惜しい！蚊が逃げる
+          const a = Math.atan2(m.y - y, m.x - x);
+          m.vx = Math.cos(a) * 320; m.vy = Math.sin(a) * 320;
+          m.state = "fly"; m.wp = randWp(); m.wpT = 0;
+        }
+      });
+      if (hitAny) { sfxSwat(ac.currentTime); flash = 1; }
+    }
+    if (chaos >= 100) { chaos = 100; endGame("orchestra"); }
+  }
+
+  // ---------- 蚊 ----------
+  function randWp() { return { x: 50 + Math.random() * 380, y: 100 + Math.random() * 400 }; }
+
+  function spawnMosquito(sec) {
+    const left = Math.random() < 0.5;
+    mosq.push({
+      x: left ? -20 : W + 20, y: 140 + Math.random() * 260,
+      vx: left ? 80 : -80, vy: 0,
+      state: "fly", timer: (3 + Math.random() * 3) / SECTIONS[sec].speed,
+      wp: randWp(), wpT: 0, suck: 0, t: 0, flap: Math.random() * 10,
+    });
+  }
+
+  function updateMosquito(m, dt, sec) {
+    const sp = SECTIONS[sec].speed;
+    m.flap += dt * 60;
+    if (m.state === "dead") {
+      m.t += dt; m.vy += 500 * dt; m.x += m.vx * dt; m.y += m.vy * dt;
+      return m.t < 1.2;
+    }
+    let tx, ty, v;
+    if (m.state === "fly") {
+      tx = m.wp.x; ty = m.wp.y; v = 85 * sp;
+      m.wpT += dt;
+      if (m.wpT > 1.6 || Math.hypot(tx - m.x, ty - m.y) < 20) { m.wp = randWp(); m.wpT = 0; }
+      m.timer -= dt;
+      if (m.timer <= 0) m.state = "approach";
+    } else if (m.state === "approach") {
+      tx = BALD.x + Math.sin(m.flap * 0.05) * 30; ty = BALD.y - 6; v = 70 * sp;
+      if (Math.hypot(BALD.x - m.x, BALD.y - m.y) < 16) { m.state = "suck"; m.suck = 0; }
+    } else if (m.state === "suck") {
+      m.x += (BALD.x - 4 - m.x) * Math.min(1, dt * 8);
+      m.y += (BALD.y - 4 - m.y) * Math.min(1, dt * 8);
+      m.suck += dt;
+      if (m.suck >= SUCK_TIME) {
+        lives--; chaos = Math.min(100, chaos + 6); combo = 0;
+        bites.push({ x: BALD.x + (Math.random() - 0.5) * 30, y: BALD.y + 4 + (Math.random() - 0.5) * 10 });
+        popup(HEAD.x, HEAD.y - 64, "チクッ！", "#ff6a5a", 26);
+        redFlash = 1;
+        sfxBite(ac.currentTime);
+        m.state = "flee";
+        if (lives <= 0) endGame("itch");
+      }
+      return true;
+    } else if (m.state === "flee") {
+      tx = m.x < 240 ? -60 : W + 60; ty = 80; v = 200;
+      if (m.x < -40 || m.x > W + 40) return false;
+    }
+    const dx = tx - m.x, dy = ty - m.y, dl = Math.hypot(dx, dy) || 1;
+    const k = Math.min(1, dt * 2.6);
+    m.vx += (dx / dl * v - m.vx) * k + (Math.random() - 0.5) * 900 * dt;
+    m.vy += (dy / dl * v - m.vy) * k + (Math.random() - 0.5) * 900 * dt;
+    m.x += m.vx * dt; m.y += m.vy * dt;
+    m.y = Math.max(70, m.y);
+    return true;
+  }
+
+  // ---------- 更新 ----------
+  function update(dt) {
+    if (!ac) return;
+    const t = now();
+
+    if (state === "play") {
+      while (nextSched < beats.length && startAt + beats[nextSched].t < ac.currentTime + 0.12) { scheduleBeat(nextSched); nextSched++; }
+
+      while (missPtr < beats.length && t > beats[missPtr].t + GOOD) {
+        const b = beats[missPtr];
+        if (!b.hit && !b.count) {
+          chaos += 5; combo = 0;
+          popup(240, 318, "合図がない…", "#e8b3a8", 15);
+        }
+        missPtr++;
+      }
+      if (chaos >= 100) { chaos = 100; endGame("orchestra"); }
+    }
+
+    while (bp < beats.length - 1 && beats[bp + 1].t <= t) bp++;
+    const sec = beats.length ? beats[bp].sec : 0;
+
+    if (state === "play") {
+      const songStarted = beats.length > 4 && t >= beats[4].t;
+      if (songStarted && sec !== lastSection) {
+        lastSection = sec; sectionBanner = 2.2; sectionName = SECTIONS[sec].name;
+      }
+      if (songStarted && t < songEnd - 1) {
+        spawnTimer -= dt;
+        const alive = mosq.filter(m => m.state !== "dead" && m.state !== "flee").length;
+        if (alive < SECTIONS[sec].mosq && spawnTimer <= 0) { spawnMosquito(sec); spawnTimer = 1.3; }
+      }
+      if (t > songEnd + 0.4) endGame("clear");
+    }
+
+    if (state === "play" || state === "ending" || state === "over") {
+      mosq = mosq.filter(m => updateMosquito(m, dt, sec));
+    }
+    if (state === "ending" || state === "over") {
+      endTimer -= dt;
+      if (state === "ending") mosq.forEach(m => { if (m.state !== "dead") m.state = "flee"; });
+      if (endTimer <= 0) showResult();
+    }
+
+    // 羽音
+    if (buzz) {
+      let near = null, nd = 1e9;
+      if (state === "play") mosq.forEach(m => {
+        if (m.state === "dead") return;
+        const d = Math.hypot(m.x - HEAD.x, m.y - HEAD.y);
+        if (d < nd) { nd = d; near = m; }
+      });
+      const target = near ? 0.025 + 0.13 * Math.max(0, 1 - nd / 520) : 0;
+      buzz.g.gain.setTargetAtTime(target, ac.currentTime, 0.05);
+      if (near) {
+        const f = near.state === "suck" ? 610 : near.state === "approach" ? 580 : 540;
+        buzz.o1.frequency.setTargetAtTime(f, ac.currentTime, 0.1);
+        buzz.o2.frequency.setTargetAtTime(f + 16, ac.currentTime, 0.1);
+        if (buzz.pan) buzz.pan.pan.setTargetAtTime(Math.max(-1, Math.min(1, (near.x - 240) / 240)), ac.currentTime, 0.05);
+      }
+    }
+
+    hand.amt = Math.max(0, hand.amt - dt * 3.2);
+    pops.forEach(p => p.t += dt); pops = pops.filter(p => p.t < 0.9);
+    swooshes.forEach(s => s.t += dt); swooshes = swooshes.filter(s => s.t < 0.35);
+    parts.forEach(p => { p.t += dt; p.x += p.vx * dt; p.y += p.vy * dt; p.vy += 300 * dt; }); parts = parts.filter(p => p.t < 0.6);
+    flash = Math.max(0, flash - dt * 5);
+    redFlash = Math.max(0, redFlash - dt * 2.5);
+    sectionBanner = Math.max(0, sectionBanner - dt);
+  }
+
+  // ---------- 描画 ----------
+  function drawBackground() {
+    const c = bgx;
+    c.setTransform(scale, 0, 0, scale, 0, 0);
+    // カーテン
+    const cg = c.createLinearGradient(0, 0, 0, 260);
+    cg.addColorStop(0, "#2a0a10"); cg.addColorStop(1, "#4a1420");
+    c.fillStyle = cg; c.fillRect(0, 0, W, 260);
+    for (let x = 0; x < W; x += 24) {
+      const g = c.createLinearGradient(x, 0, x + 24, 0);
+      g.addColorStop(0, "rgba(0,0,0,0.35)"); g.addColorStop(0.5, "rgba(255,120,120,0.06)"); g.addColorStop(1, "rgba(0,0,0,0.35)");
+      c.fillStyle = g; c.fillRect(x, 0, 24, 260);
+    }
+    // 上の飾り幕
+    c.fillStyle = "#5a1622";
+    c.beginPath(); c.moveTo(0, 0); c.lineTo(W, 0); c.lineTo(W, 60);
+    for (let x = W; x >= 0; x -= 40) c.quadraticCurveTo(x - 20, 86, x - 40, 60);
+    c.closePath(); c.fill();
+    c.strokeStyle = "#e0b04f"; c.lineWidth = 2;
+    c.beginPath(); c.moveTo(0, 60);
+    for (let x = 0; x < W; x += 40) c.quadraticCurveTo(x + 20, 86, x + 40, 60);
+    c.stroke();
+    // 舞台の床
+    const fg = c.createLinearGradient(0, 230, 0, H);
+    fg.addColorStop(0, "#5c3820"); fg.addColorStop(0.5, "#7a4a2a"); fg.addColorStop(1, "#3a2213");
+    c.fillStyle = fg; c.fillRect(0, 230, W, H - 230);
+    c.strokeStyle = "rgba(0,0,0,0.22)"; c.lineWidth = 1;
+    for (let i = -12; i <= 12; i++) {
+      c.beginPath(); c.moveTo(240 + i * 22, 230); c.lineTo(240 + i * 70, H); c.stroke();
+    }
+    for (let y = 250, s = 10; y < H; y += s, s *= 1.18) {
+      c.beginPath(); c.moveTo(0, y); c.lineTo(W, y); c.strokeStyle = "rgba(0,0,0,0.12)"; c.stroke();
+    }
+    // 照明
+    const lg = c.createRadialGradient(240, 210, 10, 240, 230, 320);
+    lg.addColorStop(0, "rgba(255,230,170,0.22)"); lg.addColorStop(1, "rgba(255,230,170,0)");
+    c.fillStyle = lg; c.fillRect(0, 0, W, H);
+    // 指揮台
+    c.fillStyle = "#24140c";
+    c.beginPath(); c.moveTo(150, 690); c.lineTo(330, 690); c.lineTo(350, H); c.lineTo(130, H); c.closePath(); c.fill();
+    c.strokeStyle = "#e0b04f"; c.lineWidth = 1.5;
+    c.beginPath(); c.moveTo(150, 690); c.lineTo(330, 690); c.stroke();
+    // 四隅を少し暗く
+    const vg = c.createRadialGradient(240, 380, 200, 240, 380, 520);
+    vg.addColorStop(0, "rgba(0,0,0,0)"); vg.addColorStop(1, "rgba(0,0,0,0.5)");
+    c.fillStyle = vg; c.fillRect(0, 0, W, H);
+  }
+
+  function drawMusician(m, bob, jit, tilt, beatPh) {
+    const c = ctx, s = m.s;
+    c.save();
+    c.translate(m.x + jit.x, m.y + jit.y);
+    c.rotate(tilt);
+    c.scale(s, s);
+    // 譜面台
+    c.strokeStyle = "#111"; c.lineWidth = 2;
+    c.beginPath(); c.moveTo(0, 30); c.lineTo(0, 54); c.stroke();
+    c.fillStyle = "#1a1a1a"; c.fillRect(-11, 22, 22, 12);
+    c.fillStyle = "#e8dcc0"; c.fillRect(-9, 23, 18, 9);
+    // 体
+    c.translate(0, bob);
+    c.fillStyle = m.dress;
+    c.beginPath(); c.moveTo(-16, 22); c.quadraticCurveTo(-17, -2, 0, -4); c.quadraticCurveTo(17, -2, 16, 22); c.closePath(); c.fill();
+    c.fillStyle = "#f2efe6"; c.beginPath(); c.moveTo(-3, -3); c.lineTo(3, -3); c.lineTo(0, 6); c.closePath(); c.fill();
+    // 頭
+    c.fillStyle = m.skin; c.beginPath(); c.arc(0, -14, 9, 0, Math.PI * 2); c.fill();
+    c.fillStyle = m.hair; c.beginPath(); c.arc(0, -16, 9.5, Math.PI * 1.05, Math.PI * 1.95); c.fill();
+    // 楽器
+    if (m.type === "violin") {
+      c.fillStyle = "#8a4a1f";
+      c.save(); c.translate(10, -4); c.rotate(-0.6); c.beginPath(); c.ellipse(0, 0, 9, 4.5, 0, 0, Math.PI * 2); c.fill(); c.restore();
+      c.strokeStyle = "#d8c9a8"; c.lineWidth = 1.2;
+      const bx = Math.sin(beatPh * Math.PI) * 8;
+      c.beginPath(); c.moveTo(-14 + bx, 4); c.lineTo(18 + bx, -10); c.stroke();
+    } else if (m.type === "cello") {
+      c.fillStyle = "#7a3d18";
+      c.beginPath(); c.ellipse(0, 18, 9, 13, 0, 0, Math.PI * 2); c.fill();
+      c.strokeStyle = "#2a160a"; c.lineWidth = 2; c.beginPath(); c.moveTo(0, 6); c.lineTo(0, -12); c.stroke();
+    } else {
+      c.strokeStyle = "#e0b04f"; c.lineWidth = 2.5;
+      c.beginPath(); c.moveTo(0, -10); c.lineTo(15, -3); c.stroke();
+      c.fillStyle = "#e0b04f"; c.beginPath(); c.arc(17, -2, 4.5, 0, Math.PI * 2); c.fill();
+    }
+    c.restore();
+  }
+
+  function drawMosquito(m, ringP) {
+    const c = ctx;
+    c.save();
+    c.globalAlpha = m.state === "dead" ? Math.max(0, 1 - m.t) : 1;
+    if (ringP !== null && (m.state === "fly" || m.state === "approach" || m.state === "suck")) {
+      const r = 22 + 48 * ringP;
+      const close = ringP < 0.12;
+      c.strokeStyle = close ? "rgba(255,232,150,0.95)" : "rgba(224,176,79," + (0.35 + 0.5 * (1 - ringP)) + ")";
+      c.lineWidth = close ? 3 : 2;
+      c.beginPath(); c.arc(m.x, m.y, r, 0, Math.PI * 2); c.stroke();
+      c.strokeStyle = "rgba(245,236,214,0.18)"; c.lineWidth = 1;
+      c.setLineDash([3, 4]); c.beginPath(); c.arc(m.x, m.y, 22, 0, Math.PI * 2); c.stroke(); c.setLineDash([]);
+    }
+    c.translate(m.x, m.y);
+    const face = m.vx >= 0 ? 1 : -1;
+    c.scale(face * 1.25, 1.25);
+    if (m.state === "dead") c.rotate(m.t * 6);
+    // 羽
+    const wing = Math.sin(m.flap) * 0.9;
+    c.fillStyle = "rgba(220,230,255,0.55)";
+    c.save(); c.rotate(-0.4 - wing * 0.5); c.beginPath(); c.ellipse(0, -7, 3.5, 8, 0.3, 0, Math.PI * 2); c.fill(); c.restore();
+    c.save(); c.rotate(0.2 + wing * 0.5); c.beginPath(); c.ellipse(2, -6, 3, 7, -0.3, 0, Math.PI * 2); c.fill(); c.restore();
+    // 脚
+    c.strokeStyle = "#1a1210"; c.lineWidth = 0.8;
+    for (let i = -1; i <= 1; i++) { c.beginPath(); c.moveTo(i * 2.5, 1); c.lineTo(i * 4 - 2, 8); c.stroke(); }
+    // 体
+    c.fillStyle = "#2a1c18";
+    c.beginPath(); c.ellipse(-5, 0, 6, 2.4, 0.15, 0, Math.PI * 2); c.fill();
+    c.fillStyle = "#3a2a24"; c.beginPath(); c.arc(2.5, -0.5, 2.8, 0, Math.PI * 2); c.fill();
+    c.strokeStyle = "#2a1c18"; c.lineWidth = 1;
+    c.beginPath(); c.moveTo(5, 0); c.lineTo(11, m.state === "suck" ? 4 : 1.5); c.stroke();
+    c.restore();
+    if (m.state === "suck") {
+      const p = m.suck / SUCK_TIME;
+      c.strokeStyle = "#e2483d"; c.lineWidth = 4;
+      c.beginPath(); c.arc(m.x, m.y, 16, -Math.PI / 2, -Math.PI / 2 + p * Math.PI * 2); c.stroke();
+    }
+  }
+
+  function drawConductor(bob) {
+    const c = ctx;
+    const shR = { x: 272, y: 642 }, shL = { x: 208, y: 642 };
+    // 左手（拍に合わせて上下）
+    const lh = { x: 168, y: 612 + bob * 10 };
+    c.strokeStyle = "#0d0a0b"; c.lineWidth = 15; c.lineCap = "round";
+    c.beginPath(); c.moveTo(shL.x, shL.y); c.lineTo(lh.x, lh.y); c.stroke();
+    c.fillStyle = "#f1c9a5"; c.beginPath(); c.arc(lh.x, lh.y, 7, 0, Math.PI * 2); c.fill();
+    // 体（燕尾服）
+    c.fillStyle = "#0d0a0b";
+    c.beginPath(); c.moveTo(196, 640); c.quadraticCurveTo(240, 618, 284, 640); c.lineTo(318, H); c.lineTo(162, H); c.closePath(); c.fill();
+    c.strokeStyle = "#2a2226"; c.lineWidth = 1.5;
+    c.beginPath(); c.moveTo(240, 632); c.lineTo(240, H); c.stroke();
+    // 右手と指揮棒
+    const rest = { x: 318, y: 590 + bob * 12 };
+    const e = hand.amt * hand.amt * (3 - 2 * hand.amt);
+    const dxT = hand.tx - shR.x, dyT = hand.ty - shR.y, dlT = Math.hypot(dxT, dyT) || 1;
+    const reach = Math.min(96, dlT);
+    const swingHand = { x: shR.x + dxT / dlT * reach, y: shR.y + dyT / dlT * reach };
+    const rh = { x: rest.x + (swingHand.x - rest.x) * e, y: rest.y + (swingHand.y - rest.y) * e };
+    let ddx = (hand.tx - rh.x) * e + (40) * (1 - e), ddy = (hand.ty - rh.y) * e + (-60) * (1 - e);
+    const dd = Math.hypot(ddx, ddy) || 1;
+    const tip = { x: rh.x + ddx / dd * 78, y: rh.y + ddy / dd * 78 };
+    c.strokeStyle = "#0d0a0b"; c.lineWidth = 15;
+    c.beginPath(); c.moveTo(shR.x, shR.y); c.lineTo(rh.x, rh.y); c.stroke();
+    c.strokeStyle = "#f8f3e6"; c.lineWidth = 3;
+    c.beginPath(); c.moveTo(rh.x, rh.y); c.lineTo(tip.x, tip.y); c.stroke();
+    c.fillStyle = "#f1c9a5"; c.beginPath(); c.arc(rh.x, rh.y, 7, 0, Math.PI * 2); c.fill();
+    c.lineCap = "butt";
+    // 襟
+    c.fillStyle = "#f2efe6";
+    c.beginPath(); c.moveTo(226, 628); c.lineTo(254, 628); c.lineTo(250, 636); c.lineTo(230, 636); c.closePath(); c.fill();
+    // 頭（後ろ姿、てっぺんがハゲ）
+    c.fillStyle = "#e9bf98"; c.beginPath(); c.arc(HEAD.x, HEAD.y, HEAD.r, 0, Math.PI * 2); c.fill();
+    c.fillStyle = "#cfcac2";
+    c.beginPath(); c.arc(HEAD.x, HEAD.y + 2, HEAD.r + 1, Math.PI * 0.05, Math.PI * 0.95); c.fill();
+    c.beginPath(); c.ellipse(HEAD.x - 22, HEAD.y - 4, 8, 14, 0.3, 0, Math.PI * 2); c.fill();
+    c.beginPath(); c.ellipse(HEAD.x + 22, HEAD.y - 4, 8, 14, -0.3, 0, Math.PI * 2); c.fill();
+    c.fillStyle = "rgba(255,255,255,0.35)";
+    c.beginPath(); c.ellipse(BALD.x - 6, BALD.y - 6, 9, 5, -0.4, 0, Math.PI * 2); c.fill();
+    c.fillStyle = "#e9bf98";
+    c.beginPath(); c.ellipse(HEAD.x - 27, HEAD.y + 2, 4, 7, 0, 0, Math.PI * 2); c.fill();
+    c.beginPath(); c.ellipse(HEAD.x + 27, HEAD.y + 2, 4, 7, 0, 0, Math.PI * 2); c.fill();
+    // 刺されたあと
+    bites.forEach(b => {
+      c.fillStyle = "rgba(226,72,61,0.85)"; c.beginPath(); c.arc(b.x, b.y, 5, 0, Math.PI * 2); c.fill();
+      c.fillStyle = "rgba(255,170,160,0.9)"; c.beginPath(); c.arc(b.x - 1.5, b.y - 1.5, 1.8, 0, Math.PI * 2); c.fill();
+    });
+  }
+
+  function heart(x, y, s, filled) {
+    const c = ctx;
+    c.beginPath();
+    c.moveTo(x, y + s * 0.35);
+    c.bezierCurveTo(x, y, x - s * 0.5, y, x - s * 0.5, y + s * 0.35);
+    c.bezierCurveTo(x - s * 0.5, y + s * 0.65, x, y + s * 0.8, x, y + s);
+    c.bezierCurveTo(x, y + s * 0.8, x + s * 0.5, y + s * 0.65, x + s * 0.5, y + s * 0.35);
+    c.bezierCurveTo(x + s * 0.5, y, x, y, x, y + s * 0.35);
+    if (filled) { c.fillStyle = "#e2483d"; c.fill(); }
+    else { c.strokeStyle = "rgba(245,236,214,0.4)"; c.lineWidth = 1.5; c.stroke(); }
+  }
+
+  function drawHUD(t, cur, nb) {
+    const c = ctx;
+    c.fillStyle = "rgba(15,4,6,0.72)"; c.fillRect(0, 0, W, 58);
+    c.strokeStyle = "rgba(224,176,79,0.5)"; c.lineWidth = 1;
+    c.beginPath(); c.moveTo(0, 58.5); c.lineTo(W, 58.5); c.stroke();
+    // 曲の進み
+    const prog = beats.length ? Math.max(0, Math.min(1, t / songEnd)) : 0;
+    c.fillStyle = "rgba(224,176,79,0.25)"; c.fillRect(0, 0, W, 3);
+    c.fillStyle = "#e0b04f"; c.fillRect(0, 0, W * prog, 3);
+    // 乱れメーター
+    c.font = "700 11px " + FONT_UI; c.fillStyle = "#f5ecd6"; c.textBaseline = "alphabetic"; c.textAlign = "left";
+    c.fillText("オケの乱れ", 14, 22);
+    c.fillStyle = "rgba(245,236,214,0.15)"; c.fillRect(14, 30, 140, 10);
+    const cr = chaos / 100;
+    c.fillStyle = cr < 0.5 ? "#8fcf9f" : cr < 0.8 ? "#e8b84a" : "#e2483d";
+    c.fillRect(14, 30, 140 * cr, 10);
+    c.strokeStyle = "rgba(245,236,214,0.5)"; c.strokeRect(14.5, 30.5, 139, 9);
+    c.font = "700 11px " + FONT_UI; c.fillStyle = "#f5ecd6";
+    c.fillText(Math.round(chaos) + "%", 160, 39);
+    // 拍のランプ
+    const bpm = SECTIONS[cur ? cur.sec : 0].bpm;
+    const posInBar = cur && t >= cur.t ? ((cur.n % 4) + 4) % 4 : -1;
+    for (let i = 0; i < 4; i++) {
+      const x = 222 + i * 16;
+      const on = i === posInBar && t - cur.t < 0.15;
+      c.fillStyle = on ? (i === 0 ? "#ffe08a" : "#f5ecd6") : "rgba(245,236,214,0.2)";
+      c.beginPath(); c.arc(x, 24, i === 0 ? 5.5 : 4.5, 0, Math.PI * 2); c.fill();
+    }
+    c.textAlign = "center"; c.font = "500 10px " + FONT_UI; c.fillStyle = "rgba(245,236,214,0.75)";
+    c.fillText("♩= " + bpm, 246, 47);
+    // ライフとスコア
+    for (let i = 0; i < 3; i++) heart(W - 66 + i * 20, 12, 14, i < lives);
+    c.textAlign = "right"; c.font = "700 13px " + FONT_UI; c.fillStyle = "#f5ecd6";
+    c.fillText(score.toLocaleString("ja-JP"), W - 14, 46);
+    if (combo >= 4) {
+      c.font = "700 10px " + FONT_UI; c.fillStyle = "#ffe08a";
+      c.fillText(combo + " コンボ", W - 80, 46);
+    }
+  }
+
+  function draw() {
+    const c = ctx;
+    const t = now();
+    const cur = beats.length ? beats[bp] : null;
+    let nb = null, ringP = null, beatPh = 0;
+    if (cur && state !== "title") {
+      nb = t < cur.t ? cur : beats[bp + 1] || null;
+      const iv = cur.iv;
+      if (nb) ringP = Math.max(0, Math.min(1, (nb.t - t) / iv));
+      beatPh = t >= cur.t ? Math.min(1, (t - cur.t) / iv) : 0;
+    }
+    c.setTransform(scale, 0, 0, scale, 0, 0);
+    let sx = 0, sy = 0;
+    if (!reduceMotion && state === "play" && chaos > 60) {
+      const a = (chaos - 60) / 40 * 3;
+      sx = (Math.random() - 0.5) * a; sy = (Math.random() - 0.5) * a;
+    }
+    c.setTransform(scale, 0, 0, scale, sx * scale, sy * scale);
+    c.drawImage(bg, 0, 0, W, H);
+
+    const bob = state === "title" ? 0 : Math.pow(1 - beatPh, 3);
+    musicians.forEach(m => {
+      const jAmp = reduceMotion ? 0 : chaos * 0.05;
+      const jit = { x: (Math.sin(m.seed + t * 17) * jAmp), y: (Math.cos(m.seed * 2 + t * 13) * jAmp) };
+      const tilt = chaos > 45 ? Math.sin(m.seed + t * 3) * (chaos - 45) / 300 : 0;
+      drawMusician(m, -bob * 2.5, jit, tilt, beatPh);
+    });
+
+    // 乱れの赤み
+    if (chaos > 0) {
+      c.fillStyle = "rgba(226,72,61," + (chaos / 100 * 0.22) + ")";
+      c.fillRect(0, 60, W, 260);
+    }
+
+    drawConductor(state === "title" ? 0 : 1 - bob);
+    mosq.forEach(m => drawMosquito(m, state === "play" ? ringP : null));
+
+    swooshes.forEach(s => {
+      const p = s.t / 0.35;
+      c.strokeStyle = s.q === "perfect" || s.q === "good" ? "rgba(255,232,150," + (1 - p) + ")" : "rgba(255,138,122," + (1 - p) + ")";
+      c.lineWidth = 4 * (1 - p) + 1;
+      c.beginPath(); c.arc(s.x, s.y, 14 + p * 30, -2.6, -0.5); c.stroke();
+    });
+    parts.forEach(p => {
+      c.globalAlpha = 1 - p.t / 0.6; c.fillStyle = p.c;
+      c.fillRect(p.x - 1.5, p.y - 1.5, 3, 3);
+    });
+    c.globalAlpha = 1;
+    pops.forEach(p => {
+      const a = 1 - p.t / 0.9;
+      c.globalAlpha = a; c.textAlign = "center"; c.textBaseline = "middle";
+      c.font = "800 " + p.size + "px " + FONT_D;
+      c.lineWidth = 4; c.strokeStyle = "rgba(20,6,8,0.85)";
+      c.strokeText(p.text, p.x, p.y - p.t * 30);
+      c.fillStyle = p.color; c.fillText(p.text, p.x, p.y - p.t * 30);
+    });
+    c.globalAlpha = 1;
+
+    if (state !== "title") {
+      // カウントイン
+      if (cur && cur.count && t >= -0.3) {
+        c.textAlign = "center"; c.textBaseline = "middle";
+        c.font = "800 22px " + FONT_D; c.fillStyle = "#f5ecd6";
+        c.fillText("拍に合わせてタップ", 240, 400);
+        c.font = "500 13px " + FONT_UI; c.fillStyle = "rgba(245,236,214,0.8)";
+        c.fillText("まずは4拍、どこでもいいので振ってみよう", 240, 430);
+      }
+      if (sectionBanner > 0) {
+        const a = Math.min(1, sectionBanner, (2.2 - sectionBanner) * 4);
+        c.globalAlpha = a; c.textAlign = "center"; c.textBaseline = "middle";
+        c.fillStyle = "rgba(15,4,6,0.6)"; c.fillRect(0, 352, W, 44);
+        c.font = "800 20px " + FONT_D; c.fillStyle = "#ffe08a";
+        c.fillText(sectionName, 240, 375);
+        c.globalAlpha = 1;
+      }
+      drawHUD(t, cur, nb);
+    }
+
+    if (flash > 0) { c.fillStyle = "rgba(255,240,200," + flash * 0.25 + ")"; c.fillRect(0, 0, W, H); }
+    if (redFlash > 0) { c.fillStyle = "rgba(226,72,61," + redFlash * 0.3 + ")"; c.fillRect(0, 0, W, H); }
+    if (state === "over") {
+      c.fillStyle = "rgba(15,4,6," + Math.min(0.5, (1.2 - endTimer) * 0.6) + ")"; c.fillRect(0, 0, W, H);
+    }
+  }
+
+  // ---------- ループ ----------
+  let last = performance.now();
+  function loop(ts) {
+    const dt = Math.min(0.05, (ts - last) / 1000);
+    last = ts;
+    update(dt);
+    draw();
+    requestAnimationFrame(loop);
+  }
+
+  document.addEventListener("visibilitychange", () => {
+    if (!ac) return;
+    if (document.hidden) ac.suspend(); else ac.resume();
+  });
+
+  document.getElementById("startBtn").addEventListener("click", startGame);
+  document.getElementById("retryBtn").addEventListener("click", startGame);
+  window.addEventListener("resize", resize);
+
+  // タイトル画面にも蚊を1匹飛ばしておく
+  mosq.push({ x: 120, y: 420, vx: 40, vy: 0, state: "fly", timer: 1e9, wp: randWp(), wpT: 0, suck: 0, t: 0, flap: 0 });
+  const titleTick = (() => {
+    let prev = performance.now();
+    return function tick(ts) {
+      if (state !== "title") return;
+      const dt = Math.min(0.05, (ts - prev) / 1000); prev = ts;
+      mosq.forEach(m => updateMosquito(m, dt, 0));
+      requestAnimationFrame(tick);
+    };
+  })();
+
+  resize();
+  requestAnimationFrame(titleTick);
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>
