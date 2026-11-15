@@ -194,6 +194,18 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
 .missions .mk { width: 1.2em; flex: none; font-weight: 800; color: #b9a98a; }
 .missions .ok .mk { color: #2f7a46; }
 .missions .new { color: var(--accent-red); font-size: 11px; font-weight: 800; }
+#resultCard .card-inner { gap: 6px; padding: 14px 16px; max-width: 380px; }
+#resultCard .eyebrow { font-size: 10px; }
+#resultCard h2 { font-size: 20px; }
+#resultCard h3 { margin: 2px 0 0; font-size: 10px; }
+#resultCard .lead { font-size: 11.5px; line-height: 1.45; }
+#resultCard .stats { grid-template-columns: auto 1fr auto 1fr; gap: 1px 8px; font-size: 11.5px; line-height: 1.5; }
+#resultCard .stats dd { text-align: left; }
+#resultCard .stats .wide { grid-column: span 3; font-size: 15px; }
+#resultCard .missions { font-size: 11.5px; gap: 0; line-height: 1.5; }
+#resultCard .rank { font-size: 11.5px; line-height: 1.45; padding-top: 6px; }
+#resultCard .rank b { font-size: 22px; margin-right: 6px; }
+#resultCard .row button { padding: 8px 12px; font-size: 14px; }
 .mini { font-size: 14px; padding: 8px 0; border-radius: 6px; background: #fffaf0; color: var(--ink); box-shadow: inset 0 0 0 1px var(--paper-line); }
 </style>
 </head>
@@ -278,17 +290,17 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
         <h2 id="resTitle">ブラボー！</h2>
         <p class="lead" id="resSub"></p>
         <dl class="stats">
-          <dt>スコア</dt><dd id="resScore">0</dd>
+          <dt>スコア</dt><dd id="resScore" class="wide">0</dd>
           <dt>拍ぴったり</dt><dd id="resAcc">0%</dd>
-          <dt>テンポ合わせ</dt><dd id="resTempo">0%</dd>
-          <dt>強弱合わせ</dt><dd id="resDyn">0%</dd>
-          <dt>予備拍のテンポ</dt><dd id="resPrep">-</dd>
-          <dt>出番の合図</dt><dd id="resCues">0</dd>
+          <dt>テンポ</dt><dd id="resTempo">0%</dd>
+          <dt>強弱</dt><dd id="resDyn">0%</dd>
+          <dt>予備拍</dt><dd id="resPrep">-</dd>
+          <dt>合図</dt><dd id="resCues">0</dd>
           <dt>締め</dt><dd id="resCut">-</dd>
           <dt>撃退した蚊</dt><dd id="resSwats">0</dd>
-          <dt>叩いてしまった団員</dt><dd id="resBonk">0</dd>
+          <dt>観客</dt><dd id="resCrowd">0%</dd>
+          <dt>叩いた団員</dt><dd id="resBonk">0</dd>
           <dt>刺された団員</dt><dd id="resBitten">0</dd>
-          <dt>観客の満足度</dt><dd id="resCrowd">0%</dd>
         </dl>
         <h3>ミッション</h3>
         <ul class="missions" id="resMissions"></ul>
@@ -1071,7 +1083,7 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
   function sfxBite(t) {
     const o = ac.createOscillator(), g = ac.createGain();
     o.type = "square"; o.frequency.setValueAtTime(1900, t); o.frequency.exponentialRampToValueAtTime(700, t + 0.18);
-    g.gain.setValueAtTime(0.1, t); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.2);
+    g.gain.setValueAtTime(0.045, t); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.2);
     o.connect(g); g.connect(sfxBus); o.start(t); o.stop(t + 0.22);
   }
   function cheer(t, amount) {
@@ -1159,7 +1171,7 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
   let fermataT = 0, maestro = { bite: 0, sorry: 0, joy: 0 };
   let gest = null;
   let preps = [], prep = null, pendingPrep = null, prepOk = 0, prepTotal = 0, snaps = [], tempoMarks = [];
-  let bitten = 0, rowItch = {}, offsets = [];
+  let bitten = 0, rowItch = {}, offsets = [], layerSpans = {}, lateOk = 0;
   let crowd = 50, crowdHigh = false, shakeT = 0, bossSpawned = false, queenKilled = false;
 
   function everyText(e) { return e === 1 ? "1拍ずつ" : e === song.meter ? "1小節に1回" : e + "拍に1回"; }
@@ -1210,6 +1222,47 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
       taps.forEach(t => { if (t.b < c.b) pb = t.b; });
       return { ...c, prepB: pb, atPrep: preps.some(q => q.b === c.b), done: false, ok: false };
     });
+    // パートごとに音が鳴っている区間
+    layerSpans = {};
+    Object.keys(ROWS).forEach(type => {
+      const ns = events.filter(e => e.layer === type).map(e => [e.b, e.b + e.d]).sort((a, b) => a[0] - b[0]);
+      const spans = [];
+      ns.forEach(([s0, e0]) => { const l = spans[spans.length - 1]; if (l && s0 <= l[1] + 2) l[1] = Math.max(l[1], e0); else spans.push([s0, e0]); });
+      layerSpans[type] = spans;
+    });
+    // 休みのあとに入ってくる場所（曲の頭は予備拍でそろって入るので除く）
+    const WHO = { violin: 3, cello: 2, brass: 4 };
+    Object.keys(layerSpans).forEach(type => layerSpans[type].forEach(sp => {
+      const start = sp[0];
+      if (start < 0.5) return;
+      if (cues.some(c => Math.abs(c.b - start) <= 2)) return;
+      let pb = 0;
+      taps.forEach(t => { if (t.b < start) pb = t.b; });
+      cues.push({ b: start, row: type, who: WHO[type], prepB: pb, atPrep: preps.some(q => Math.abs(q.b - start) < 0.01), auto: true, done: false, ok: false });
+    }));
+    cues.sort((a, b) => a.b - b.b);
+    // 休みのあとの入りは、合図がないと鳴らない
+    cues.forEach(c => {
+      const sp = (layerSpans[c.row] || []).find(q => Math.abs(q[0] - c.b) <= 0.6);
+      c.gate = !!sp;
+      c.segEnd = sp ? sp[1] : c.b;
+      c.enterB = c.gate ? undefined : c.b;
+      c.late = false;
+    });
+  }
+  // そのパートが今、合図を待っていて鳴らせない
+  function gatedOut(layer, b) {
+    for (const c of cues) {
+      if (!c.gate || c.row !== layer) continue;
+      if (b >= c.b - 0.01 && b < c.segEnd) return !(c.enterB !== undefined && b >= c.enterB - 0.01);
+    }
+    return false;
+  }
+  function rowResting(type) {
+    const spans = layerSpans[type] || [];
+    const active = spans.some(q => beatNow >= q[0] - 2 && beatNow <= q[1] + 0.3);
+    if (!active) return true;
+    return cues.some(c => c.gate && c.row === type && beatNow >= c.b - 0.01 && beatNow < c.segEnd && !(c.enterB !== undefined && beatNow >= c.enterB - 1.5));
   }
 
   let starting = false;
@@ -1245,7 +1298,7 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
     banner = { text: song.title, sub: song.composer, t: 2.4 };
     prep = preps[0]; pendingPrep = null; prepOk = 0; prepTotal = 0;
     crowd = 50; crowdHigh = false; shakeT = 0; bossSpawned = false; queenKilled = false;
-    bitten = 0; rowItch = {}; offsets = []; musicians.forEach(m => { m.bumps = 0; m.alarm = 0; });
+    bitten = 0; rowItch = {}; offsets = []; lateOk = 0; musicians.forEach(m => { m.bumps = 0; m.alarm = 0; });
     state = "prep";
     ["titleCard", "resultCard", "calibCard"].forEach(id => document.getElementById(id).hidden = true);
   }
@@ -1295,8 +1348,8 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
     $("resAcc").textContent = Math.round(acc * 100) + "%";
     $("resTempo").textContent = pct(tempoOk, tempoChecks);
     $("resDyn").textContent = pct(dynOk, dynChecks);
-    $("resPrep").textContent = prepTotal ? prepOk + " / " + prepTotal + " 回ぴったり" : "-";
-    $("resCues").textContent = cueOk + " / " + cues.length;
+    $("resPrep").textContent = prepTotal ? prepOk + "/" + prepTotal + " ぴったり" : "-";
+    $("resCues").textContent = cueOk + "/" + cues.length + (lateOk ? "（遅れ" + lateOk + "）" : "");
     $("resCut").textContent = cutResult;
     $("resSwats").textContent = swats + " 匹";
     $("resBonk").textContent = bonks + " 人";
@@ -1396,10 +1449,21 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
     const m = rowList(cue.row)[cue.who];
     return { x: m.x, y: m.y - 55 * m.s - 30, m };
   }
-  function shownCueAt(b) {
-    return cues.find(c => !c.done && (c.atPrep
-      ? (state === "prep" && prep && prep.b === c.b) || (b >= c.b - CUE_LEAD && b < c.b)
+  function shownCues(b) {
+    return cues.filter(c => !c.done && (c.late ? b < c.segEnd - 1
+      : c.atPrep ? (state === "prep" && prep && prep.b === c.b) || (b >= c.b - CUE_LEAD && b < c.b)
       : b >= c.prepB - CUE_LEAD && b < c.prepB + 1));
+  }
+  function shownCueAt(b) { return shownCues(b)[0] || null; }
+  // 合図をもらえなかったパート：あとから合図すれば次の小節の頭から入る
+  function missCue(c, m, msg) {
+    if (c.gate) {
+      c.late = true; addChaos(6);
+      popup(m.x, m.y - 80 * m.s, m.name + "「" + msg + "」 あとからでも合図を！", "#ff8a7a", 14);
+    } else {
+      c.done = true; addChaos(10); layerMess[c.row] = c.b + 8; m.angry = 3;
+      popup(m.x, m.y - 80 * m.s, m.name + "「" + msg + "」", "#ff8a7a", 15);
+    }
   }
 
   // 予備拍：1回目＝構え、2回目＝予備拍。2回の間隔がテンポになり、次の拍で楽団が入る
@@ -1437,15 +1501,13 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
       const mk = cueMark(pc);
       pc.done = true;
       if (Math.hypot(x - mk.x, y - mk.y) <= 24 && mk.m.itch > 0) {
-        addChaos(8); layerMess[pc.row] = pc.b + 8;
-        popup(mk.x, mk.y - 26, mk.m.name + "「かゆくて入れない…」", "#ff8a7a", 15);
+        pc.done = false; missCue(pc, mk.m, "かゆくて入れない…");
       } else if (Math.hypot(x - mk.x, y - mk.y) <= 24) {
-        pc.ok = true; cueOk++; score += 500; mk.m.joy = 2.5;
+        pc.ok = true; pc.enterB = pc.b; cueOk++; score += 500; mk.m.joy = 2.5;
         popup(mk.x, mk.y - 26, mk.m.name + "「スッ（息を吸って）」 +500", "#ffe08a", 16);
         sfxCue(ac.currentTime);
       } else {
-        addChaos(10); layerMess[pc.row] = pc.b + 8; mk.m.angry = 3;
-        popup(mk.x, mk.y - 26, mk.m.name + "「合図がなかった…」", "#ff8a7a", 15);
+        pc.done = false; missCue(pc, mk.m, "合図がなかった…");
       }
     }
     const entry = th + 60 * e / T;
@@ -1510,16 +1572,24 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
     }
 
     // 出番の合図（団員の頭上の金色マーク）
-    const sc = shownCueAt(pt);
     let onCueMark = false;
+    const sc = shownCues(pt).find(q => Math.hypot(x - cueMark(q).x, y - cueMark(q).y) <= 24);
     if (sc) {
       const mk = cueMark(sc);
-      onCueMark = Math.hypot(x - mk.x, y - mk.y) <= 24;
-      if (onCueMark && onBeat && !best.count && !sc.atPrep && sc.prepB === best.b && mk.m.itch > 0) {
-        sc.done = true; addChaos(8); layerMess[sc.row] = sc.b + 8;
-        popup(mk.x, mk.y - 26, mk.m.name + "「かゆくて入れない…」", "#ff8a7a", 15);
-      } else if (onCueMark && onBeat && !best.count && !sc.atPrep && sc.prepB === best.b) {
-        sc.done = true; sc.ok = true; cueOk++; crowdUp(6);
+      onCueMark = true;
+      if (sc.late && onBeat && !best.count) {
+        if (mk.m.itch > 0) popup(mk.x, mk.y - 26, mk.m.name + "「まだかゆい…」", "#ff8a7a", 14);
+        else {
+          sc.done = true; sc.late = false; lateOk++;
+          sc.enterB = (Math.floor(best.b / song.meter + 1e-6) + 1) * song.meter;
+          score += 150; crowdUp(2); mk.m.joy = 1.5;
+          popup(mk.x, mk.y - 26, mk.m.name + "「次の小節から入ります！」 +150", "#cfe7c8", 14);
+          sfxCue(ac.currentTime);
+        }
+      } else if (onBeat && !best.count && !sc.atPrep && !sc.late && sc.prepB === best.b && mk.m.itch > 0) {
+        missCue(sc, mk.m, "かゆくて入れない…");
+      } else if (onBeat && !best.count && !sc.atPrep && !sc.late && sc.prepB === best.b) {
+        sc.done = true; sc.ok = true; sc.enterB = sc.b; cueOk++; crowdUp(6);
         chaos = Math.max(0, chaos - 10);
         score += Math.round(500 * (fever ? 2 : 1));
         mk.m.joy = 2.5;
@@ -1711,8 +1781,7 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
     const list = [];
     musicians.forEach(mm => {
       if (mm.hurt > 0 || mm.itch > 0 || taken.has(mm)) return;
-      const resting = cues.some(cu => cu.rest && cu.row === mm.type && beatNow < cu.b - 2);
-      let w = resting ? 0.4 : 1.5;
+      let w = rowResting(mm.type) ? 0.4 : 1.5;
       if (mm.type === "violin") w *= 1.3;
       cues.forEach(cu => {
         if (cu.done) return;
@@ -1869,6 +1938,7 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
       const e = events[evPtr++];
       const mess = (layerMess[e.layer] || -99) > e.b;
       let m = e.m, jt = Math.random() * 0.01, det = (Math.random() - 0.5) * chaos * 0.8;
+      if (e.layer in ROWS && gatedOut(e.layer, e.b)) continue;   // 合図をもらっていないパートは鳴らない
       const iv = rowItch[e.layer] || 0;
       if (e.solo !== undefined && e.layer in ROWS && rowList(e.layer)[e.solo].itch > 0) continue;   // ソリストがかいている
       if (iv > 0 && Math.random() < iv * 0.9) continue;                                            // 弾けない人の分だけ音が抜ける
@@ -1935,14 +2005,8 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
           else if (Math.abs(level - dv) > 0.33) { addChaos(1.5); warn("dyn", level < dv ? "もっと大きく払って！（" + mk + "）" : "もっと小さく、トンと（" + mk + "）"); }
         }
         cues.forEach(c => {
-          if (!c.done && !c.atPrep && c.prepB === tb.b) {
-            c.done = true;
-            addChaos(10);
-            layerMess[c.row] = c.b + 8;
-            const m = rowList(c.row)[c.who];
-            m.angry = 3;
-            popup(m.x, m.y - 80 * m.s, m.name + "「入れなかった…」", "#ff8a7a", 15);
-          }
+          if (!c.done && !c.late && !c.atPrep && c.prepB === tb.b) missCue(c, rowList(c.row)[c.who], "入れなかった…");
+          if (c.late && !c.done && tb.b >= c.segEnd - 1) c.done = true;   // 出番が終わった
         });
         tapPtr++;
       }
@@ -2024,7 +2088,7 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
         const d = Math.hypot(m.x - HEAD.x, m.y - HEAD.y);
         if (d < nd) { nd = d; near = m; }
       });
-      const target = near ? 0.02 + 0.11 * Math.max(0, 1 - nd / 520) : 0;
+      const target = near ? 0.006 + 0.035 * Math.max(0, 1 - nd / 520) : 0;   // 音楽のじゃまにならない大きさ
       buzz.g.gain.setTargetAtTime(target, ac.currentTime, 0.05);
       if (near) {
         const f = (near.state === "suck" ? 610 : near.state === "approach" ? 580 : 540) * (near.kind === "big" ? 0.7 : near.kind === "fast" ? 1.2 : 1);
@@ -2740,20 +2804,21 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
 
   function drawCueMark(activeCue) {
     const c = ctx;
+      const late = activeCue.late;
       const goalB = activeCue.atPrep ? activeCue.b : activeCue.prepB;
       const left = Math.ceil(goalB - beatNow);
-      const mk = cueMark(activeCue), go = activeCue.atPrep ? state === "prep" : left <= 1;
+      const mk = cueMark(activeCue), go = late || (activeCue.atPrep ? state === "prep" : left <= 1);
       c.textAlign = "center"; c.textBaseline = "middle";
       c.font = "800 13px " + FONT_D;
-      const txt = mk.m.name + "の出番 " + (activeCue.atPrep ? (go ? "2回目の予備拍で合図！" : "次の予備拍で合図") : go ? "今！（予備拍）" : "予備拍まであと" + left + "拍");
+      const txt = late ? mk.m.name + "がまだ入っていない！ 合図を" : mk.m.name + "の出番 " + (activeCue.atPrep ? (go ? "2回目の予備拍で合図！" : "次の予備拍で合図") : go ? "今！（予備拍）" : "予備拍まであと" + left + "拍");
       const tw = c.measureText(txt).width + 16;
       const ly = mk.y - 44 < 128 ? mk.y + 22 : mk.y - 44;
       c.fillStyle = "rgba(15,4,6,0.85)"; c.fillRect(clamp(mk.x - tw / 2, 4, W - tw - 4), ly, tw, 20);
-      c.fillStyle = go ? "#ffe08a" : "#f5ecd6"; c.fillText(txt, clamp(mk.x, tw / 2 + 4, W - tw / 2 - 4), ly + 10);
+      c.fillStyle = late ? "#ff8a7a" : go ? "#ffe08a" : "#f5ecd6"; c.fillText(txt, clamp(mk.x, tw / 2 + 4, W - tw / 2 - 4), ly + 10);
       c.fillStyle = "rgba(15,4,6,0.7)"; c.beginPath(); c.arc(mk.x, mk.y, 17, 0, Math.PI * 2); c.fill();
-      c.strokeStyle = "#e0b04f"; c.lineWidth = 2.5; c.beginPath(); c.arc(mk.x, mk.y, 17, 0, Math.PI * 2); c.stroke();
+      c.strokeStyle = late ? "#e2483d" : "#e0b04f"; c.lineWidth = 2.5; c.beginPath(); c.arc(mk.x, mk.y, 17, 0, Math.PI * 2); c.stroke();
       if (go) {
-        const p = activeCue.atPrep ? 0 : clamp(goalB - beatNow, 0, 1);
+        const p = late ? (Math.sin(performance.now() / 150) * 0.5 + 0.5) * 0.5 : activeCue.atPrep ? 0 : clamp(goalB - beatNow, 0, 1);
         c.strokeStyle = "rgba(255,232,150," + (1 - p * 0.6) + ")"; c.lineWidth = 2.5;
         c.beginPath(); c.arc(mk.x, mk.y, 17 + 34 * p, 0, Math.PI * 2); c.stroke();
       }
@@ -3061,21 +3126,22 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
     c.setTransform(scale, 0, 0, scale, sx * scale, sy * scale);
     c.drawImage(bg, 0, 0, W, H);
 
-    const activeCue = playing && (state === "play" || state === "prep") ? shownCueAt(beatNow) : null;
+    const activeCues = playing && (state === "play" || state === "prep") ? shownCues(beatNow) : [];
+    const activeCue = activeCues[0] || null;
     const bob = playing ? Math.pow(1 - beatPh, 3) : 0;
     const now = performance.now() / 1000;
     const lv = playing ? level : 0.5;
     const baseMood = state === "play" && chaos > 50 ? "worried" : state === "play" && combo >= 16 ? "happy" : (state === "ending" || (state === "result" && endReason === "clear")) ? "happy" : "neutral";
     const live = mosq.filter(mm => mm.state !== "dead");
     ["brass", "cello", "violin"].forEach(type => {
-      const resting = playing && cues.some(cu => cu.rest && cu.row === type && beatNow < cu.b - 2);
+      const resting = playing && state !== "prep" && rowResting(type);
       rowList(type).forEach(m => {
         const jAmp = reduceMotion ? 0 : chaos * 0.05;
         const mess = playing && (layerMess[m.type] || -99) > beatNow;
         const jit = { x: Math.sin(m.seed + now * 17) * (jAmp + (mess ? 3 : 0)), y: Math.cos(m.seed * 2 + now * 13) * jAmp };
         const tilt = chaos > 45 ? Math.sin(m.seed + now * 3) * (chaos - 45) / 300 : 0;
-        const isCueMan = activeCue && activeCue.row === m.type && rowList(m.type)[activeCue.who] === m;
-        const glow = isCueMan ? 0.55 + 0.45 * Math.pow(1 - beatPh, 2) : (activeCue && activeCue.row === m.type ? 0.18 : 0);
+        const isCueMan = activeCues.some(q => q.row === m.type && rowList(m.type)[q.who] === m);
+        const glow = isCueMan ? 0.55 + 0.45 * Math.pow(1 - beatPh, 2) : (activeCues.some(q => q.row === m.type) ? 0.18 : 0);
         let look = (240 - m.x) / 240 * 0.6, nd = 170;
         live.forEach(mm => { const d = Math.hypot(mm.x - m.x, mm.y - m.y); if (d < nd) { nd = d; look = clamp((mm.x - m.x) / 30, -0.9, 0.9); } });
         const blink = ((now + m.seed) % 4.3) < 0.13;
@@ -3153,7 +3219,7 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
       }
       drawHUD();
       if (state === "play" || state === "prep") drawScoreLane();
-      if (activeCue) drawCueMark(activeCue);
+      activeCues.forEach(q => drawCueMark(q));
     }
     if (playing) drawAudience(beatPh);
     drawPortrait();
