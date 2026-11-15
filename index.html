@@ -337,7 +337,7 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
           tempo: [{ b: -4, bpm: 96 }, { b: 48, bpm: 96 }, { b: 64, bpm: 64 }],
           tapEvery: [{ b: 0, e: 1 }],
           lastTap: 64,
-          cues: [{ b: 16, row: "cello" }, { b: 32, row: "brass" }],
+          cues: [{ b: 16, row: "cello", rest: true }, { b: 32, row: "brass", rest: true }],
           spawn: p => ({ max: 1, fast: 0, big: 0, speed: 0.9 }),
         };
       },
@@ -383,7 +383,7 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
           tempo: [{ b: -4, bpm: 132 }, { b: 96, bpm: 138 }, { b: 128, bpm: 184 }],
           tapEvery: [{ b: 0, e: 1 }, { b: 112, e: 2 }],
           lastTap: 130,
-          cues: [{ b: 32, row: "brass" }, { b: 64, row: "cello" }, { b: 96, row: "violin" }],
+          cues: [{ b: 32, row: "brass", rest: true }, { b: 64, row: "cello" }, { b: 96, row: "violin" }],
           spawn: p => p < 0.25 ? { max: 1, fast: 0, big: 0, speed: 1.1 }
             : p < 0.6 ? { max: 2, fast: 0.25, big: 0, speed: 1.25 }
             : { max: 2, fast: 0.4, big: 0.15, speed: 1.4 },
@@ -426,7 +426,7 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
           tempo: [{ b: -4, bpm: 72 }, { b: 0, bpm: 72 }, { b: 64, bpm: 100 }, { b: 128, bpm: 138 }, { b: 192, bpm: 200 }],
           tapEvery: [{ b: 0, e: 1 }, { b: 128, e: 2 }],
           lastTap: 196,
-          cues: [{ b: 64, row: "violin" }, { b: 128, row: "brass" }],
+          cues: [{ b: 64, row: "violin", rest: true }, { b: 128, row: "brass", rest: true }],
           spawn: p => p < 0.33 ? { max: 1, fast: 0, big: 0, speed: 1.0 }
             : p < 0.66 ? { max: 2, fast: 0.3, big: 0.1, speed: 1.3 }
             : { max: 3, fast: 0.4, big: 0.2, speed: 1.6 },
@@ -486,13 +486,13 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
   // ======================================================
   //  楽団員
   // ======================================================
-  const SKIN = ["#f1c9a5", "#e0ac84", "#c98f66", "#f5d6b8", "#a86f4c"];
-  const HAIR = ["#2a1a12", "#4a3020", "#111", "#7a5a3a", "#bdb6ad", "#5b2a1a"];
+  const SKIN = ["#f1c9a5", "#e3b38c", "#c98f66", "#f6dcc2", "#a86f4c", "#8a5638"];
+  const HAIR = ["#2a1a12", "#4a3020", "#151012", "#7a5a3a", "#9e9890", "#5b2a1a", "#c9a46a"];
   const musicians = [];
   const ROWS = {
-    brass: { y: 150, n: 9, s: 0.62, rx: 185 },
-    cello: { y: 205, n: 8, s: 0.78, rx: 195 },
-    violin: { y: 262, n: 7, s: 0.95, rx: 200 },
+    brass: { y: 160, n: 9, s: 0.62, rx: 190 },
+    cello: { y: 222, n: 8, s: 0.78, rx: 198 },
+    violin: { y: 290, n: 7, s: 0.95, rx: 200 },
   };
   (function makeOrchestra() {
     let k = 0;
@@ -500,10 +500,17 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
       const row = ROWS[type];
       for (let i = 0; i < row.n; i++) {
         const xn = (i / (row.n - 1)) * 2 - 1;
+        const female = (k * 3 + 1) % 5 < 2;
+        const old = k % 7 === 3;
         musicians.push({
-          x: 240 + row.rx * xn, y: row.y + 26 * xn * xn, s: row.s, type,
-          skin: SKIN[(k * 7) % SKIN.length], hair: HAIR[(k * 5) % HAIR.length],
-          dress: k % 3 === 0 ? "#2b1a26" : "#16100f", seed: Math.random() * 100,
+          x: 240 + row.rx * xn, y: row.y + 12 * xn * xn, s: row.s, type, row: i,
+          skin: SKIN[(k * 7 + 2) % SKIN.length],
+          hair: old ? "#c8c4bc" : HAIR[(k * 5) % HAIR.length],
+          female,
+          style: female ? ["bun", "bob", "long"][k % 3] : old ? "bald" : ["short", "part", "curly", "short"][k % 4],
+          glasses: k % 6 === 1 || old,
+          suit: female ? "#141013" : (k % 4 === 2 ? "#1d1a24" : "#121012"),
+          seed: Math.random() * 100,
         });
         k++;
       }
@@ -512,7 +519,7 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
   function rowAt(x, y) {
     let best = null, bd = 46;
     musicians.forEach(m => {
-      const d = Math.hypot(m.x - x, (m.y - 4) - y);
+      const d = Math.hypot(m.x - x, (m.y - 20 * m.s) - y);
       if (d < bd) { bd = d; best = m.type; }
     });
     return best;
@@ -1000,7 +1007,7 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
             c.done = true;
             chaos += 10;
             layerMess[c.row] = timing.timeOf(c.b + 8);
-            popup(240, ROWS[c.row].y - 40, ROW_LABEL[c.row] + "が入りそびれた！", "#ff8a7a", 17);
+            popup(240, ROWS[c.row].y - 66 * ROWS[c.row].s, ROW_LABEL[c.row] + "が入りそびれた！", "#ff8a7a", 17);
           }
         });
         tapPtr++;
@@ -1067,13 +1074,14 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
   function drawBackground() {
     const c = bgx;
     c.setTransform(scale, 0, 0, scale, 0, 0);
-    const cg = c.createLinearGradient(0, 0, 0, 260);
+    // カーテン
+    const cg = c.createLinearGradient(0, 0, 0, 150);
     cg.addColorStop(0, "#2a0a10"); cg.addColorStop(1, "#4a1420");
-    c.fillStyle = cg; c.fillRect(0, 0, W, 260);
+    c.fillStyle = cg; c.fillRect(0, 0, W, 150);
     for (let x = 0; x < W; x += 24) {
       const g = c.createLinearGradient(x, 0, x + 24, 0);
       g.addColorStop(0, "rgba(0,0,0,0.35)"); g.addColorStop(0.5, "rgba(255,120,120,0.06)"); g.addColorStop(1, "rgba(0,0,0,0.35)");
-      c.fillStyle = g; c.fillRect(x, 0, 24, 260);
+      c.fillStyle = g; c.fillRect(x, 0, 24, 150);
     }
     c.fillStyle = "#5a1622";
     c.beginPath(); c.moveTo(0, 0); c.lineTo(W, 0); c.lineTo(W, 60);
@@ -1083,17 +1091,23 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
     c.beginPath(); c.moveTo(0, 60);
     for (let x = 0; x < W; x += 40) c.quadraticCurveTo(x + 20, 86, x + 40, 60);
     c.stroke();
-    const fg = c.createLinearGradient(0, 230, 0, H);
-    fg.addColorStop(0, "#5c3820"); fg.addColorStop(0.5, "#7a4a2a"); fg.addColorStop(1, "#3a2213");
-    c.fillStyle = fg; c.fillRect(0, 230, W, H - 230);
-    c.strokeStyle = "rgba(0,0,0,0.22)"; c.lineWidth = 1;
-    for (let i = -12; i <= 12; i++) { c.beginPath(); c.moveTo(240 + i * 22, 230); c.lineTo(240 + i * 70, H); c.stroke(); }
-    for (let y = 250, s = 10; y < H; y += s, s *= 1.18) {
-      c.beginPath(); c.moveTo(0, y); c.lineTo(W, y); c.strokeStyle = "rgba(0,0,0,0.12)"; c.stroke();
-    }
-    const lg = c.createRadialGradient(240, 210, 10, 240, 230, 320);
+    // 舞台の床
+    const fg = c.createLinearGradient(0, 140, 0, H);
+    fg.addColorStop(0, "#4e2f1a"); fg.addColorStop(0.45, "#7a4a2a"); fg.addColorStop(1, "#3a2213");
+    c.fillStyle = fg; c.fillRect(0, 140, W, H - 140);
+    c.strokeStyle = "rgba(0,0,0,0.2)"; c.lineWidth = 1;
+    for (let i = -12; i <= 12; i++) { c.beginPath(); c.moveTo(240 + i * 22, 140); c.lineTo(240 + i * 70, H); c.stroke(); }
+    // ひな壇（後ろの列ほど高い）
+    [[140, 196, "#5d3920"], [196, 262, "#68412a"]].forEach(([y0, y1, col]) => {
+      c.fillStyle = col; c.fillRect(0, y0, W, y1 - y0);
+      c.fillStyle = "rgba(0,0,0,0.35)"; c.fillRect(0, y1 - 7, W, 7);
+      c.fillStyle = "rgba(255,220,160,0.18)"; c.fillRect(0, y1 - 8, W, 1.5);
+    });
+    // 照明
+    const lg = c.createRadialGradient(240, 220, 10, 240, 240, 320);
     lg.addColorStop(0, "rgba(255,230,170,0.22)"); lg.addColorStop(1, "rgba(255,230,170,0)");
     c.fillStyle = lg; c.fillRect(0, 0, W, H);
+    // 指揮台
     c.fillStyle = "#24140c";
     c.beginPath(); c.moveTo(150, 690); c.lineTo(330, 690); c.lineTo(350, H); c.lineTo(130, H); c.closePath(); c.fill();
     c.strokeStyle = "#e0b04f"; c.lineWidth = 1.5;
@@ -1103,43 +1117,287 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
     c.fillStyle = vg; c.fillRect(0, 0, W, H);
   }
 
-  function drawMusician(m, bob, jit, tilt, beatPh, glow) {
+  // ---------- 楽団員（正面向き・座った人） ----------
+  function limb(c, pts, w, col) {
+    c.strokeStyle = col; c.lineWidth = w; c.lineCap = "round"; c.lineJoin = "round";
+    c.beginPath(); c.moveTo(pts[0][0], pts[0][1]);
+    for (let i = 1; i < pts.length; i++) c.lineTo(pts[i][0], pts[i][1]);
+    c.stroke();
+  }
+  function handAt(c, x, y, skin) { c.fillStyle = skin; c.beginPath(); c.arc(x, y, 2.4, 0, Math.PI * 2); c.fill(); }
+  function shade(hex, f) {
+    const n = parseInt(hex.slice(1), 16);
+    const r = Math.round(((n >> 16) & 255) * f), g = Math.round(((n >> 8) & 255) * f), b = Math.round((n & 255) * f);
+    return "rgb(" + Math.min(255, r) + "," + Math.min(255, g) + "," + Math.min(255, b) + ")";
+  }
+
+  function drawHairBack(c, m) {
+    c.fillStyle = m.hair;
+    if (m.style === "long") {
+      c.beginPath(); c.moveTo(-10, -44); c.quadraticCurveTo(-12, -30, -10, -24); c.lineTo(10, -24); c.quadraticCurveTo(12, -30, 10, -44); c.closePath(); c.fill();
+    } else if (m.style === "bob") {
+      c.beginPath(); c.ellipse(0, -39, 10.2, 10.5, 0, 0, Math.PI * 2); c.fill();
+    } else if (m.style === "bun") {
+      c.beginPath(); c.arc(0, -51, 4.2, 0, Math.PI * 2); c.fill();
+    }
+  }
+  function drawHairFront(c, m) {
+    c.fillStyle = m.hair;
+    if (m.style === "bald") {
+      c.beginPath(); c.ellipse(-7.6, -41, 2.2, 3.8, 0.2, 0, Math.PI * 2); c.fill();
+      c.beginPath(); c.ellipse(7.6, -41, 2.2, 3.8, -0.2, 0, Math.PI * 2); c.fill();
+      c.fillStyle = "rgba(255,255,255,0.3)"; c.beginPath(); c.ellipse(-2.5, -47, 3, 1.5, -0.3, 0, Math.PI * 2); c.fill();
+      return;
+    }
+    if (m.style === "curly") {
+      for (let i = 0; i < 7; i++) {
+        const a = Math.PI + (i / 6) * Math.PI;
+        c.beginPath(); c.arc(Math.cos(a) * 7.5, -42 + Math.sin(a) * 7.5, 3.4, 0, Math.PI * 2); c.fill();
+      }
+      return;
+    }
+    c.beginPath(); c.ellipse(0, -43.2, 8.9, 7, 0, Math.PI, Math.PI * 2); c.fill();
+    if (m.style === "part") {
+      c.beginPath(); c.moveTo(-8.6, -43); c.quadraticCurveTo(-2, -46, 8.4, -42); c.lineTo(8.6, -44); c.quadraticCurveTo(0, -51, -8.6, -44); c.fill();
+    } else if (m.style === "short") {
+      c.fillRect(-8.6, -44, 17.2, 1.8);
+      c.fillRect(-8.8, -44, 1.8, 5); c.fillRect(7, -44, 1.8, 5);
+    } else {
+      // 女性の前髪
+      c.beginPath(); c.moveTo(-8.8, -43); c.quadraticCurveTo(-3, -42, 1, -45); c.quadraticCurveTo(5, -42, 8.8, -42); c.lineTo(8.8, -45); c.lineTo(-8.8, -45); c.fill();
+      c.fillRect(-9.4, -44, 2.2, m.style === "bun" ? 6 : 10); c.fillRect(7.2, -44, 2.2, m.style === "bun" ? 6 : 10);
+    }
+  }
+
+  function drawFace(c, m, f) {
+    // f: { look, mood, blink, playingBrass, puff }
+    const skin = m.skin;
+    // 耳・顔
+    c.fillStyle = shade(skin, 0.92);
+    c.beginPath(); c.ellipse(-8.3, -40, 1.8, 2.6, 0, 0, Math.PI * 2); c.fill();
+    c.beginPath(); c.ellipse(8.3, -40, 1.8, 2.6, 0, 0, Math.PI * 2); c.fill();
+    c.fillStyle = skin;
+    c.beginPath(); c.ellipse(0, -40, 8, 9.6, 0, 0, Math.PI * 2); c.fill();
+    if (f.puff) {
+      c.beginPath(); c.arc(-4.6, -35.5, 3.4, 0, Math.PI * 2); c.arc(4.6, -35.5, 3.4, 0, Math.PI * 2); c.fill();
+    }
+    // ほお
+    c.fillStyle = "rgba(220,90,80,0.18)";
+    c.beginPath(); c.arc(-4.8, -36.6, 1.8, 0, Math.PI * 2); c.arc(4.8, -36.6, 1.8, 0, Math.PI * 2); c.fill();
+    // まゆ
+    const worried = f.mood === "worried", happy = f.mood === "happy";
+    c.strokeStyle = shade(m.hair === "#c8c4bc" ? "#8a8680" : m.hair, 0.9); c.lineWidth = 0.9; c.lineCap = "round";
+    c.beginPath();
+    c.moveTo(-5, worried ? -43.2 : -44); c.lineTo(-1.6, worried ? -44.6 : -44.2);
+    c.moveTo(5, worried ? -43.2 : -44); c.lineTo(1.6, worried ? -44.6 : -44.2);
+    c.stroke();
+    // 目
+    c.fillStyle = "#1a1210"; c.strokeStyle = "#1a1210";
+    if (f.blink || happy) {
+      c.lineWidth = 0.8;
+      c.beginPath();
+      if (happy) { c.arc(-3.2, -40.4, 1.3, Math.PI * 1.1, Math.PI * 1.9); c.moveTo(4.5, -40.6); c.arc(3.2, -40.4, 1.3, Math.PI * 1.1, Math.PI * 1.9); }
+      else { c.moveTo(-4.4, -40.4); c.lineTo(-2, -40.4); c.moveTo(2, -40.4); c.lineTo(4.4, -40.4); }
+      c.stroke();
+    } else {
+      c.fillStyle = "#fbf7ef";
+      c.beginPath(); c.ellipse(-3.2, -40.4, 1.6, 1.2, 0, 0, Math.PI * 2); c.ellipse(3.2, -40.4, 1.6, 1.2, 0, 0, Math.PI * 2); c.fill();
+      c.fillStyle = "#1a1210";
+      c.beginPath(); c.arc(-3.2 + f.look, -40.1, 0.95, 0, Math.PI * 2); c.arc(3.2 + f.look, -40.1, 0.95, 0, Math.PI * 2); c.fill();
+    }
+    // 鼻
+    c.strokeStyle = shade(skin, 0.75); c.lineWidth = 0.8;
+    c.beginPath(); c.moveTo(0.2, -39.4); c.lineTo(0.9, -37.2); c.lineTo(-0.3, -37); c.stroke();
+    // 口
+    if (!f.playingBrass) {
+      c.strokeStyle = "#7a2c2a"; c.lineWidth = 0.9;
+      c.beginPath();
+      if (happy) c.arc(0, -35.4, 2.2, 0.15 * Math.PI, 0.85 * Math.PI);
+      else if (worried) { c.moveTo(-1.8, -34.2); c.quadraticCurveTo(0, -35.6, 1.8, -34.2); }
+      else { c.moveTo(-1.6, -34.6); c.lineTo(1.6, -34.6); }
+      c.stroke();
+    }
+    // めがね
+    if (m.glasses) {
+      c.strokeStyle = "#2a2220"; c.lineWidth = 0.7;
+      c.beginPath(); c.arc(-3.3, -40.3, 2.5, 0, Math.PI * 2); c.moveTo(5.8, -40.3); c.arc(3.3, -40.3, 2.5, 0, Math.PI * 2);
+      c.moveTo(-0.8, -40.5); c.lineTo(0.8, -40.5); c.stroke();
+    }
+  }
+
+  function drawMusician(m, o) {
+    // o: { bob, jit, tilt, beatPh, glow, playing, mood, look, blink }
     const c = ctx, s = m.s;
     c.save();
-    c.translate(m.x + jit.x, m.y + jit.y);
-    c.rotate(tilt);
+    c.translate(m.x + o.jit.x, m.y + o.jit.y);
+    c.rotate(o.tilt);
     c.scale(s, s);
-    if (glow > 0) {
-      const g = c.createRadialGradient(0, 0, 4, 0, 0, 34);
-      g.addColorStop(0, "rgba(255,224,138," + 0.75 * glow + ")"); g.addColorStop(1, "rgba(255,224,138,0)");
-      c.fillStyle = g; c.beginPath(); c.arc(0, 0, 34, 0, Math.PI * 2); c.fill();
+    if (o.glow > 0) {
+      const g = c.createRadialGradient(0, -16, 6, 0, -16, 50);
+      g.addColorStop(0, "rgba(255,224,138," + 0.75 * o.glow + ")"); g.addColorStop(1, "rgba(255,224,138,0)");
+      c.fillStyle = g; c.beginPath(); c.arc(0, -16, 50, 0, Math.PI * 2); c.fill();
     }
-    c.strokeStyle = "#111"; c.lineWidth = 2;
-    c.beginPath(); c.moveTo(0, 30); c.lineTo(0, 54); c.stroke();
-    c.fillStyle = "#1a1a1a"; c.fillRect(-11, 22, 22, 12);
-    c.fillStyle = "#e8dcc0"; c.fillRect(-9, 23, 18, 9);
-    c.translate(0, bob);
-    c.fillStyle = m.dress;
-    c.beginPath(); c.moveTo(-16, 22); c.quadraticCurveTo(-17, -2, 0, -4); c.quadraticCurveTo(17, -2, 16, 22); c.closePath(); c.fill();
-    c.fillStyle = "#f2efe6"; c.beginPath(); c.moveTo(-3, -3); c.lineTo(3, -3); c.lineTo(0, 6); c.closePath(); c.fill();
-    c.fillStyle = m.skin; c.beginPath(); c.arc(0, -14, 9, 0, Math.PI * 2); c.fill();
-    c.fillStyle = m.hair; c.beginPath(); c.arc(0, -16, 9.5, Math.PI * 1.05, Math.PI * 1.95); c.fill();
-    if (m.type === "violin") {
-      c.fillStyle = "#8a4a1f";
-      c.save(); c.translate(10, -4); c.rotate(-0.6); c.beginPath(); c.ellipse(0, 0, 9, 4.5, 0, 0, Math.PI * 2); c.fill(); c.restore();
-      c.strokeStyle = "#d8c9a8"; c.lineWidth = 1.2;
-      const bx = Math.sin(beatPh * Math.PI) * 8;
-      c.beginPath(); c.moveTo(-14 + bx, 4); c.lineTo(18 + bx, -10); c.stroke();
-    } else if (m.type === "cello") {
-      c.fillStyle = "#7a3d18";
-      c.beginPath(); c.ellipse(0, 18, 9, 13, 0, 0, Math.PI * 2); c.fill();
-      c.strokeStyle = "#2a160a"; c.lineWidth = 2; c.beginPath(); c.moveTo(0, 6); c.lineTo(0, -12); c.stroke();
+    const skin = m.skin, suit = m.suit, suitHi = shade(suit === "#141013" ? "#2a2028" : suit, 1.6);
+    const isCello = m.type === "cello";
+    const knee = isCello ? 15 : 9;
+
+    // 椅子
+    c.fillStyle = "#2b1a10";
+    c.fillRect(-16, 1, 32, 4);
+    c.strokeStyle = "#2b1a10"; c.lineWidth = 2;
+    c.beginPath(); c.moveTo(-14, 5); c.lineTo(-15, 40); c.moveTo(14, 5); c.lineTo(15, 40); c.stroke();
+
+    // 脚
+    if (m.female && !isCello) {
+      c.fillStyle = suit;
+      c.beginPath(); c.moveTo(-13, -2); c.lineTo(-16, 41); c.lineTo(16, 41); c.lineTo(13, -2); c.closePath(); c.fill();
+      c.fillStyle = "#0a0808";
+      c.beginPath(); c.ellipse(-7, 42.5, 4, 2, 0, 0, Math.PI * 2); c.ellipse(7, 42.5, 4, 2, 0, 0, Math.PI * 2); c.fill();
     } else {
-      c.strokeStyle = "#e0b04f"; c.lineWidth = 2.5;
-      c.beginPath(); c.moveTo(0, -10); c.lineTo(15, -3); c.stroke();
-      c.fillStyle = "#e0b04f"; c.beginPath(); c.arc(17, -2, 4.5, 0, Math.PI * 2); c.fill();
+      const pants = m.female ? suit : "#0f0d10";
+      limb(c, [[-7, 2], [-knee, 16], [-knee - 1, 39]], 8.5, pants);
+      limb(c, [[7, 2], [knee, 16], [knee + 1, 39]], 8.5, pants);
+      c.fillStyle = "#0a0808";
+      c.beginPath(); c.ellipse(-knee - 2, 42, 5, 2.4, 0, 0, Math.PI * 2); c.ellipse(knee + 2, 42, 5, 2.4, 0, 0, Math.PI * 2); c.fill();
+      c.fillStyle = "rgba(255,255,255,0.25)";
+      c.beginPath(); c.ellipse(-knee - 3, 41.2, 2, 0.7, 0, 0, Math.PI * 2); c.ellipse(knee + 1, 41.2, 2, 0.7, 0, 0, Math.PI * 2); c.fill();
+    }
+
+    // チェロ本体（脚の間）
+    const bowPh = Math.sin(o.beatPh * Math.PI);
+    if (isCello) {
+      c.save(); c.translate(3, 14); c.rotate(0.18);
+      c.fillStyle = "#6e3414";
+      c.beginPath(); c.ellipse(0, 6, 10.5, 9, 0, 0, Math.PI * 2); c.ellipse(0, -7, 8.5, 7.5, 0, 0, Math.PI * 2); c.fill();
+      c.fillStyle = "#8a4a1f";
+      c.beginPath(); c.ellipse(-2, 4, 6, 5, 0, 0, Math.PI * 2); c.fill();
+      c.strokeStyle = "#2a1408"; c.lineWidth = 0.8;
+      c.beginPath(); c.moveTo(-4, -2); c.quadraticCurveTo(-5, 1, -4, 4); c.moveTo(4, -2); c.quadraticCurveTo(5, 1, 4, 4); c.stroke();
+      c.strokeStyle = "#1a0e08"; c.lineWidth = 2.6;
+      c.beginPath(); c.moveTo(0, -12); c.lineTo(0, -50); c.stroke();
+      c.fillStyle = "#1a0e08"; c.beginPath(); c.arc(0, -52, 2.6, 0, Math.PI * 2); c.fill();
+      c.strokeStyle = "#555"; c.lineWidth = 1;
+      c.beginPath(); c.moveTo(0, 15); c.lineTo(0, 28); c.stroke();
+      c.restore();
+    }
+
+    // 上半身（拍で少し揺れる）
+    c.translate(0, o.bob);
+    // 胴体
+    c.fillStyle = suit;
+    c.beginPath();
+    c.moveTo(-14, 2); c.lineTo(-15, -20); c.quadraticCurveTo(-15, -27, -8, -27.5);
+    c.lineTo(8, -27.5); c.quadraticCurveTo(15, -27, 15, -20); c.lineTo(14, 2); c.closePath(); c.fill();
+    if (m.female) {
+      c.fillStyle = skin;
+      c.beginPath(); c.moveTo(-6, -27.5); c.quadraticCurveTo(0, -18, 6, -27.5); c.closePath(); c.fill();
+      c.fillStyle = "#e8dcc0"; c.beginPath(); c.arc(0, -22.5, 0.9, 0, Math.PI * 2); c.fill();
+    } else {
+      c.fillStyle = "#f4f1ea";
+      c.beginPath(); c.moveTo(-5, -27.5); c.lineTo(5, -27.5); c.lineTo(0, -10); c.closePath(); c.fill();
+      c.strokeStyle = suitHi; c.lineWidth = 1.2;
+      c.beginPath(); c.moveTo(-5.5, -27); c.lineTo(-1, -9); c.moveTo(5.5, -27); c.lineTo(1, -9); c.stroke();
+      c.fillStyle = "#0a0808";
+      c.beginPath(); c.moveTo(0, -25); c.lineTo(-3.4, -27); c.lineTo(-3.4, -23); c.closePath();
+      c.moveTo(0, -25); c.lineTo(3.4, -27); c.lineTo(3.4, -23); c.closePath(); c.fill();
+      c.fillStyle = "#f4f1ea"; c.fillRect(-0.5, -19, 1, 1); c.fillRect(-0.5, -15, 1, 1);
+    }
+    // 首
+    c.fillStyle = shade(skin, 0.9); c.fillRect(-2.6, -32, 5.2, 5);
+
+    // 頭
+    const brassUp = m.type === "brass" && o.playing;
+    c.save();
+    if (m.type === "violin" && o.playing) { c.translate(2, 0.6); c.rotate(0.12); }
+    drawHairBack(c, m);
+    drawFace(c, m, { look: o.look, mood: o.mood, blink: o.blink, playingBrass: brassUp, puff: brassUp && o.beatPh < 0.35 });
+    drawHairFront(c, m);
+    c.restore();
+
+    // 腕と楽器
+    const sL = [-12.5, -23], sR = [12.5, -23];
+    if (m.type === "violin") {
+      if (o.playing) {
+        // バイオリン：あごの下（向かって右）
+        c.save(); c.translate(11, -29); c.rotate(0.35);
+        c.fillStyle = "#8a4a1f";
+        c.beginPath(); c.ellipse(0, 0, 7.5, 3.6, 0, 0, Math.PI * 2); c.fill();
+        c.fillStyle = "#a8622a"; c.beginPath(); c.ellipse(-1, -0.4, 4.5, 2, 0, 0, Math.PI * 2); c.fill();
+        c.strokeStyle = "#1a0e08"; c.lineWidth = 1.5;
+        c.beginPath(); c.moveTo(5, -0.5); c.lineTo(17, -1.5); c.stroke();
+        c.fillStyle = "#1a0e08"; c.beginPath(); c.arc(18, -1.6, 1.4, 0, Math.PI * 2); c.fill();
+        c.restore();
+        // 左手（向かって右）でネックを持つ
+        limb(c, [sR, [21, -16], [26, -32]], 5.5, suit); handAt(c, 26, -32.5, skin);
+        // 右手（向かって左）で弓
+        const hx = -14 + 13 * bowPh, hy = -19 - 3 * bowPh;
+        const tx = 9, ty = -28, dl = Math.hypot(tx - hx, ty - hy);
+        const ux = (tx - hx) / dl, uy = (ty - hy) / dl;
+        c.strokeStyle = "#d8c9a8"; c.lineWidth = 0.9;
+        c.beginPath(); c.moveTo(hx - ux * 3, hy - uy * 3); c.lineTo(hx + ux * 36, hy + uy * 36); c.stroke();
+        limb(c, [sL, [-19, -10], [hx, hy]], 5.5, suit); handAt(c, hx, hy, skin);
+      } else {
+        // ひざの上で休み
+        c.fillStyle = "#8a4a1f";
+        c.save(); c.translate(5, 6); c.rotate(-0.2);
+        c.beginPath(); c.ellipse(0, 0, 3.6, 7.5, 0, 0, Math.PI * 2); c.fill();
+        c.strokeStyle = "#1a0e08"; c.lineWidth = 1.4; c.beginPath(); c.moveTo(0, -6); c.lineTo(0, -16); c.stroke();
+        c.restore();
+        c.strokeStyle = "#d8c9a8"; c.lineWidth = 0.9; c.beginPath(); c.moveTo(-14, 10); c.lineTo(8, -10); c.stroke();
+        limb(c, [sL, [-16, -8], [-7, 2]], 5.5, suit); handAt(c, -7, 2, skin);
+        limb(c, [sR, [16, -8], [7, 0]], 5.5, suit); handAt(c, 7, 0, skin);
+      }
+    } else if (isCello) {
+      // 左手（向かって右）でネック
+      limb(c, [sR, [19, -14], [11, -19]], 5.5, suit); handAt(c, 11, -19, skin);
+      if (o.playing) {
+        const hx = -22 + 12 * bowPh, hy = 9;
+        c.strokeStyle = "#d8c9a8"; c.lineWidth = 0.9;
+        c.beginPath(); c.moveTo(hx - 3, hy + 0.5); c.lineTo(hx + 34, hy - 2); c.stroke();
+        limb(c, [sL, [-19, -6], [hx, hy]], 5.5, suit); handAt(c, hx, hy, skin);
+      } else {
+        c.strokeStyle = "#d8c9a8"; c.lineWidth = 0.9; c.beginPath(); c.moveTo(-12, 12); c.lineTo(-18, 36); c.stroke();
+        limb(c, [sL, [-17, -6], [-12, 12]], 5.5, suit); handAt(c, -12, 12, skin);
+      }
+    } else {
+      if (o.playing) {
+        // トランペットを口に（こちらを向いている）
+        limb(c, [sL, [-17, -14], [-4, -29]], 5.5, suit);
+        limb(c, [sR, [17, -14], [4, -29]], 5.5, suit);
+        c.strokeStyle = "#c9952e"; c.lineWidth = 2;
+        c.beginPath(); c.moveTo(0, -34); c.lineTo(0, -29); c.stroke();
+        c.fillStyle = "#e0b04f"; c.beginPath(); c.arc(0, -26, 6.5, 0, Math.PI * 2); c.fill();
+        c.fillStyle = "#8a5a12"; c.beginPath(); c.arc(0, -26, 4.2, 0, Math.PI * 2); c.fill();
+        c.fillStyle = "rgba(255,240,190,0.7)"; c.beginPath(); c.arc(-2.4, -28.4, 1.4, 0, Math.PI * 2); c.fill();
+        handAt(c, -4.5, -29, skin); handAt(c, 4.5, -29, skin);
+      } else {
+        c.strokeStyle = "#e0b04f"; c.lineWidth = 2;
+        c.beginPath(); c.moveTo(-9, 6); c.lineTo(9, 6); c.stroke();
+        c.fillStyle = "#e0b04f"; c.beginPath(); c.ellipse(11, 6, 2.5, 4.2, 0, 0, Math.PI * 2); c.fill();
+        limb(c, [sL, [-16, -8], [-6, 5]], 5.5, suit); handAt(c, -6, 5, skin);
+        limb(c, [sR, [16, -8], [5, 5]], 5.5, suit); handAt(c, 5, 5, skin);
+      }
     }
     c.restore();
+  }
+
+  // 2人で1台の譜面台
+  function drawStands(type) {
+    const c = ctx;
+    const list = musicians.filter(m => m.type === type);
+    for (let i = 0; i + 1 < list.length; i += 2) {
+      const a = list[i], b = list[i + 1], s = a.s;
+      const x = (a.x + b.x) / 2, y = (a.y + b.y) / 2 + 10 * s;
+      c.save(); c.translate(x, y); c.scale(s, s);
+      c.strokeStyle = "#0e0c0c"; c.lineWidth = 1.6;
+      c.beginPath(); c.moveTo(0, -4); c.lineTo(0, 36); c.moveTo(-6, 38); c.lineTo(0, 34); c.lineTo(6, 38); c.stroke();
+      c.fillStyle = "#151212";
+      c.beginPath(); c.moveTo(-12, -14); c.lineTo(12, -14); c.lineTo(11, -2); c.lineTo(-11, -2); c.closePath(); c.fill();
+      c.fillStyle = "#ece2c8"; c.fillRect(-10.5, -13, 10, 10); c.fillRect(0.5, -13, 10, 10);
+      c.strokeStyle = "rgba(60,40,30,0.4)"; c.lineWidth = 0.5;
+      for (let r = 0; r < 4; r++) { c.beginPath(); c.moveTo(-9.5, -11 + r * 2.2); c.lineTo(9.5, -11 + r * 2.2); c.stroke(); }
+      c.restore();
+    }
   }
 
   function drawMosquito(m, ringP) {
@@ -1321,17 +1579,28 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
     }
     const bob = playing ? Math.pow(1 - beatPh, 3) : 0;
     const now = performance.now() / 1000;
-    musicians.forEach(m => {
-      const jAmp = reduceMotion ? 0 : chaos * 0.05;
-      const mess = playing && (layerMess[m.type] || -1) > t;
-      const jit = { x: Math.sin(m.seed + now * 17) * (jAmp + (mess ? 3 : 0)), y: Math.cos(m.seed * 2 + now * 13) * jAmp };
-      const tilt = chaos > 45 ? Math.sin(m.seed + now * 3) * (chaos - 45) / 300 : 0;
-      const glow = activeCue && activeCue.row === m.type ? 0.5 + 0.5 * Math.pow(1 - beatPh, 2) : 0;
-      drawMusician(m, -bob * 2.5, jit, tilt, beatPh, glow);
+    const mood = state === "play" && chaos > 50 ? "worried" : state === "play" && combo >= 16 ? "happy" : (state === "result" && endReason === "clear") ? "happy" : "neutral";
+    const live = mosq.filter(mm => mm.state !== "dead");
+    ["brass", "cello", "violin"].forEach(type => {
+      const resting = playing && cues.some(cu => cu.rest && cu.row === type && beatNow < cu.b - 2);
+      musicians.forEach(m => {
+        if (m.type !== type) return;
+        const jAmp = reduceMotion ? 0 : chaos * 0.05;
+        const mess = playing && (layerMess[m.type] || -1) > t;
+        const jit = { x: Math.sin(m.seed + now * 17) * (jAmp + (mess ? 3 : 0)), y: Math.cos(m.seed * 2 + now * 13) * jAmp };
+        const tilt = chaos > 45 ? Math.sin(m.seed + now * 3) * (chaos - 45) / 300 : 0;
+        const glow = activeCue && activeCue.row === m.type ? 0.5 + 0.5 * Math.pow(1 - beatPh, 2) : 0;
+        // 一番近い蚊のほうを見る（いなければ指揮者を見る）
+        let look = (240 - m.x) / 240 * 0.6, nd = 170;
+        live.forEach(mm => { const d = Math.hypot(mm.x - m.x, mm.y - m.y); if (d < nd) { nd = d; look = Math.max(-0.8, Math.min(0.8, (mm.x - m.x) / 30)); } });
+        const blink = ((now + m.seed) % 4.3) < 0.13;
+        drawMusician(m, { bob: -bob * 2.5, jit, tilt, beatPh, glow, playing: !resting, mood: mess ? "worried" : mood, look, blink });
+      });
+      drawStands(type);
     });
     if (activeCue) {
       const left = Math.ceil(activeCue.b - beatNow);
-      const ry = ROWS[activeCue.row].y - 44;
+      const ry = ROWS[activeCue.row].y - 66 * ROWS[activeCue.row].s;
       c.textAlign = "center"; c.textBaseline = "middle";
       c.fillStyle = "rgba(15,4,6,0.75)"; c.fillRect(110, ry - 14, 260, 28);
       c.font = "800 16px " + FONT_D;
@@ -1339,7 +1608,7 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
       c.fillText(ROW_LABEL[activeCue.row] + "の出番 " + (left <= 1 ? "今！タップ" : "あと" + left + "拍"), 240, ry);
     }
 
-    if (chaos > 0) { c.fillStyle = "rgba(226,72,61," + (chaos / 100 * 0.22) + ")"; c.fillRect(0, 60, W, 260); }
+    if (chaos > 0) { c.fillStyle = "rgba(226,72,61," + (chaos / 100 * 0.22) + ")"; c.fillRect(0, 60, W, 290); }
 
     drawConductor(playing ? 1 - bob : 0, state === "play" && combo >= 16);
     mosq.forEach(m => drawMosquito(m, state === "play" ? ringP : null));
