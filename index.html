@@ -221,6 +221,7 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
           <summary>指揮のしかた</summary>
           <ul>
             <li><b>予備拍</b>：楽団はあなたの合図を待っています。<b>2回タップ</b>（1回目＝構え、2回目＝予備拍）。<b>2回の間隔がそのままテンポ</b>になり、次の拍で楽団が入ります。楽譜のテンポに近いほど高得点。</li>
+            <li><b>楽譜の帯</b>：画面上部に、これからのテンポと強弱が流れてきます。<b>拍の目盛りが詰まる＝速く、広がる＝遅く</b>。橙の線は accel.、青い線は rit.、𝄐は「止まる」。</li>
             <li><b>テンポ</b>：あとは拍に合わせてタップ。楽団はあなたの拍についてきます。accel.（だんだん速く）では少しずつ早めに、rit.（だんだん遅く）では遅めに。</li>
             <li><b>音量</b>：トンと軽く叩くと小さく、サッと大きく払うと大きく鳴ります。楽譜の p（小さく）f（大きく）に合わせましょう。</li>
             <li><b>合図</b>：本物の指揮と同じく、<b>入る1拍前（予備拍）</b>に合図します。光った団員の頭上の「合図」を「今！」でタップ。</li>
@@ -400,6 +401,49 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
       },
     },
     {
+      id: "largo",
+      title: "家路（新世界より 第2楽章）",
+      composer: "ドヴォルザーク",
+      stars: 1,
+      feature: "ゆっくり・フレーズの終わりで遅く・途中で止まる",
+      meter: 4,
+      build() {
+        const n = [];
+        const P1 = "E4*1.5 G4*0.5 G4*2 E4*1.5 D4*0.5 C4*2 D4 E4 G4 E4 D4*4";
+        const P2 = "E4*1.5 G4*0.5 G4*2 E4*1.5 D4*0.5 C4*2 D4 E4 D4 C4";
+        const HAR = { C: ["C2", "E3+G3+C4"], G: ["G1", "D3+G3+B3"] };
+        const chords = (from, list, v, hold) => list.forEach((h, i) => {
+          chordsOn(n, [from + i * 4], HAR[h][1], { d: 4, inst: "pad", layer: "all", v, hold: hold && i === list.length - 1 });
+          seq(n, HAR[h][0] + "*4", from + i * 4, 4, { inst: "cb", layer: "cello", v: 0.09, hold: hold && i === list.length - 1 });
+        });
+        // 1. イングリッシュホルンのソロ
+        seq(n, P1, 0, 1, { inst: "eh", layer: "brass", v: 0.24 });
+        seq(n, P2, 16, 1, { inst: "eh", layer: "brass", v: 0.24 });
+        seq(n, "C4*4", 28, 4, { inst: "eh", layer: "brass", v: 0.22, hold: true });
+        chords(0, ["C", "C", "G", "G", "C", "C", "G", "C"], 0.045, true);
+        // 2. バイオリンが歌い出す
+        seq(n, P1, 32, 1, { inst: "vln", layer: "violin", v: 0.2, tr: 12 });
+        seq(n, P2, 48, 1, { inst: "vln", layer: "violin", v: 0.2, tr: 12 });
+        seq(n, P1, 32, 1, { inst: "vlc", layer: "cello", v: 0.1 });
+        seq(n, P2, 48, 1, { inst: "vlc", layer: "cello", v: 0.1 });
+        chords(32, ["C", "C", "G", "G", "C", "C", "G"], 0.05, false);
+        chordsOn(n, [40, 44], "G3+C4+E4", { d: 4, inst: "horn", layer: "brass", v: 0.05 });
+        seq(n, "C5*8", 60, 8, { inst: "vln", layer: "violin", v: 0.18, hold: true });
+        chordsOn(n, [60], "C2+G2+E3+G3+C4+E4", { d: 8, inst: "pad", layer: "all", v: 0.06, hold: true });
+        chordsOn(n, [60], "C3+G3+E4", { d: 8, inst: "horn", layer: "brass", v: 0.05, hold: true });
+        return {
+          notes: n,
+          tempo: [{ b: -4, bpm: 60 }, { b: 12, bpm: 60 }, { b: 16, bpm: 50 }, { b: 16, bpm: 60 }, { b: 26, bpm: 60 }, { b: 29, bpm: 46 }, { b: 32, bpm: 46 },
+            { b: 32, bpm: 62, stop: true, label: "もう一度歌い出す（少し前へ）" }, { b: 44, bpm: 62 }, { b: 48, bpm: 68 }, { b: 54, bpm: 68 }, { b: 60, bpm: 44 }],
+          dyn: [{ b: 0, v: 0.3, mark: "p" }, { b: 24, v: 0.3, mark: "dim." }, { b: 31, v: 0.15, mark: "pp" }, { b: 32, v: 0.35, mark: "mp" }, { b: 40, v: 0.35, mark: "cresc." }, { b: 48, v: 0.8, mark: "f" }, { b: 54, v: 0.8, mark: "dim." }, { b: 60, v: 0.2, mark: "pp" }],
+          tapEvery: [{ b: 0, e: 1 }],
+          lastTap: 60,
+          cues: [{ b: 0, row: "brass", who: 4 }, { b: 32, row: "violin", who: 3, rest: true }],
+          spawn: p => p < 0.5 ? { max: 1, fast: 0, big: 0, speed: 0.8, land: 0.5 } : { max: 2, fast: 0.2, big: 0.1, speed: 0.9, land: 0.5 },
+        };
+      },
+    },
+    {
       id: "cancan",
       title: "天国と地獄",
       composer: "オッフェンバック",
@@ -451,6 +495,57 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
           boss: { b: 92 },
           spawn: p => p < 0.25 ? { max: 1, fast: 0, big: 0, speed: 1.1, land: 0.4 }
             : p < 0.6 ? { max: 2, fast: 0.25, big: 0, speed: 1.25, land: 0.45 }
+            : { max: 2, fast: 0.4, big: 0.15, speed: 1.4, land: 0.5 },
+        };
+      },
+    },
+    {
+      id: "waltz",
+      title: "美しく青きドナウ",
+      composer: "ヨハン・シュトラウス2世",
+      stars: 2,
+      feature: "3拍子のワルツ・途中で止まり、2回目は1小節に1回",
+      meter: 3,
+      build() {
+        const n = [];
+        const WM = ["D4 D4 F#4", "A4*3", "r A5 A5", "r F#5 F#5", "D4 D4 F#4", "A4*3", "r A5 A5", "r G5 G5",
+          "C#4 C#4 E4", "B4*3", "r B5 B5", "r G5 G5", "C#4 C#4 E4", "B4*3", "r B5 B5", "r F#5 F#5",
+          "D4 D4 F#4", "A4 D5*2", "r D6 D6", "r A5 A5", "D4 D4 F#4", "A4 D5*2", "r D6 D6", "r B5 B5",
+          "E4 E4 G4", "B4*2 G5", "F#5*2 A4", "E5*2 A4", "D5*3"];
+        const HAR = ["D", "D", "D", "D", "D", "D", "A", "A", "A", "A", "A", "A", "A", "A", "A", "A",
+          "D", "D", "D", "D", "D", "D", "D", "G", "E", "E", "D", "A", "D"];
+        const CH = { D: ["D2", "F#3+A3+D4"], A: ["A1", "G3+C#4+E4"], G: ["G1", "G3+B3+D4"], E: ["E2", "G3+B3+E4"] };
+        const waltz = (base, second) => {
+          WM.forEach((mStr, m) => {
+            const b = base + m * 3, last = m === WM.length - 1;
+            seq(n, mStr, b, 1, { inst: "vln", layer: "violin", v: 0.2, hold: last });
+            if (mStr[0] === "r") seq(n, mStr, b, 1, { inst: "fl", layer: "brass", v: second ? 0.12 : 0.08 });
+            if (second) seq(n, mStr, b, 1, { inst: "fl", layer: "brass", v: 0.07, tr: 12 });
+            const ch = CH[HAR[m]];
+            seq(n, ch[0] + "*1", b, 1, { inst: "cb", layer: "cello", v: 0.13, hold: last });
+            seq(n, ch[0] + "*0.5", b, 1, { inst: "pizz", layer: "cello", v: 0.24, tr: 12 });
+            if (!last) {
+              chordsOn(n, [b + 1, b + 2], ch[1], { d: 0.45, inst: "low", layer: "cello", v: 0.06 });
+              if (b >= 48) chordsOn(n, [b + 1, b + 2], ch[1], { d: 0.4, inst: "horn", layer: "brass", v: 0.05 });
+            } else {
+              chordsOn(n, [b], "D3+F#3+A3+D4", { d: 8, inst: "pad", layer: "all", v: 0.06, hold: true });
+              seq(n, "D2*2", b, 2, { inst: "timp", layer: "all", v: 0.12 });
+            }
+          });
+        };
+        waltz(0, false);
+        waltz(87, true);
+        return {
+          notes: n,
+          tempo: [{ b: -4, bpm: 132 }, { b: 42, bpm: 132 }, { b: 48, bpm: 108 }, { b: 48, bpm: 132 }, { b: 78, bpm: 132 }, { b: 86, bpm: 100 }, { b: 87, bpm: 100 },
+            { b: 87, bpm: 150, stop: true, label: "2回目は速く・1小節に1回振る" }, { b: 159, bpm: 160 }, { b: 168, bpm: 160 }, { b: 171, bpm: 120 }],
+          dyn: [{ b: 0, v: 0.3, mark: "p" }, { b: 24, v: 0.3, mark: "cresc." }, { b: 48, v: 0.8, mark: "f" }, { b: 78, v: 0.8, mark: "dim." }, { b: 86, v: 0.45 },
+            { b: 87, v: 0.55, mark: "mf" }, { b: 111, v: 0.55, mark: "cresc." }, { b: 135, v: 1, mark: "ff" }],
+          tapEvery: [{ b: 0, e: 1 }, { b: 87, e: 3 }],
+          lastTap: 171,
+          cues: [{ b: 48, row: "brass", who: 4, rest: true }, { b: 135, row: "violin", who: 2 }],
+          spawn: p => p < 0.3 ? { max: 1, fast: 0, big: 0, speed: 1.0, land: 0.4 }
+            : p < 0.7 ? { max: 2, fast: 0.25, big: 0.1, speed: 1.2, land: 0.45 }
             : { max: 2, fast: 0.4, big: 0.15, speed: 1.4, land: 0.5 },
         };
       },
@@ -514,9 +609,9 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
           notes: n,
           tempo: [
             { b: -4, bpm: 92 }, { b: 96, bpm: 92 },
-            { b: 96, bpm: 132, label: "アラ・マルチャ（行進曲・速く）" }, { b: 160, bpm: 132 },
-            { b: 160, bpm: 56, label: "マエストーソ（堂々と・とても遅く）" }, { b: 192, bpm: 56 },
-            { b: 192, bpm: 192, label: "プレスティッシモ（最高速・2拍に1回）" },
+            { b: 96, bpm: 132, stop: true, label: "アラ・マルチャ（行進曲・速く）" }, { b: 160, bpm: 132 },
+            { b: 160, bpm: 56, stop: true, label: "マエストーソ（堂々と・とても遅く）" }, { b: 192, bpm: 56 },
+            { b: 192, bpm: 192, stop: true, label: "プレスティッシモ（最高速・2拍に1回）" },
           ],
           dyn: [{ b: 0, v: 0.2, mark: "p" }, { b: 31.9, v: 0.2 }, { b: 32, v: 0.45, mark: "mf" }, { b: 95.9, v: 0.45 }, { b: 96, v: 0.75, mark: "f" }, { b: 159.9, v: 0.75 }, { b: 160, v: 1, mark: "ff" }, { b: 191.9, v: 1 }, { b: 192, v: 0.85, mark: "f" }],
           tapEvery: [{ b: 0, e: 1 }, { b: 192, e: 2 }],
@@ -597,6 +692,16 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
       { text: "最後まで演奏する", ok: r => r.cleared },
       { text: "予備拍を4回ともぴったり出す", ok: r => r.prepOk >= 4 },
       { text: "出番の合図を全部成功", ok: r => r.cueOk >= r.cueTotal },
+    ],
+    largo: [
+      { text: "最後まで演奏する", ok: r => r.cleared },
+      { text: "ソロとバイオリンへの合図を両方成功", ok: r => r.cueOk >= r.cueTotal },
+      { text: "最後の音を見事に締める", ok: r => r.cut === "見事" },
+    ],
+    waltz: [
+      { text: "最後まで演奏する", ok: r => r.cleared },
+      { text: "予備拍を2回ともぴったり出す", ok: r => r.prepOk >= 2 },
+      { text: "テンポ合わせ80%以上", ok: r => r.cleared && r.tempoPct >= 80 },
     ],
     mountain: [
       { text: "最後まで演奏する", ok: r => r.cleared },
@@ -816,18 +921,20 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
 
   // ---------- 本物の楽器の音（MusyngKite サウンドフォント, CC BY-SA 3.0） ----------
   const SAMPLE_NOTES = {
-    violin: ["Gb3", "A3", "C4", "Eb4", "Gb4", "A4", "C5", "Eb5", "Gb5", "A5", "C6", "Eb6", "Gb6", "A6", "C7"],
-    cello: ["C2", "Eb2", "Gb2", "A2", "C3", "Eb3", "Gb3", "A3", "C4", "Eb4", "Gb4", "A4", "C5"],
-    contrabass: ["Gb1", "A1", "C2", "Eb2", "Gb2", "A2", "C3"],
-    bassoon: ["A2", "C3", "Eb3", "Gb3", "A3", "C4", "Eb4"],
-    pizzicato_strings: ["Gb1", "A1", "C2", "Eb2", "Gb2", "A2", "C3", "Eb3", "Gb3", "A3"],
-    trumpet: ["A3", "C4", "Eb4", "Gb4", "A4", "C5", "Eb5"],
-    french_horn: ["A2", "C3", "Eb3", "Gb3", "A3", "C4", "Eb4", "Gb4"],
-    string_ensemble_1: ["C2", "Eb2", "Gb2", "A2", "C3", "Eb3", "Gb3", "A3", "C4", "Eb4", "Gb4", "A4", "C5", "Eb5"],
-    timpani: ["A1", "C2", "Eb2", "Gb2", "A2"],
+    bassoon: ["A2", "A3", "C3", "C4", "Eb3", "Eb4", "Gb3"],
+    cello: ["A2", "A3", "A4", "Ab2", "Ab3", "Ab4", "B2", "B3", "B4", "Bb2", "Bb3", "Bb4", "C2", "C3", "C4", "C5", "D2", "D3", "D4", "Db2", "Db3", "Db4", "E2", "E3", "E4", "Eb2", "Eb3", "Eb4", "F2", "F3", "F4", "G2", "G3", "G4", "Gb2", "Gb3", "Gb4"],
+    contrabass: ["A1", "A2", "C2", "C3", "Eb2", "Gb1", "Gb2"],
+    english_horn: ["A3", "A4", "Ab4", "B3", "B4", "Bb3", "Bb4", "C4", "C5", "D4", "D5", "Db4", "Db5", "E4", "E5", "Eb4", "Eb5", "F4", "G4", "Gb4"],
+    flute: ["A4", "A5", "A6", "Ab4", "Ab5", "Ab6", "B4", "B5", "B6", "Bb4", "Bb5", "Bb6", "C4", "C5", "C6", "C7", "D4", "D5", "D6", "Db4", "Db5", "Db6", "E4", "E5", "E6", "Eb4", "Eb5", "Eb6", "F4", "F5", "F6", "G4", "G5", "G6", "Gb4", "Gb5", "Gb6"],
+    french_horn: ["A2", "A3", "A4", "Ab3", "Ab4", "B2", "B3", "B4", "Bb2", "Bb3", "Bb4", "C3", "C4", "C5", "D3", "D4", "D5", "Db3", "Db4", "Db5", "E3", "E4", "E5", "Eb3", "Eb4", "Eb5", "F3", "F4", "F5", "G3", "G4", "Gb3", "Gb4"],
+    pizzicato_strings: ["A1", "A2", "A3", "C2", "C3", "Eb2", "Eb3", "Gb1", "Gb2", "Gb3"],
+    string_ensemble_1: ["A2", "A3", "A4", "C2", "C3", "C4", "C5", "Eb2", "Eb3", "Eb4", "Eb5", "Gb2", "Gb3", "Gb4"],
+    timpani: ["A1", "A2", "C2", "Eb2", "Gb2"],
+    trumpet: ["A3", "A4", "A5", "Ab3", "Ab4", "Ab5", "B3", "B4", "B5", "Bb3", "Bb4", "Bb5", "C4", "C5", "C6", "D4", "D5", "D6", "Db4", "Db5", "Db6", "E4", "E5", "Eb4", "Eb5", "F4", "F5", "G3", "G4", "G5", "Gb3", "Gb4", "Gb5"],
+    violin: ["A3", "A4", "A5", "A6", "Ab3", "Ab4", "Ab5", "Ab6", "B3", "B4", "B5", "B6", "Bb3", "Bb4", "Bb5", "Bb6", "C4", "C5", "C6", "C7", "D4", "D5", "D6", "Db4", "Db5", "Db6", "E4", "E5", "E6", "Eb4", "Eb5", "Eb6", "F4", "F5", "F6", "G3", "G4", "G5", "G6", "Gb3", "Gb4", "Gb5", "Gb6"],
   };
   // 録音ごとの音量差をそろえる倍率
-  const NORM = { violin: 5.9, cello: 3.83, contrabass: 1.56, bassoon: 4.0, pizzicato_strings: 9.08, trumpet: 3.75, french_horn: 3.59, string_ensemble_1: 2.23, timpani: 2.0 };
+  const NORM = { violin: 5.9, cello: 3.83, contrabass: 1.56, bassoon: 4.0, pizzicato_strings: 9.08, trumpet: 3.75, french_horn: 3.59, string_ensemble_1: 2.23, timpani: 2.0, english_horn: 2.28, flute: 3.04 };
   // 楽器: 音ファイル, 何人で弾くか, 左右(-1左〜1右), 立ち上がり, 余韻(-1は鳴らしきり)
   const INST = {
     vln: { file: "violin", ens: 3, pan: -0.5, atk: 0.03, rel: 0.22 },
@@ -840,6 +947,8 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
     horn: { file: "french_horn", ens: 2, pan: -0.2, atk: 0.06, rel: 0.35 },
     pad: { file: "string_ensemble_1", ens: 1, pan: 0, atk: 0.08, rel: 0.5 },
     timp: { file: "timpani", ens: 1, pan: 0.15, atk: 0.003, rel: -1 },
+    eh: { file: "english_horn", ens: 1, pan: 0.05, atk: 0.04, rel: 0.3 },
+    fl: { file: "flute", ens: 1, pan: -0.2, atk: 0.03, rel: 0.22 },
   };
   const rawSamples = {}, sampleBufs = {};
   let samplesState = "idle", decodePromise = null;
@@ -905,7 +1014,8 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
       const len = I.rel < 0 ? maxLen : Math.max(0.05, hold ? 30 : Math.min(dur, maxLen - I.rel));
       const peak = vol * NORM[I.file] * 8 / Math.sqrt(n) * (0.92 + Math.random() * 0.16);
       const pan = I.pan + (n > 1 ? (i - (n - 1) / 2) * 0.22 : 0);
-      const v = voice(t + delay, sm.buf, rate, peak, len, I.atk, I.rel, pan, hold && I.rel >= 0);
+      const atk = I.rel < 0 ? I.atk : I.atk * (1.6 - 1.0 * level);
+      const v = voice(t + delay, sm.buf, rate, peak, len, atk, I.rel, pan, hold && I.rel >= 0);
       if (hold) holdVoices.push(v);
     }
     return true;
@@ -1037,9 +1147,10 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
   let warnAt = { tempo: -99, dyn: -99 }, lastMark = "";
   let fermataT = 0, maestro = { bite: 0, sorry: 0, joy: 0 };
   let gest = null;
-  let preps = [], prep = null, pendingPrep = null, prepOk = 0, prepTotal = 0;
+  let preps = [], prep = null, pendingPrep = null, prepOk = 0, prepTotal = 0, snaps = [], tempoMarks = [];
   let crowd = 50, crowdHigh = false, shakeT = 0, bossSpawned = false, queenKilled = false;
 
+  function everyText(e) { return e === 1 ? "1拍ずつ" : e === song.meter ? "1小節に1回" : e + "拍に1回"; }
   function everyAt(b) {
     let e = 1;
     chart.tapEvery.forEach(x => { if (b >= x.b) e = x.e; });
@@ -1057,11 +1168,30 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
     songTaps = taps.length;
     // 予備拍を出す場所：曲の始まりと、テンポが急に変わるところ
     preps = [{ b: 0, target: chart.tempo[0].bpm, label: "曲の始まり", t1: null }];
+    snaps = [];
     for (let i = 1; i < chart.tempo.length; i++) {
       const a = chart.tempo[i - 1], c = chart.tempo[i];
-      if (a.b === c.b && a.bpm !== c.bpm) preps.push({ b: c.b, target: c.bpm, label: c.label, t1: null, started: false, warned: false });
+      if (c.stop) preps.push({ b: c.b, target: c.bpm, label: c.label, t1: null, started: false, warned: false });
+      else if (a.b === c.b && a.bpm !== c.bpm) snaps.push({ b: c.b, bpm: c.bpm, done: false });
     }
     jumps = preps.filter(q => q.b > 0);
+    // テンポの記号（accel. / rit. / a tempo / ♩=）
+    tempoMarks = [];
+    const tp = chart.tempo;
+    let prevRamp = false;
+    for (let i = 0; i < tp.length - 1; i++) {
+      const a = tp[i], c2 = tp[i + 1];
+      if (c2.b === a.b) {
+        if (a.bpm !== c2.bpm) tempoMarks.push({ b: c2.b, text: c2.stop ? "♩=" + c2.bpm : prevRamp ? "a tempo" : "♩=" + c2.bpm, kind: c2.stop ? "stop" : "snap", warned: false });
+        prevRamp = false;
+      } else if (c2.bpm !== a.bpm) {
+        const txt = c2.bpm > a.bpm ? "accel." : "rit.";
+        const lastM = tempoMarks[tempoMarks.length - 1];
+        if (!(lastM && lastM.text === txt && lastM.end === a.b)) tempoMarks.push({ b: Math.max(0, a.b), text: txt, kind: txt, end: c2.b, warned: false });
+        else lastM.end = c2.b;
+        prevRamp = true;
+      } else prevRamp = false;
+    }
     // 合図は入る1拍前（予備拍）に出す。予備拍で再開する場所の合図は、2回目の予備拍で出す
     cues = chart.cues.map(c => {
       let pb = 0;
@@ -1184,7 +1314,7 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
     if (!best || score > best.score) { store.set("maestro.best." + song.id, { score, rank }); isNew = score > 0; }
     $("resRank").innerHTML = "<b>" + rank + "</b>" + comment + (isNew ? "<br>ベストスコア更新！" : "");
     // ミッション
-    const res = { cleared, rank, bonks, swats, cueOk, cueTotal: cues.length, prepOk, prepTotal, queen: queenKilled, crowd: Math.round(crowd),
+    const res = { cleared, rank, bonks, swats, cueOk, cueTotal: cues.length, prepOk, prepTotal, queen: queenKilled, crowd: Math.round(crowd), cut: cutResult,
       tempoPct: tempoChecks ? tempoOk / tempoChecks * 100 : 0, dynPct: dynChecks ? dynOk / dynChecks * 100 : 0 };
     const before = missionState(song.id), after = before.slice();
     const ul = $("resMissions"); ul.innerHTML = "";
@@ -1271,6 +1401,7 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
     if (P.t1 !== null && th - P.t1 < 0.18) return;
     if (P.t1 === null || th - P.t1 > 3) {
       P.t1 = th;
+      if (holdVoices.length) { stopHolds(ac.currentTime, 0.1); popup(x, y - 52, "音を切って", "#f5ecd6", 15); }
       popup(x, y - 30, "構え…", "#f5ecd6", 18);
       sfxBreath(ac.currentTime, 0.5, 0.03);
       return;
@@ -1671,6 +1802,15 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
         lastJ = null;
       }
     });
+    // すぐ速さが変わる場所（a tempo など）は楽団もそろえて変える
+    snaps.forEach(q => {
+      if (!q.done && posAt(horizon) >= q.b && A.T > 0) {
+        q.done = true;
+        const ts = timeAt(q.b);
+        A0 = A; A = { t: ts, p: q.b, T: q.bpm };
+        lastJ = null;
+      }
+    });
     const pH = posAt(horizon);
     while (evPtr < events.length && events[evPtr].b < pH) {
       const e = events[evPtr++];
@@ -1755,6 +1895,13 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
         lastMark = mk;
         popup(240, 560, mk + "　" + ({ pp: "とても小さく", p: "小さく", mp: "少し小さく", mf: "少し大きく", f: "大きく", ff: "とても大きく", "cresc.": "だんだん大きく", "dim.": "だんだん小さく" }[mk] || ""), "#ffe08a", 22);
       }
+      // テンポが変わる4拍前に予告
+      tempoMarks.forEach(m => {
+        if (m.warned || m.kind === "stop" || !(beatNow >= m.b - 4 && beatNow < m.b - 0.5)) return;
+        m.warned = true;
+        const msg = m.kind === "accel." ? "4拍後から accel.：少しずつ早めに振って" : m.kind === "rit." ? "4拍後から rit.：少しずつゆっくり振って" : "4拍後に " + m.text + "：すぐ速さを変える";
+        popup(240, 572, msg, m.kind === "rit." ? "#8cc8ff" : "#ffb070", 16);
+      });
       // 強弱が大きく変わる4拍前に予告
       chart.dyn.forEach((d, i) => {
         if (!d.mark || d.warned || !(beatNow >= d.b - 4 && beatNow < d.b - 0.5)) return;
@@ -1776,7 +1923,7 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
       const nearJump = jumps.some(j => Math.abs(j.b - (beatNow + 4)) < 7);
       if (beatNow > -1 && e !== lastEvery) {
         lastEvery = e;
-        if (!nearJump) banner = { text: e === 2 ? "2拍に1回振る" : "1拍ずつ振る", sub: "テンポが速くなってきた！", t: 2 };
+        if (!nearJump) banner = { text: everyText(e) + "振る", sub: e > 1 ? "テンポが速くなってきた！" : "1拍ずつに戻す", t: 2 };
       }
 
       // 蚊の出現
@@ -2476,9 +2623,9 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
 
   function drawHUD() {
     const c = ctx;
-    c.fillStyle = "rgba(15,4,6,0.78)"; c.fillRect(0, 0, W, 88);
+    c.fillStyle = "rgba(15,4,6,0.78)"; c.fillRect(0, 0, W, 56);
     c.strokeStyle = "rgba(224,176,79,0.5)"; c.lineWidth = 1;
-    c.beginPath(); c.moveTo(0, 88.5); c.lineTo(W, 88.5); c.stroke();
+    c.beginPath(); c.moveTo(0, 56.5); c.lineTo(W, 56.5); c.stroke();
     const prog = clamp(beatNow / chart.lastTap, 0, 1);
     c.fillStyle = "rgba(224,176,79,0.25)"; c.fillRect(0, 0, W, 3);
     c.fillStyle = "#e0b04f"; c.fillRect(0, 0, W * prog, 3);
@@ -2500,7 +2647,7 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
     const tgt = targetBpm(Math.max(0, beatNow)), ahead = targetBpm(Math.max(0, beatNow) + 4);
     const mark = ahead > tgt + 1 ? "accel." : ahead < tgt - 1 ? "rit." : "";
     c.textAlign = "center"; c.font = "500 10px " + FONT_UI; c.fillStyle = "rgba(245,236,214,0.8)";
-    c.fillText(everyAt(Math.max(0, beatNow)) === 2 ? "2拍に1回" : "1拍ずつ", 240, 38);
+    c.fillText(everyText(everyAt(Math.max(0, beatNow))), 240, 38);
     if (mark) { c.font = "italic 800 13px " + FONT_D; c.fillStyle = "#ffe08a"; c.fillText(mark, 240, 52); }
     for (let i = 0; i < 3; i++) heart(W - 66 + i * 20, 9, 14, i < lives);
     c.textAlign = "right"; c.font = "700 13px " + FONT_UI; c.fillStyle = "#f5ecd6";
@@ -2509,15 +2656,6 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
       c.font = "700 10px " + FONT_UI; c.fillStyle = combo >= 16 ? "#ffe08a" : "#f5ecd6";
       c.fillText(combo + " コンボ" + (combo >= 16 ? " ノリノリ" : ""), W - 14, 53);
     }
-    // テンポと音量のゲージ
-    if (state === "prep" || !A.T) {
-      gauge(14, 70, 200, "テンポ：予備拍待ち", 0.5, 0.5, "目標 " + (prep ? prep.target : Math.round(tgt)), true);
-    } else {
-      const r = A.T / tgt, tempoGood = Math.abs(r - 1) <= 0.07;
-      gauge(14, 70, 200, "テンポ ♩=" + Math.round(A.T), (r - 0.7) / 0.6, 0.5, "目標 " + Math.round(tgt) + (mark ? " " + mark : ""), tempoGood);
-    }
-    const dv = dynMap.at(Math.max(0, beatNow)), mk = dynMap.mark(Math.max(0, beatNow));
-    gauge(W - 214, 70, 200, "音量（振りの大きさ）", level, dv, "楽譜 " + mk, Math.abs(level - dv) <= 0.2);
   }
 
   function drawCueMark(activeCue) {
@@ -2542,47 +2680,114 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
       c.font = "800 11px " + FONT_D; c.fillStyle = "#ffe08a"; c.fillText("合図", mk.x, mk.y + 1);
       }
 
-  // これからの強弱（山が高く金〜赤のところ＝大きく払う）
-  function drawDynLane() {
-    const c = ctx, x0 = 44, x1 = 466, y0 = 94, y1 = 122, h = y1 - y0 - 6;
-    const span = song.meter === 2 ? 16 : 14, back = 1.5;
-    const bx = b => x0 + (b - (beatNow - back)) / span * (x1 - x0);
-    c.save();
-    c.fillStyle = "rgba(15,4,6,0.66)"; c.fillRect(0, y0 - 4, W, y1 - y0 + 8);
-    c.font = "700 9px " + FONT_UI; c.fillStyle = "rgba(245,236,214,0.75)"; c.textAlign = "left"; c.textBaseline = "middle";
-    c.fillText("強弱", 8, y0 + 6); c.fillText("これから", 8, y0 + 18);
-    // 山（目標の音量）
-    const end = Math.min(chart.lastTap + 2, beatNow - back + span);
-    for (let x = x0; x < x1; x += 3) {
-      const b = beatNow - back + (x - x0) / (x1 - x0) * span;
-      if (b < 0 || b > end) continue;
-      const v = dynMap.at(b);
-      const big = v >= 0.6, small = v <= 0.35;
-      c.fillStyle = big ? (v >= 0.85 ? "rgba(226,72,61,0.85)" : "rgba(232,184,74,0.85)") : small ? "rgba(140,190,230,0.6)" : "rgba(245,236,214,0.45)";
-      const hh = 3 + h * v;
-      c.fillRect(x, y1 - hh, 3, hh);
+  // ---------- 楽譜の帯：横は「時間」。拍の目盛りが詰まる＝速く、広がる＝遅く ----------
+  const LANE_BACK = 1.0, LANE_AHEAD = 6.0;
+  function laneSamples() {
+    const out = [], dt = 0.04;
+    const T0 = A && A.T > 0 ? A.T : (prep ? prep.target : targetBpm(Math.max(0, beatNow)));
+    for (let t = -LANE_BACK; t < 0; t += dt) out.push({ t, b: beatNow + t * T0 / 60, wait: false });
+    let b = beatNow, wait = state === "prep" ? 1.2 : 0, waitStart = state === "prep";
+    const stops = jumps.filter(j => !j.started && j.b > beatNow + 0.01);
+    let si = 0;
+    for (let t = 0; t <= LANE_AHEAD; t += dt) {
+      out.push({ t, b, wait: wait > 0, waitStart });
+      waitStart = false;
+      if (wait > 0) { wait -= dt; continue; }
+      let nb = b + Math.max(20, targetBpm(Math.max(0, b))) / 60 * dt;
+      if (si < stops.length && nb >= stops[si].b && b < stops[si].b) { nb = stops[si].b; wait = 1.2; waitStart = true; si++; }
+      if (nb > chart.lastTap) { if (b < chart.lastTap) { nb = chart.lastTap; wait = 99; waitStart = true; } else nb = chart.lastTap; }
+      b = nb;
     }
-    // 拍の目盛り
-    taps.forEach(t => {
-      if (t.b < beatNow - back || t.b > beatNow - back + span) return;
-      const x = bx(t.b), bar = Math.round(t.b) % song.meter === 0;
-      c.fillStyle = bar ? "rgba(245,236,214,0.55)" : "rgba(245,236,214,0.22)";
-      c.fillRect(x - 0.5, y1, 1, bar ? 4 : 2);
+    return out;
+  }
+  function fermataSign(c, x, y, col) {
+    c.strokeStyle = col; c.fillStyle = col; c.lineWidth = 2;
+    c.beginPath(); c.arc(x, y + 4, 7, Math.PI, 0); c.stroke();
+    c.beginPath(); c.arc(x, y + 2, 1.8, 0, Math.PI * 2); c.fill();
+  }
+  function drawScoreLane() {
+    const c = ctx, X0 = 50, X1 = 472, Y0 = 58, YT = 88, YD0 = 92, YD = 122;
+    const tx = t => X0 + (t + LANE_BACK) / (LANE_BACK + LANE_AHEAD) * (X1 - X0);
+    const S = laneSamples();
+    const bpms = chart.tempo.map(q => q.bpm), tmin = Math.min(...bpms) * 0.92, tmax = Math.max(...bpms) * 1.04;
+    const ty = bpm => YT - 3 - (clamp(bpm, tmin, tmax) - tmin) / Math.max(1, tmax - tmin) * 24;
+    c.save();
+    c.fillStyle = "rgba(15,4,6,0.7)"; c.fillRect(0, 56, W, 70);
+    c.fillStyle = "rgba(245,236,214,0.08)"; c.fillRect(X0, Y0, X1 - X0, YT - Y0); c.fillRect(X0, YD0, X1 - X0, YD - YD0);
+    // 左の見出し
+    const tgtNow = state === "prep" && prep ? prep.target : targetBpm(Math.max(0, beatNow));
+    c.textAlign = "left"; c.textBaseline = "middle"; c.font = "700 9px " + FONT_UI; c.fillStyle = "rgba(245,236,214,0.75)";
+    c.fillText("テンポ", 6, 65); c.fillText("強弱", 6, 99);
+    c.font = "700 10px " + FONT_UI;
+    const curT = A && A.T > 0 ? Math.round(A.T) : null;
+    const tOk = curT && Math.abs(curT / tgtNow - 1) <= 0.07;
+    c.fillStyle = curT ? (tOk ? "#8fcf9f" : "#ffc9a8") : "#f5ecd6";
+    c.fillText(curT ? "♩" + curT : "待ち", 6, 79);
+    c.fillStyle = "#f5ecd6"; c.fillText(dynMap.mark(Math.max(0, beatNow)), 6, 113);
+    // テンポの線（目標）: 金＝一定、橙＝accel.、青＝rit.
+    c.lineWidth = 2.4; c.lineCap = "round";
+    for (let i = 1; i < S.length; i++) {
+      const a = S[i - 1], q = S[i];
+      if (a.wait || q.wait || q.b < 0 || a.b < 0) continue;
+      const va = targetBpm(Math.max(0, a.b)), vq = targetBpm(Math.max(0, q.b));
+      const slope = targetBpm(Math.max(0, q.b) + 0.5) - targetBpm(Math.max(0, q.b) - 0.5);
+      c.strokeStyle = slope > 0.3 ? "#ffb070" : slope < -0.3 ? "#8cc8ff" : "#e0b04f";
+      c.beginPath(); c.moveTo(tx(a.t), ty(va)); c.lineTo(tx(q.t), ty(vq)); c.stroke();
+    }
+    // 止まる場所（フェルマータ）
+    S.forEach(q => {
+      if (!q.waitStart) return;
+      const x = tx(q.t);
+      fermataSign(c, x + 6, Y0 + 4, "#ffe08a");
+      c.font = "700 9px " + FONT_UI; c.fillStyle = "#ffe08a"; c.textAlign = "left";
+      c.fillText(q.b >= chart.lastTap - 0.01 ? "のばして締め" : "止まる→予備拍", x + 16, Y0 + 9);
     });
-    // 記号
-    chart.dyn.forEach(d => {
-      if (!d.mark || d.b < beatNow - back || d.b > beatNow - back + span) return;
-      const x = bx(d.b);
-      c.font = "italic 800 12px " + FONT_D; c.textAlign = "left"; c.textBaseline = "top";
-      c.lineWidth = 3; c.strokeStyle = "rgba(15,4,6,0.9)"; c.strokeText(d.mark, x + 2, y0 - 2);
-      c.fillStyle = d.v >= 0.6 ? "#ffd08a" : "#f5ecd6"; c.fillText(d.mark, x + 2, y0 - 2);
-      c.fillStyle = "rgba(245,236,214,0.6)"; c.fillRect(x, y0, 1, y1 - y0);
+    // 拍の目盛り（時間で並べるので、詰まる＝速い）
+    const timeOfB = b => { for (let i = 1; i < S.length; i++) if (!S[i].wait && S[i - 1].b <= b && S[i].b >= b && S[i].b > S[i - 1].b) return S[i - 1].t + (b - S[i - 1].b) / (S[i].b - S[i - 1].b) * (S[i].t - S[i - 1].t); return null; };
+    const bFirst = Math.ceil(S[0].b), bLast = Math.floor(S[S.length - 1].b);
+    for (let b = Math.max(0, bFirst); b <= bLast; b++) {
+      const t = timeOfB(b);
+      if (t === null) continue;
+      const x = tx(t), bar = b % song.meter === 0, isTap = taps.some(q => q.b === b);
+      c.fillStyle = isTap ? (bar ? "rgba(255,236,180,0.95)" : "rgba(245,236,214,0.7)") : "rgba(245,236,214,0.25)";
+      c.fillRect(x - (bar ? 1 : 0.5), YT - (bar ? 9 : isTap ? 6 : 3), bar ? 2 : 1, bar ? 9 : isTap ? 6 : 3);
+    }
+    // テンポの記号
+    tempoMarks.forEach(m => {
+      const t = m.b <= beatNow ? null : timeOfB(m.b);
+      if (t === null) return;
+      const x = tx(t);
+      c.font = "italic 800 11px " + FONT_D; c.textAlign = "left"; c.textBaseline = "top";
+      const tw = c.measureText(m.text).width, lx = x + 2 + tw > W - 4 ? x - 2 - tw : x + 2;
+      c.lineWidth = 3; c.strokeStyle = "rgba(15,4,6,0.9)"; c.strokeText(m.text, lx, Y0 - 1);
+      c.fillStyle = m.kind === "accel." ? "#ffb070" : m.kind === "rit." ? "#8cc8ff" : "#ffe08a"; c.fillText(m.text, lx, Y0 - 1);
+      c.fillStyle = "rgba(245,236,214,0.5)"; c.fillRect(x, Y0, 1, YT - Y0);
     });
-    // いまの位置と、いまの音量
-    const nx = bx(beatNow);
-    c.fillStyle = "#ffe08a"; c.fillRect(nx - 1, y0 - 2, 2, y1 - y0 + 4);
-    const ly = y1 - (3 + h * level);
-    c.fillStyle = "#ffffff"; c.fillRect(nx - 9, ly - 1, 18, 2.5);
+    // 強弱の山（高く金〜赤＝大きく払う、低く水色＝トンと軽く）
+    for (let i = 1; i < S.length; i++) {
+      const q = S[i];
+      if (q.wait || q.b < 0) continue;
+      const v = dynMap.at(Math.max(0, q.b)), x = tx(S[i - 1].t), w = tx(q.t) - x + 0.5;
+      c.fillStyle = v >= 0.6 ? (v >= 0.85 ? "rgba(226,72,61,0.85)" : "rgba(232,184,74,0.85)") : v <= 0.35 ? "rgba(140,190,230,0.6)" : "rgba(245,236,214,0.45)";
+      const hh = 3 + 24 * v;
+      c.fillRect(x, YD - hh, w, hh);
+    }
+    chart.dyn.forEach(dd => {
+      if (!dd.mark || dd.b <= beatNow) return;
+      const t = timeOfB(dd.b); if (t === null) return;
+      const x = tx(t);
+      c.font = "italic 800 11px " + FONT_D; c.textAlign = "left"; c.textBaseline = "top";
+      const tw = c.measureText(dd.mark).width, lx = x + 2 + tw > W - 4 ? x - 2 - tw : x + 2;
+      c.lineWidth = 3; c.strokeStyle = "rgba(15,4,6,0.9)"; c.strokeText(dd.mark, lx, YD0 - 1);
+      c.fillStyle = dd.v >= 0.6 ? "#ffd08a" : "#f5ecd6"; c.fillText(dd.mark, lx, YD0 - 1);
+      c.fillStyle = "rgba(245,236,214,0.5)"; c.fillRect(x, YD0, 1, YD - YD0);
+    });
+    // いま（黄色の縦線）と、いまのテンポ・音量（白）
+    const nx = tx(0);
+    c.fillStyle = "#ffe08a"; c.fillRect(nx - 1, Y0 - 2, 2, YD - Y0 + 4);
+    c.fillStyle = "#ffffff";
+    if (curT) { c.beginPath(); c.arc(nx, ty(curT), 3.6, 0, Math.PI * 2); c.fill(); }
+    c.fillRect(nx - 9, YD - (3 + 24 * level) - 1, 18, 2.5);
     c.restore();
   }
 
@@ -2630,7 +2835,7 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
     c.font = "500 12px " + FONT_UI; c.fillStyle = "#f5ecd6";
     c.fillText("2回の間隔がテンポになり、次の拍で楽団が入ります", 240, 464);
     const v0 = dynMap.at(P.b), mk0 = dynMap.mark(P.b);
-    c.fillText("目標 ♩=" + P.target + (e === 2 ? "（2拍に1回）" : ""), 240, 482);
+    c.fillText("目標 ♩=" + P.target + (e > 1 ? "（" + everyText(e) + "）" : ""), 240, 482);
     c.fillStyle = v0 >= 0.6 ? "#ffb070" : v0 <= 0.35 ? "#bfe3ff" : "#f5ecd6";
     c.font = "700 12px " + FONT_UI;
     c.fillText("ここは " + mk0 + "：" + (v0 >= 0.6 ? "予備拍を大きく払って入ろう" : v0 <= 0.35 ? "予備拍はトンと軽く" : "予備拍は中くらいに"), 240, 500);
@@ -2762,7 +2967,7 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
         c.fillText(held >= 1.5 ? "いまだ！ 好きなところでタップ" : "まだのばして…", 240, 470);
       }
       drawHUD();
-      if (state === "play" || state === "prep") drawDynLane();
+      if (state === "play" || state === "prep") drawScoreLane();
       if (activeCue) drawCueMark(activeCue);
     }
     if (playing) drawAudience(beatPh);
