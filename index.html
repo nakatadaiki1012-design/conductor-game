@@ -1755,6 +1755,16 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
         lastMark = mk;
         popup(240, 560, mk + "　" + ({ pp: "とても小さく", p: "小さく", mp: "少し小さく", mf: "少し大きく", f: "大きく", ff: "とても大きく", "cresc.": "だんだん大きく", "dim.": "だんだん小さく" }[mk] || ""), "#ffe08a", 22);
       }
+      // 強弱が大きく変わる4拍前に予告
+      chart.dyn.forEach((d, i) => {
+        if (!d.mark || d.warned || !(beatNow >= d.b - 4 && beatNow < d.b - 0.5)) return;
+        const prev = i > 0 ? chart.dyn[i - 1].v : d.v;
+        const next = d.mark === "cresc." || d.mark === "dim." ? (chart.dyn[i + 1] || d).v : d.v;
+        d.warned = true;
+        if (d.mark === "cresc." && next - d.v > 0.3) popup(240, 600, "4拍後から cresc.：少しずつ大きく払って", "#ffe08a", 16);
+        else if (next >= 0.6 && next - prev >= 0.25) popup(240, 600, "4拍後から " + d.mark + "：大きく払う準備！", "#ffb070", 18);
+        else if (next <= 0.35 && prev - next >= 0.25) popup(240, 600, "4拍後から " + d.mark + "：トンと軽く", "#bfe3ff", 17);
+      });
       // テンポ急変の予告
       jumps.forEach(j => {
         if (!j.warned && beatNow >= j.b - 6 && beatNow < j.b) {
@@ -2510,6 +2520,102 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
     gauge(W - 214, 70, 200, "音量（振りの大きさ）", level, dv, "楽譜 " + mk, Math.abs(level - dv) <= 0.2);
   }
 
+  function drawCueMark(activeCue) {
+    const c = ctx;
+      const goalB = activeCue.atPrep ? activeCue.b : activeCue.prepB;
+      const left = Math.ceil(goalB - beatNow);
+      const mk = cueMark(activeCue), go = activeCue.atPrep ? state === "prep" : left <= 1;
+      c.textAlign = "center"; c.textBaseline = "middle";
+      c.font = "800 13px " + FONT_D;
+      const txt = mk.m.name + "の出番 " + (activeCue.atPrep ? (go ? "2回目の予備拍で合図！" : "次の予備拍で合図") : go ? "今！（予備拍）" : "予備拍まであと" + left + "拍");
+      const tw = c.measureText(txt).width + 16;
+      const ly = mk.y - 44 < 128 ? mk.y + 22 : mk.y - 44;
+      c.fillStyle = "rgba(15,4,6,0.85)"; c.fillRect(clamp(mk.x - tw / 2, 4, W - tw - 4), ly, tw, 20);
+      c.fillStyle = go ? "#ffe08a" : "#f5ecd6"; c.fillText(txt, clamp(mk.x, tw / 2 + 4, W - tw / 2 - 4), ly + 10);
+      c.fillStyle = "rgba(15,4,6,0.7)"; c.beginPath(); c.arc(mk.x, mk.y, 17, 0, Math.PI * 2); c.fill();
+      c.strokeStyle = "#e0b04f"; c.lineWidth = 2.5; c.beginPath(); c.arc(mk.x, mk.y, 17, 0, Math.PI * 2); c.stroke();
+      if (go) {
+        const p = activeCue.atPrep ? 0 : clamp(goalB - beatNow, 0, 1);
+        c.strokeStyle = "rgba(255,232,150," + (1 - p * 0.6) + ")"; c.lineWidth = 2.5;
+        c.beginPath(); c.arc(mk.x, mk.y, 17 + 34 * p, 0, Math.PI * 2); c.stroke();
+      }
+      c.font = "800 11px " + FONT_D; c.fillStyle = "#ffe08a"; c.fillText("合図", mk.x, mk.y + 1);
+      }
+
+  // これからの強弱（山が高く金〜赤のところ＝大きく払う）
+  function drawDynLane() {
+    const c = ctx, x0 = 44, x1 = 466, y0 = 94, y1 = 122, h = y1 - y0 - 6;
+    const span = song.meter === 2 ? 16 : 14, back = 1.5;
+    const bx = b => x0 + (b - (beatNow - back)) / span * (x1 - x0);
+    c.save();
+    c.fillStyle = "rgba(15,4,6,0.66)"; c.fillRect(0, y0 - 4, W, y1 - y0 + 8);
+    c.font = "700 9px " + FONT_UI; c.fillStyle = "rgba(245,236,214,0.75)"; c.textAlign = "left"; c.textBaseline = "middle";
+    c.fillText("強弱", 8, y0 + 6); c.fillText("これから", 8, y0 + 18);
+    // 山（目標の音量）
+    const end = Math.min(chart.lastTap + 2, beatNow - back + span);
+    for (let x = x0; x < x1; x += 3) {
+      const b = beatNow - back + (x - x0) / (x1 - x0) * span;
+      if (b < 0 || b > end) continue;
+      const v = dynMap.at(b);
+      const big = v >= 0.6, small = v <= 0.35;
+      c.fillStyle = big ? (v >= 0.85 ? "rgba(226,72,61,0.85)" : "rgba(232,184,74,0.85)") : small ? "rgba(140,190,230,0.6)" : "rgba(245,236,214,0.45)";
+      const hh = 3 + h * v;
+      c.fillRect(x, y1 - hh, 3, hh);
+    }
+    // 拍の目盛り
+    taps.forEach(t => {
+      if (t.b < beatNow - back || t.b > beatNow - back + span) return;
+      const x = bx(t.b), bar = Math.round(t.b) % song.meter === 0;
+      c.fillStyle = bar ? "rgba(245,236,214,0.55)" : "rgba(245,236,214,0.22)";
+      c.fillRect(x - 0.5, y1, 1, bar ? 4 : 2);
+    });
+    // 記号
+    chart.dyn.forEach(d => {
+      if (!d.mark || d.b < beatNow - back || d.b > beatNow - back + span) return;
+      const x = bx(d.b);
+      c.font = "italic 800 12px " + FONT_D; c.textAlign = "left"; c.textBaseline = "top";
+      c.lineWidth = 3; c.strokeStyle = "rgba(15,4,6,0.9)"; c.strokeText(d.mark, x + 2, y0 - 2);
+      c.fillStyle = d.v >= 0.6 ? "#ffd08a" : "#f5ecd6"; c.fillText(d.mark, x + 2, y0 - 2);
+      c.fillStyle = "rgba(245,236,214,0.6)"; c.fillRect(x, y0, 1, y1 - y0);
+    });
+    // いまの位置と、いまの音量
+    const nx = bx(beatNow);
+    c.fillStyle = "#ffe08a"; c.fillRect(nx - 1, y0 - 2, 2, y1 - y0 + 4);
+    const ly = y1 - (3 + h * level);
+    c.fillStyle = "#ffffff"; c.fillRect(nx - 9, ly - 1, 18, 2.5);
+    c.restore();
+  }
+
+  // 右下：いまどう振ればいいか
+  function drawSwingHint(gx, gy) {
+    const c = ctx, v = dynMap.at(Math.max(0, beatNow + 0.5)), diff = v - level;
+    const big = v >= 0.6, small = v <= 0.35;
+    const txt = big ? "サッと大きく払う" : small ? "トンと軽く" : "中くらいに";
+    const col = big ? "#ffb070" : small ? "#bfe3ff" : "#f5ecd6";
+    const off = Math.abs(diff) > 0.25;
+    const blink = off ? 0.55 + 0.45 * Math.sin(performance.now() / 120) : 1;
+    c.save();
+    c.globalAlpha = blink;
+    c.textAlign = "center"; c.textBaseline = "middle";
+    c.font = "800 12px " + FONT_D;
+    c.lineWidth = 3; c.strokeStyle = "rgba(15,4,6,0.9)"; c.strokeText(txt, gx, gy - 66);
+    c.fillStyle = col; c.fillText(txt, gx, gy - 66);
+    // 矢印の長さ＝振る大きさ
+    const len = 6 + 40 * v;
+    c.strokeStyle = col; c.fillStyle = col; c.lineWidth = 3; c.lineCap = "round";
+    if (small) { c.beginPath(); c.arc(gx, gy - 50, 3.5, 0, Math.PI * 2); c.fill(); }
+    else {
+      c.beginPath(); c.moveTo(gx - len / 2, gy - 50); c.lineTo(gx + len / 2, gy - 50); c.stroke();
+      c.beginPath(); c.moveTo(gx + len / 2 + 4, gy - 50); c.lineTo(gx + len / 2 - 3, gy - 55); c.lineTo(gx + len / 2 - 3, gy - 45); c.closePath(); c.fill();
+    }
+    if (off) {
+      c.font = "700 10px " + FONT_UI; c.fillStyle = "#ffc9a8";
+      c.fillText(diff > 0 ? "もっと大きく" : "もっと小さく", gx, gy - 82);
+    }
+    c.lineCap = "butt";
+    c.restore();
+  }
+
   // 予備拍の案内と、目安のテンポで弾むボール
   function drawPrepGuide() {
     const c = ctx, P = prep, e = everyAt(P.b);
@@ -2523,10 +2629,14 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
     c.fillText(P.t1 === null ? "構えて、予備拍を2回タップ" : "もう1回！（予備拍）", 240, 440);
     c.font = "500 12px " + FONT_UI; c.fillStyle = "#f5ecd6";
     c.fillText("2回の間隔がテンポになり、次の拍で楽団が入ります", 240, 464);
-    c.fillText("目標 ♩=" + P.target + (e === 2 ? "（2拍に1回）" : "") + "　大きく払う＝大きな音で入る", 240, 482);
+    const v0 = dynMap.at(P.b), mk0 = dynMap.mark(P.b);
+    c.fillText("目標 ♩=" + P.target + (e === 2 ? "（2拍に1回）" : ""), 240, 482);
+    c.fillStyle = v0 >= 0.6 ? "#ffb070" : v0 <= 0.35 ? "#bfe3ff" : "#f5ecd6";
+    c.font = "700 12px " + FONT_UI;
+    c.fillText("ここは " + mk0 + "：" + (v0 >= 0.6 ? "予備拍を大きく払って入ろう" : v0 <= 0.35 ? "予備拍はトンと軽く" : "予備拍は中くらいに"), 240, 500);
     // 目安のボール
     const ph = (now % period) / period;
-    const bx = 240, by = 524 - Math.sin(ph * Math.PI) * 18;
+    const bx = 240, by = 526 - Math.sin(ph * Math.PI) * 12;
     c.strokeStyle = "rgba(245,236,214,0.35)"; c.lineWidth = 1.5;
     c.beginPath(); c.moveTo(196, 528); c.lineTo(284, 528); c.stroke();
     c.fillStyle = ph < 0.08 || ph > 0.92 ? "#ffe08a" : "rgba(245,236,214,0.7)";
@@ -2562,7 +2672,7 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
     c.setTransform(scale, 0, 0, scale, sx * scale, sy * scale);
     c.drawImage(bg, 0, 0, W, H);
 
-    const activeCue = playing && state === "play" ? shownCueAt(beatNow) : null;
+    const activeCue = playing && (state === "play" || state === "prep") ? shownCueAt(beatNow) : null;
     const bob = playing ? Math.pow(1 - beatPh, 3) : 0;
     const now = performance.now() / 1000;
     const lv = playing ? level : 0.5;
@@ -2593,26 +2703,6 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
       });
       drawStands(type);
     });
-    if (activeCue) {
-      const goalB = activeCue.atPrep ? activeCue.b : activeCue.prepB;
-      const left = Math.ceil(goalB - beatNow);
-      const mk = cueMark(activeCue), go = activeCue.atPrep ? state === "prep" : left <= 1;
-      c.textAlign = "center"; c.textBaseline = "middle";
-      c.font = "800 13px " + FONT_D;
-      const txt = mk.m.name + "の出番 " + (activeCue.atPrep ? (go ? "2回目の予備拍で合図！" : "次の予備拍で合図") : go ? "今！（予備拍）" : "予備拍まであと" + left + "拍");
-      const tw = c.measureText(txt).width + 16;
-      c.fillStyle = "rgba(15,4,6,0.85)"; c.fillRect(clamp(mk.x - tw / 2, 4, W - tw - 4), mk.y - 44, tw, 20);
-      c.fillStyle = go ? "#ffe08a" : "#f5ecd6"; c.fillText(txt, clamp(mk.x, tw / 2 + 4, W - tw / 2 - 4), mk.y - 34);
-      c.fillStyle = "rgba(15,4,6,0.7)"; c.beginPath(); c.arc(mk.x, mk.y, 17, 0, Math.PI * 2); c.fill();
-      c.strokeStyle = "#e0b04f"; c.lineWidth = 2.5; c.beginPath(); c.arc(mk.x, mk.y, 17, 0, Math.PI * 2); c.stroke();
-      if (go) {
-        const p = activeCue.atPrep ? 0 : clamp(goalB - beatNow, 0, 1);
-        c.strokeStyle = "rgba(255,232,150," + (1 - p * 0.6) + ")"; c.lineWidth = 2.5;
-        c.beginPath(); c.arc(mk.x, mk.y, 17 + 34 * p, 0, Math.PI * 2); c.stroke();
-      }
-      c.font = "800 11px " + FONT_D; c.fillStyle = "#ffe08a"; c.fillText("合図", mk.x, mk.y + 1);
-    }
-
     if (chaos > 0) { c.fillStyle = "rgba(226,72,61," + (chaos / 100 * 0.2) + ")"; c.fillRect(0, 88, W, 260); }
 
     drawConductor(playing ? 1 - bob : 0, state === "play" && combo >= 16);
@@ -2653,6 +2743,7 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
         c.beginPath(); c.arc(gx, gy, 14 + 30 * ringP, 0, Math.PI * 2); c.stroke();
         c.textAlign = "center"; c.textBaseline = "middle"; c.font = "700 10px " + FONT_UI; c.fillStyle = "rgba(245,236,214,0.7)";
         c.fillText("拍", gx, gy);
+        drawSwingHint(gx, gy);
       }
       if (state === "prep" && prep) drawPrepGuide();
       if (banner.t > 0) {
@@ -2671,6 +2762,8 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
         c.fillText(held >= 1.5 ? "いまだ！ 好きなところでタップ" : "まだのばして…", 240, 470);
       }
       drawHUD();
+      if (state === "play" || state === "prep") drawDynLane();
+      if (activeCue) drawCueMark(activeCue);
     }
     if (playing) drawAudience(beatPh);
     drawPortrait();
