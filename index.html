@@ -261,6 +261,7 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
           </ul>
         </details>
         <button class="secondary" id="calibBtn" type="button">タイミング調整（いま <span id="calibNow">0</span>ms）</button>
+        <p class="note">いつも同じ向きにずれて叩いていると、遊んでいる間に自動でタイミングを補正します。</p>
         <p class="note">音が出ます。iPhoneはマナーモードだと音が鳴りません。</p>
         <p class="note">楽器の音：MusyngKite サウンドフォント（CC BY-SA 3.0）／ midi-js-soundfonts（gleitz）。曲はこのゲーム用に短く編曲しています。</p>
       </div>
@@ -328,11 +329,11 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
   const FONT_D = '"Shippori Mincho B1","Hiragino Mincho ProN","Yu Mincho",serif';
   let PERFECT = 0.07, GOOD = 0.15;     // 判定の幅（秒）。むずかしさで変わる
   const DIFFS = {
-    easy: { name: "かんたん", perfect: 0.09, good: 0.2, chaos: 0.6, mosq: -1, speed: 0.85, land: 0.6, sweep: false, ring: true, prepTol: 0.1, mult: 0.8, pin: 20, circle: 1.6,
+    easy: { name: "かんたん", perfect: 0.11, good: 0.25, chaos: 0.6, mosq: -1, speed: 0.85, land: 0.6, sweep: false, ring: true, prepTol: 0.1, mult: 0.8, pin: 20, circle: 1.6,
       note: "判定がゆるく、蚊も少なめ。払った棒は団員に当たりません。スコア×0.8" },
-    normal: { name: "ふつう", perfect: 0.07, good: 0.15, chaos: 1, mosq: 0, speed: 1, land: 1, sweep: true, ring: true, prepTol: 0.07, mult: 1, pin: 15, circle: 1.2,
+    normal: { name: "ふつう", perfect: 0.085, good: 0.19, chaos: 1, mosq: 0, speed: 1, land: 1, sweep: true, ring: true, prepTol: 0.07, mult: 1, pin: 15, circle: 1.2,
       note: "標準のルールです。" },
-    hard: { name: "むずかしい", perfect: 0.05, good: 0.11, chaos: 1.3, mosq: 1, speed: 1.2, land: 1.2, sweep: true, ring: false, prepTol: 0.05, mult: 1.5, pin: 12, circle: 0.9,
+    hard: { name: "むずかしい", perfect: 0.06, good: 0.13, chaos: 1.3, mosq: 1, speed: 1.2, land: 1.2, sweep: true, ring: false, prepTol: 0.05, mult: 1.5, pin: 12, circle: 0.9,
       note: "判定がきびしく、蚊が多くて速い。蚊のまわりの「拍の輪」も出ません。スコア×1.5" },
   };
   const HEAD = { x: 240, y: 596, r: 30 };
@@ -1134,6 +1135,28 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
     return ts && ts > p - 1000 && ts <= p + 5 ? ts : p;
   }
   // 聞こえている音の時刻（AudioContext の時間軸）
+  // いつも同じ向きにずれていたら、タイミング調整を自動で少しずつ直す
+  let calibNoteAt = -99, calibDrift = 0, steadyN = 0;
+  function autoCalib() {
+    // テンポが変わっているところ（accel. / rit.）のずれは、音の遅れではないので数えない
+    const bn = Math.max(0, beatNow), tg = targetBpm(bn);
+    if (!A || Math.abs(targetBpm(bn - 4) - tg) > 1 || Math.abs(targetBpm(bn + 2) - tg) > 1 || Math.abs(A.T - tg) / tg > 0.04) { steadyN = 0; return; }
+    if (++steadyN < 6) return;
+    const r = offsets.slice(-6);
+    if (r.length < 6) return;
+    const mean = r.reduce((a, o) => a + o.e, 0) / r.length;
+    const same = r.every(o => Math.sign(o.e) === Math.sign(mean));
+    if (!same || Math.abs(mean) < 0.015) return;
+    const step = clamp(mean * 1000 * 0.5, -25, 25);
+    calibMs = clamp(calibMs + step, -150, 300); calibDrift += step;
+    store.set("maestro.calib", Math.round(calibMs));
+    offsets.forEach(o => { o.e -= step / 1000; });
+    if (performance.now() / 1000 - calibNoteAt > 8 && Math.abs(calibDrift) >= 20) {
+      calibNoteAt = performance.now() / 1000;
+      popup(240, 640, "タイミングを自動で補正（" + (calibDrift > 0 ? "+" : "") + Math.round(calibDrift) + "ms）", "#bfe3ff", 13);
+      calibDrift = 0;
+    }
+  }
   function heardAt(perfMs, useCalib = true) {
     if (!ac || clockOffset === null) return 0;
     return perfMs / 1000 + clockOffset - (useCalib ? calibMs / 1000 : 0);
@@ -1552,7 +1575,7 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
     }
     if (!best) return g;
     const eSec = (pt - best.b) * 60 / A.T;
-    if (!best.count && Math.abs(eSec) < 0.35) { offsets.push({ e: eSec, t: 0 }); if (offsets.length > 10) offsets.shift(); }
+    if (!best.count && Math.abs(eSec) < 0.35) { offsets.push({ e: eSec, t: 0 }); if (offsets.length > 10) offsets.shift(); autoCalib(); }
     const ae = Math.abs(eSec);
     let q;
     if (ae <= GOOD && !best.hit) { best.hit = true; q = ae <= PERFECT ? "perfect" : "good"; }
@@ -1573,9 +1596,9 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
       popup(x, y - 34, eSec < 0 ? "いい感じ（早め）" : "いい感じ（遅め）", "#cfe7c8", 16);
     } else if (q === "extra") {
       crowdUp(-1.5);
-      combo = 0; addChaos(8); popup(x, y - 34, "振りすぎ！", "#ff8a7a", 20);
+      combo = 0; addChaos(3); popup(x, y - 34, "振りすぎ！", "#ff8a7a", 20);
     } else {
-      combo = 0; addChaos(10); popup(x, y - 34, eSec < 0 ? "早い！" : "遅い！", "#ff8a7a", 20);
+      combo = 0; addChaos(4); popup(x, y - 34, eSec < 0 ? "早い！" : "遅い！", "#ff8a7a", 20);
     }
     if (combo === 16) banner = { text: "ノリノリ！", sub: "スコア2倍・当たり判定アップ", t: 1.6 };
     maxCombo = Math.max(maxCombo, combo);
@@ -3448,7 +3471,7 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
     get state() { return state; }, get score() { return score; }, get chaos() { return chaos; }, get lives() { return lives; },
     get taps() { return taps; }, get mosq() { return mosq; }, get cues() { return cues; }, get vt() { return vtc; },
     get beat() { return beatNow; }, get tempo() { return A ? A.T : 0; }, get level() { return level; },
-    get samples() { return samplesState; }, get bonks() { return bonks; }, get lastTap() { return chart ? chart.lastTap : 0; },
+    get samples() { return samplesState; }, get calib() { return calibMs; }, get offs() { return offsets.map(o => o.e); }, get bonks() { return bonks; }, get lastTap() { return chart ? chart.lastTap : 0; },
     get stats() { return { tempoOk, tempoChecks, dynOk, dynChecks, cutResult, cueOk, perfects, goods, songTaps }; },
     timeAt: p => timeAt(p), targetBpm: b => targetBpm(b), dynAt: b => dynMap.at(b), get prep() { return prep; }, everyAt: b => everyAt(b), get prepStats() { return { prepOk, prepTotal }; }, get extra() { return { crowd, queenKilled, bossSpawned, diff: diffKey, bitten, recalls, ambushes, ens: ensN ? ensSum / ensN : 1 }; }, recallMark, get outList() { return musicians.filter(m => m.out && m.itch <= 0); },
     rows: ROWS, songs: SONGS, cueMark, musicianAt, rowList,
