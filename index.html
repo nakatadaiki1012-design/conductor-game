@@ -226,6 +226,12 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
           <button type="button" data-d="hard" aria-pressed="false">むずかしい</button>
         </div>
         <p class="diff-note" id="diffNote"></p>
+        <h3>テンポ</h3>
+        <div class="diff" id="tempoRow" role="group" aria-label="テンポの方式" style="grid-template-columns:repeat(2,1fr)">
+          <button type="button" data-t="fixed" aria-pressed="true">音ゲー式（曲に合わせる）</button>
+          <button type="button" data-t="follow" aria-pressed="false">指揮者式（ついてくる）</button>
+        </div>
+        <p class="diff-note" id="tempoNote"></p>
         <h3>拍の音（カチカチ）</h3>
         <div class="diff" id="clickRow" role="group" aria-label="拍の音">
           <button type="button" data-c="big" aria-pressed="true">大きめ</button>
@@ -240,9 +246,9 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
           <ul>
             <li><b>予備拍</b>：楽団はあなたの合図を待っています。<b>2回タップ</b>（1回目＝構え、2回目＝予備拍）。<b>2回の間隔がそのままテンポ</b>になり、次の拍で楽団が入ります。楽譜のテンポに近いほど高得点。</li>
             <li><b>楽譜の帯</b>：画面上部に、これからのテンポと強弱が流れてきます。<b>拍の目盛りが詰まる＝速く、広がる＝遅く</b>。橙の線は accel.、青い線は rit.、𝄐は「止まる」。</li>
-            <li><b>テンポ</b>：あとは拍に合わせてタップ。楽団はあなたの拍についてきます。accel.（だんだん速く）では少しずつ早めに、rit.（だんだん遅く）では遅めに。</li>
+            <li><b>テンポ</b>：流れてくる玉が金の線に重なった瞬間にタップ。「音ゲー式」では曲は楽譜どおりに進みます（accel. や rit. も楽譜どおり）。「指揮者式」にすると、楽団があなたの拍についてきます。</li>
             <li><b>音量</b>：トンと軽く叩くと小さく、サッと大きく払うと大きく鳴ります。楽譜の p（小さく）f（大きく）に合わせましょう。</li>
-            <li><b>合図</b>：本物の指揮と同じく、<b>入る1拍前（予備拍）</b>に合図します。光った団員の頭上の「合図」を「今！」でタップ。</li>
+            <li><b>合図</b>：本物の指揮と同じく、<b>入る1拍前（予備拍）</b>に合図します。光った団員を「今！」でタップ（頭上の「合図」でも、<b>本人をタッチ</b>してもOK）。合図や呼び戻しのタッチでは団員は痛がりません。</li>
             <li><b>締め</b>：最後の音はしばらくのばして、好きなところでタップして止めます。</li>
           </ul>
         </details>
@@ -329,11 +335,11 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
   const FONT_D = '"Shippori Mincho B1","Hiragino Mincho ProN","Yu Mincho",serif';
   let PERFECT = 0.07, GOOD = 0.15;     // 判定の幅（秒）。むずかしさで変わる
   const DIFFS = {
-    easy: { name: "かんたん", perfect: 0.11, good: 0.25, chaos: 0.6, mosq: -1, speed: 0.85, land: 0.6, sweep: false, ring: true, prepTol: 0.1, mult: 0.8, pin: 20, circle: 1.6,
+    easy: { name: "かんたん", perfect: 0.11, good: 0.25, chaos: 0.6, mosq: -1, speed: 0.85, land: 0.6, sweep: false, ring: true, prepTol: 0.1, mult: 0.8, pin: 24, circle: 1.6,
       note: "判定がゆるく、蚊も少なめ。払った棒は団員に当たりません。スコア×0.8" },
-    normal: { name: "ふつう", perfect: 0.085, good: 0.19, chaos: 1, mosq: 0, speed: 1, land: 1, sweep: true, ring: true, prepTol: 0.07, mult: 1, pin: 15, circle: 1.2,
+    normal: { name: "ふつう", perfect: 0.085, good: 0.19, chaos: 1, mosq: 0, speed: 1, land: 1, sweep: true, ring: true, prepTol: 0.07, mult: 1, pin: 18, circle: 1.2,
       note: "標準のルールです。" },
-    hard: { name: "むずかしい", perfect: 0.06, good: 0.13, chaos: 1.3, mosq: 1, speed: 1.2, land: 1.2, sweep: true, ring: false, prepTol: 0.05, mult: 1.5, pin: 12, circle: 0.9,
+    hard: { name: "むずかしい", perfect: 0.06, good: 0.13, chaos: 1.3, mosq: 1, speed: 1.2, land: 1.2, sweep: true, ring: false, prepTol: 0.05, mult: 1.5, pin: 14, circle: 0.9,
       note: "判定がきびしく、蚊が多くて速い。蚊のまわりの「拍の輪」も出ません。スコア×1.5" },
   };
   const HEAD = { x: 240, y: 596, r: 30 };
@@ -352,6 +358,8 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
   let diffKey = store.get("maestro.diff", "normal");
   if (!["easy", "normal", "hard"].includes(diffKey)) diffKey = "normal";
   let DIFF = null;
+  let tempoMode = store.get("maestro.tempo", "fixed");
+  if (!["fixed", "follow"].includes(tempoMode)) tempoMode = "fixed";
   let clickKey = store.get("maestro.click", "big");
   if (!["big", "small", "off"].includes(clickKey)) clickKey = "big";
 
@@ -1136,7 +1144,7 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
   }
   // 聞こえている音の時刻（AudioContext の時間軸）
   // いつも同じ向きにずれていたら、タイミング調整を自動で少しずつ直す
-  let calibNoteAt = -99, calibDrift = 0, steadyN = 0;
+  let calibNoteAt = -99, calibDrift = 0, steadyN = 0, lastHalf = -99, judge = { text: "", sub: "", color: "#fff", t: 9 };
   function autoCalib() {
     // テンポが変わっているところ（accel. / rit.）のずれは、音の遅れではないので数えない
     const bn = Math.max(0, beatNow), tg = targetBpm(bn);
@@ -1326,6 +1334,7 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
     banner = { text: song.title, sub: song.composer, t: 2.4 };
     prep = preps[0]; pendingPrep = null; prepOk = 0; prepTotal = 0;
     crowd = 50; crowdHigh = false; shakeT = 0; bossSpawned = false; queenKilled = false;
+    lastHalf = -99; judge.t = 9;
     bitten = 0; rowItch = {}; offsets = []; lateOk = 0; recalls = 0; ensSum = 0; ensN = 0; ambushes = 0;
     bonkPenalty = 0; bonkStreak = 0; lastBonkAt = -99; scoreFlash = 0; musicians.forEach(m => { m.bumps = 0; m.alarm = 0; });
     state = "prep";
@@ -1473,11 +1482,17 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
     if (crowd < 70) crowdHigh = false;
   }
   function addChaos(v) { chaos += v * (DIFF ? DIFF.chaos : 1); }
+  function sfxHit(perfect) {
+    if (!ac || clickKey === "off") return;
+    const t = ac.currentTime;
+    osc(t, perfect ? 1568 : 1175, "triangle", 0.07, perfect ? 0.07 : 0.045);
+    if (perfect) osc(t, 2349, "sine", 0.05, 0.03);
+  }
   function popup(x, y, text, color, size = 20) { pops.push({ x, y, text, color, size, t: 0 }); }
 
   function recallMark(m) { return { x: m.x, y: m.y - 55 * m.s - 30 }; }
   function tryRecall(x, y, ok) {
-    const m = musicians.find(q => q.out && q.itch <= 0 && Math.hypot(x - recallMark(q).x, y - recallMark(q).y) <= 26);
+    const m = musicians.find(q => q.out && q.itch <= 0 && touches(q, recallMark(q), x, y));
     if (!m) return false;
     if (!ok) { popup(m.x, m.y - 80 * m.s, "拍に合わせて呼び戻して", "#ffc9a8", 14); return true; }
     m.out = false; m.joy = 2; recalls++;
@@ -1486,6 +1501,8 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
     sfxCue(ac.currentTime);
     return true;
   }
+  // 団員へのタッチ：頭の上の印でも、本人（体）でも反応する
+  function touches(m, mk, x, y) { return Math.hypot(x - mk.x, y - mk.y) <= 26 || bodyDist(m, x, y) < 3; }
   function cueMark(cue) {
     const m = rowList(cue.row)[cue.who];
     return { x: m.x, y: m.y - 55 * m.s - 30, m };
@@ -1515,7 +1532,7 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
       const hm = musicianAt(x, y);
       const rc = tryRecall(x, y, true);
       const pc = cues.find(c => !c.done && c.atPrep && c.b === P.b);
-      const onMark = pc && Math.hypot(x - cueMark(pc).x, y - cueMark(pc).y) <= 24;
+      const onMark = pc && touches(cueMark(pc).m, cueMark(pc), x, y);
       if (hm && !onMark && !rc) hitMusician(hm, x, y, g);
     }
     if (P.t1 !== null && th - P.t1 < 0.18) return;
@@ -1529,7 +1546,7 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
     const e = everyAt(P.b);
     const raw = 60 * e / (th - P.t1);
     const r = raw / P.target;
-    const T = clamp(raw, P.target * 0.7, P.target * 1.4);
+    const T = tempoMode === "fixed" ? P.target : clamp(raw, P.target * 0.7, P.target * 1.4);
     prepTotal++;
     let msg;
     if (Math.abs(r - 1) <= DIFF.prepTol) { prepOk++; score += 300; crowdUp(6); chaos = Math.max(0, chaos - 5); msg = "予備拍ぴったり！ ♩=" + Math.round(raw); }
@@ -1542,9 +1559,9 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
     if (pc) {
       const mk = cueMark(pc);
       pc.done = true;
-      if (Math.hypot(x - mk.x, y - mk.y) <= 24 && outOf(mk.m)) {
+      if (touches(mk.m, mk, x, y) && outOf(mk.m)) {
         pc.done = false; missCue(pc, mk.m, "かゆくて入れない…");
-      } else if (Math.hypot(x - mk.x, y - mk.y) <= 24) {
+      } else if (touches(mk.m, mk, x, y)) {
         pc.ok = true; pc.enterB = pc.b; cueOk++; score += 1000; mk.m.joy = 2.5;
         popup(mk.x, mk.y - 26, mk.m.name + "「スッ（息を吸って）」 +1000", "#ffe08a", 16);
         sfxCue(ac.currentTime);
@@ -1590,21 +1607,21 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
       if (onBeat) popup(x, y - 30, String(best.b + 5), "#f5ecd6", 26);
     } else if (q === "perfect") {
       perfects++; combo++; chaos = Math.max(0, chaos - 0.6); crowdUp(0.6); score += Math.round(20 * mult);
-      popup(x, y - 34, "ぴったり", "#ffe08a", 20);
+      judge = { text: "PERFECT", sub: "", color: "#ffe08a", t: 0 }; sfxHit(true);
     } else if (q === "good") {
       goods++; combo++; chaos = Math.max(0, chaos - 0.2); crowdUp(0.3); score += Math.round(10 * mult);
-      popup(x, y - 34, eSec < 0 ? "いい感じ（早め）" : "いい感じ（遅め）", "#cfe7c8", 16);
+      judge = { text: "GOOD", sub: eSec < 0 ? "早い" : "遅い", color: "#cfe7c8", t: 0 }; sfxHit(false);
     } else if (q === "extra") {
       crowdUp(-1.5);
-      combo = 0; addChaos(3); popup(x, y - 34, "振りすぎ！", "#ff8a7a", 20);
+      combo = 0; addChaos(3); judge = { text: "振りすぎ", sub: "", color: "#ff8a7a", t: 0 };
     } else {
-      combo = 0; addChaos(4); popup(x, y - 34, eSec < 0 ? "早い！" : "遅い！", "#ff8a7a", 20);
+      combo = 0; addChaos(4); judge = { text: "BAD", sub: eSec < 0 ? "早すぎ" : "遅すぎ", color: "#ff8a7a", t: 0 };
     }
     if (combo === 16) banner = { text: "ノリノリ！", sub: "スコア2倍・当たり判定アップ", t: 1.6 };
     maxCombo = Math.max(maxCombo, combo);
 
     // テンポはあなたの拍についてくる
-    if (onBeat && !best.count) {
+    if (onBeat && !best.count && tempoMode === "follow") {
       const jumped = false;
       if (lastJ && !jumped && best.b - lastJ.b > 0 && best.b - lastJ.b <= 4 && th > lastJ.t) {
         const implied = clamp(60 * (best.b - lastJ.b) / (th - lastJ.t), A.T * 0.75, A.T * 1.3);
@@ -1616,10 +1633,15 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
     // 刺されて止まった団員を呼び戻す
     let onCueMark = tryRecall(x, y, onBeat && !best.count);
     // 出番の合図（団員の頭上の金色マーク）
-    const sc = shownCues(pt).find(q => Math.hypot(x - cueMark(q).x, y - cueMark(q).y) <= 24);
+    const sc = shownCues(pt).find(q => touches(cueMark(q).m, cueMark(q), x, y));
     if (sc) {
       const mk = cueMark(sc);
-      onCueMark = true;
+      onCueMark = true; g.cueM = mk.m;
+      if (!best.count && !sc.late && !sc.atPrep && !(onBeat && sc.prepB === best.b)) {
+        const left = Math.ceil(sc.prepB - pt - 0.3);
+        popup(mk.x, mk.y - 26, left >= 1 ? "まだ！ あと" + left + "拍" : "拍に合わせて合図を", "#ffc9a8", 14);
+        mk.m.joy = 0.4;
+      }
       if (sc.late && onBeat && !best.count) {
         if (outOf(mk.m)) popup(mk.x, mk.y - 26, mk.m.name + "「まだかゆい…」", "#ff8a7a", 14);
         else {
@@ -1753,7 +1775,7 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
       if (!g.count) swatAt(g, px, py, g.onBeat, combo >= 16, false);
       if (!g.bonked && DIFF.sweep && !(g.onCueMark && Math.hypot(px - g.x0, py - g.y0) < 20)) {
         const hm = musicianAt(px, py);
-        if (hm) {
+        if (hm && hm !== g.cueM) {
           if (g.count) { if (!g.warnedCount) { popup(px, py - 20, "そこは団員！", "#ffd0c0", 16); g.warnedCount = true; } }
           else hitMusician(hm, px, py, g, true);
         }
@@ -2033,6 +2055,15 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
     }
     if (state === "play") {
       if (gest && !gest.done && performance.now() - gest.t0 > GESTURE_MS) finishGesture(gest);
+      // 音ゲー式：半拍ごとに楽譜のテンポへそろえる（accel. / rit. も楽譜どおり）
+      if (tempoMode === "fixed" && A.T > 0 && beatNow >= 0) {
+        const hb = Math.floor(beatNow * 2);
+        if (hb !== lastHalf) {
+          lastHalf = hb;
+          const want = targetBpm(Math.min(chart.lastTap, beatNow + 0.3));
+          if (Math.abs(want - A.T) > 0.05 && !jumps.some(j => !j.started && j.b - beatNow < 0.6 && j.b >= beatNow)) retempo(want);
+        }
+      }
       // 通りすぎた拍ごとに、振り忘れ・テンポ・音量を評価
       while (tapPtr < taps.length && A.T > 0 && beatNow > taps[tapPtr].b + GOOD * A.T / 60) {
         const tb = taps[tapPtr];
@@ -2040,10 +2071,10 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
         if (!tb.count) {
           if (!tb.hit) {
             addChaos(5); combo = 0; crowdUp(-1);
-            popup(240, 338, "合図がない…", "#e8b3a8", 15);
-            retempo(A.T + 0.3 * (targetBpm(tb.b) - A.T));
+            judge = { text: "MISS", sub: "", color: "#e2483d", t: 0 };
+            if (tempoMode === "follow") retempo(A.T + 0.3 * (targetBpm(tb.b) - A.T));
             lastJ = null;
-          } else if (Math.abs(A.T - targetBpm(tb.b)) > 0.5) {
+          } else if (tempoMode === "follow" && Math.abs(A.T - targetBpm(tb.b)) > 0.5) {
             retempo(A.T + 0.06 * (targetBpm(tb.b) - A.T));
           }
           const playFrac = 1 - musicians.filter(outOf).length / musicians.length;
@@ -2051,7 +2082,7 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
           if (playFrac >= 0.999) score += 40;
           const tgt = targetBpm(tb.b), r = (A.T || tgt) / tgt;
           tempoChecks++;
-          if (Math.abs(r - 1) <= 0.07) { tempoOk++; score += 20; }
+          if (tempoMode === "fixed" ? tb.hit : Math.abs(r - 1) <= 0.07) { tempoOk++; score += 20; }
           else if (Math.abs(r - 1) > 0.16) { addChaos(2); warn("tempo", r < 1 ? "テンポが遅い！ 早めに振って" : "テンポが速い！ ゆっくり振って"); }
           const dv = dynMap.at(tb.b), mk = dynMap.mark(tb.b);
           dynChecks++;
@@ -2180,6 +2211,7 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
       m.itch = Math.max(0, m.itch - dt); m.joy = Math.max(0, m.joy - dt);
     });
     maestro.bite = Math.max(0, maestro.bite - dt); maestro.sorry = Math.max(0, maestro.sorry - dt); maestro.joy = Math.max(0, maestro.joy - dt);
+    judge.t += dt;
     pops.forEach(p => p.t += dt); pops = pops.filter(p => p.t < 1.1);
     swooshes.forEach(s => s.t += dt); swooshes = swooshes.filter(s => s.t < 0.4);
     parts.forEach(p => { p.t += dt; p.x += p.vx * dt; p.y += p.vy * dt; p.vy += 300 * dt; }); parts = parts.filter(p => p.t < 0.6);
@@ -3018,6 +3050,32 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
       c.font = "800 11px " + FONT_D; c.fillStyle = "#ffe08a"; c.textAlign = "left"; c.textBaseline = "middle";
       c.fillText("← 予備拍を2回タップすると流れ出します", XH + 22, Y);
     }
+    // 判定（音ゲー風）：線の上に大きく、当たった瞬間に輪がはじける
+    if (judge.t < 0.6) {
+      const k = judge.t, sc2 = 1 + 0.5 * Math.max(0, 1 - k / 0.1);
+      c.globalAlpha = Math.max(0, 1 - Math.max(0, k - 0.35) / 0.25);
+      if (k < 0.25 && (judge.text === "PERFECT" || judge.text === "GOOD")) {
+        c.strokeStyle = judge.color; c.lineWidth = 3 * (1 - k / 0.25);
+        c.beginPath(); c.arc(XH, Y, 16 + 90 * k, 0, Math.PI * 2); c.stroke();
+      }
+      c.textAlign = "center"; c.textBaseline = "middle";
+      c.font = "900 " + Math.round(19 * sc2) + "px " + FONT_UI;
+      c.lineWidth = 4; c.strokeStyle = "rgba(15,4,6,0.85)"; c.strokeText(judge.text, XH + 14, Y - 38);
+      c.fillStyle = judge.color; c.fillText(judge.text, XH + 14, Y - 38);
+      if (judge.sub) {
+        c.font = "800 11px " + FONT_UI; c.strokeText(judge.sub, XH + 14, Y - 56);
+        c.fillStyle = judge.sub[0] === "早" ? "#8cc8ff" : "#ffb070"; c.fillText(judge.sub, XH + 14, Y - 56);
+      }
+      c.globalAlpha = 1;
+    }
+    if (combo >= 3) {
+      const pulse = judge.t < 0.12 ? 1 + 0.25 * (1 - judge.t / 0.12) : 1;
+      c.textAlign = "center"; c.textBaseline = "middle";
+      c.font = "900 " + Math.round(26 * pulse) + "px " + FONT_UI;
+      c.lineWidth = 4; c.strokeStyle = "rgba(15,4,6,0.8)"; c.strokeText(String(combo), 400, Y - 44);
+      c.fillStyle = combo >= 16 ? "#ffe08a" : "#f5ecd6"; c.fillText(String(combo), 400, Y - 44);
+      c.font = "800 9px " + FONT_UI; c.strokeText("COMBO", 400, Y - 27); c.fillText("COMBO", 400, Y - 27);
+    }
     // 早い・遅いメーター
     const MY = Y + 30, MW = 90;
     c.fillStyle = "rgba(15,4,6,0.6)"; c.fillRect(XH - MW / 2 - 30, MY - 7, MW + 60, 14);
@@ -3223,7 +3281,7 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
         const jit = { x: Math.sin(m.seed + now * 17) * (jAmp + (mess ? 3 : 0)), y: Math.cos(m.seed * 2 + now * 13) * jAmp };
         const tilt = chaos > 45 ? Math.sin(m.seed + now * 3) * (chaos - 45) / 300 : 0;
         const isCueMan = activeCues.some(q => q.row === m.type && rowList(m.type)[q.who] === m);
-        const glow = isCueMan ? 0.55 + 0.45 * Math.pow(1 - beatPh, 2) : (activeCues.some(q => q.row === m.type) ? 0.18 : 0);
+        const glow = (isCueMan || (m.out && m.itch <= 0)) ? 0.55 + 0.45 * Math.pow(1 - beatPh, 2) : (activeCues.some(q => q.row === m.type) ? 0.18 : 0);
         let look = (240 - m.x) / 240 * 0.6, nd = 170;
         live.forEach(mm => { const d = Math.hypot(mm.x - m.x, mm.y - m.y); if (d < nd) { nd = d; look = clamp((mm.x - m.x) / 30, -0.9, 0.9); } });
         const blink = ((now + m.seed) % 4.3) < 0.13;
@@ -3423,6 +3481,14 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
   }
   document.querySelectorAll("#clickRow button").forEach(b => b.addEventListener("click", () => { clickKey = b.dataset.c; store.set("maestro.click", clickKey); renderClick(); }));
   renderClick();
+  function renderTempo() {
+    document.querySelectorAll("#tempoRow button").forEach(b => b.setAttribute("aria-pressed", b.dataset.t === tempoMode ? "true" : "false"));
+    document.getElementById("tempoNote").textContent = tempoMode === "fixed"
+      ? "曲は楽譜どおりのテンポで進みます。流れてくる玉に合わせてタップ。タイミングが取りやすい方式です。"
+      : "楽団があなたのタップの速さについてきます。速く叩けば速く、遅く叩けば遅くなる上級者向け。";
+  }
+  document.querySelectorAll("#tempoRow button").forEach(b => b.addEventListener("click", () => { tempoMode = b.dataset.t; store.set("maestro.tempo", tempoMode); renderTempo(); }));
+  renderTempo();
   function renderDiff() {
     document.querySelectorAll("#diffRow button").forEach(b => b.setAttribute("aria-pressed", b.dataset.d === diffKey ? "true" : "false"));
     document.getElementById("diffNote").textContent = DIFFS[diffKey].note;
