@@ -178,7 +178,7 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
   font-variant-numeric: tabular-nums;
 }
 .pausebtn {
-  position: absolute; left: 1.5%; bottom: 1%; width: 36px; height: 36px; border-radius: 50%; padding: 0;
+  position: absolute; left: 1.5%; bottom: 17.5%; width: 36px; height: 36px; border-radius: 50%; padding: 0;
   background: rgba(15, 4, 6, 0.65); color: var(--ivory); font-size: 12px; letter-spacing: 1px;
   box-shadow: inset 0 0 0 1.5px rgba(224, 176, 79, 0.6);
 }
@@ -938,7 +938,7 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
   })();
   function rowList(type) { return musicians.filter(m => m.type === type); }
   // ---------- 絵（Gemini で描いた画像）。読みこめなければ、これまでの図形の絵のまま ----------
-  const ART_META = {"vln0":{"w":155.0,"h":260.0,"hx":50.4,"hy":42.8,"fy":260.0},"vln1":{"w":160.0,"h":260.0,"hx":56.0,"hy":40.2,"fy":260.0},"vln2":{"w":162.0,"h":260.0,"hx":68.2,"hy":41.7,"fy":260.0},"vln3":{"w":158.0,"h":260.0,"hx":76.9,"hy":43.8,"fy":260.0},"vlc0":{"w":141.0,"h":260.0,"hx":66.6,"hy":41.7,"fy":260.0},"vlc1":{"w":135.0,"h":260.0,"hx":72.4,"hy":39.8,"fy":260.0},"vlc2":{"w":139.0,"h":260.0,"hx":72.2,"hy":41.8,"fy":260.0},"vlc3":{"w":139.0,"h":260.0,"hx":77.7,"hy":41.2,"fy":260.0},"vln0_itch":{"w":162.0,"h":260.0,"hx":53.9,"hy":44.4,"fy":260.0},"vln0_dizzy":{"w":153.0,"h":260.0,"hx":52.0,"hy":44.3,"fy":260.0},"vln0_play2":{"w":155.0,"h":260.0,"hx":72.2,"hy":42.5,"fy":260.0},"vln0_breath":{"w":153.0,"h":260.0,"hx":76.1,"hy":41.5,"fy":260.0},"vln0_itch2":{"w":163.0,"h":260.0,"hx":54.8,"hy":44.4,"fy":260.0},"vln0_dizzy2":{"w":133.0,"h":260.0,"hx":67.7,"hy":44.3,"fy":260.0},"vln0_breath2":{"w":126.0,"h":260.0,"hx":75.5,"hy":42.2,"fy":260.0},"aud0":{"w":89.0,"h":120.0,"hx":43.9,"hy":0.0,"fy":120.0},"aud1":{"w":75.0,"h":120.0,"hx":37.2,"hy":0.0,"fy":120.0},"aud2":{"w":85.0,"h":120.0,"hx":45.5,"hy":0.0,"fy":120.0},"aud3":{"w":95.0,"h":120.0,"hx":49.1,"hy":0.0,"fy":120.0},"aud4":{"w":74.0,"h":120.0,"hx":39.6,"hy":0.0,"fy":120.0},"aud5":{"w":93.0,"h":120.0,"hx":48.2,"hy":0.0,"fy":120.0},"aud6":{"w":90.0,"h":120.0,"hx":44.3,"hy":0.0,"fy":120.0},"aud7":{"w":90.0,"h":120.0,"hx":47.6,"hy":0.0,"fy":120.0},"brs0":{"w":130.0,"h":260.0,"hx":58.4,"hy":42.1,"fy":260.0},"brs1":{"w":152.0,"h":260.0,"hx":56.7,"hy":39.2,"fy":260.0},"brs2":{"w":133.0,"h":260.0,"hx":74.7,"hy":39.4,"fy":260.0},"brs3":{"w":140.0,"h":260.0,"hx":85.1,"hy":42.1,"fy":260.0},"mq_fly":{"w":169.0,"h":160.0,"hx":74.3,"hy":0.0,"fy":160.0},"mq_land":{"w":162.0,"h":160.0,"hx":69.3,"hy":0.0,"fy":160.0},"mq_dead":{"w":160.0,"h":160.0,"hx":85.1,"hy":0.0,"fy":160.0},"mq_queen":{"w":128.0,"h":160.0,"hx":63.2,"hy":0.0,"fy":160.0}};
+  const ART_META = {"vln0":{"w":155.0,"h":260.0,"hx":50.4,"hy":42.8,"fy":260.0},"vln1":{"w":160.0,"h":260.0,"hx":56.0,"hy":40.2,"fy":260.0},"vln2":{"w":162.0,"h":260.0,"hx":68.2,"hy":41.7,"fy":260.0},"vln3":{"w":158.0,"h":260.0,"hx":76.9,"hy":43.8,"fy":260.0},"vlc0":{"w":141.0,"h":260.0,"hx":66.6,"hy":41.7,"fy":260.0},"vlc1":{"w":135.0,"h":260.0,"hx":72.4,"hy":39.8,"fy":260.0},"vlc2":{"w":139.0,"h":260.0,"hx":72.2,"hy":41.8,"fy":260.0},"vlc3":{"w":139.0,"h":260.0,"hx":77.7,"hy":41.2,"fy":260.0},"vln0_itch":{"w":162.0,"h":260.0,"hx":53.9,"hy":44.4,"fy":260.0},"vln0_dizzy":{"w":153.0,"h":260.0,"hx":52.0,"hy":44.3,"fy":260.0},"vln0_play2":{"w":155.0,"h":260.0,"hx":72.2,"hy":42.5,"fy":260.0},"vln0_breath":{"w":153.0,"h":260.0,"hx":76.1,"hy":41.5,"fy":260.0},"vln0_itch2":{"w":163.0,"h":260.0,"hx":54.8,"hy":44.4,"fy":260.0},"vln0_dizzy2":{"w":133.0,"h":260.0,"hx":67.7,"hy":44.3,"fy":260.0},"vln0_breath2":{"w":126.0,"h":260.0,"hx":75.5,"hy":42.2,"fy":260.0},"aud0":{"w":89.0,"h":120.0,"hx":43.9,"hy":0.0,"fy":120.0},"aud1":{"w":75.0,"h":120.0,"hx":37.2,"hy":0.0,"fy":120.0},"aud2":{"w":85.0,"h":120.0,"hx":45.5,"hy":0.0,"fy":120.0},"aud3":{"w":95.0,"h":120.0,"hx":49.1,"hy":0.0,"fy":120.0},"aud4":{"w":74.0,"h":120.0,"hx":39.6,"hy":0.0,"fy":120.0},"aud5":{"w":93.0,"h":120.0,"hx":48.2,"hy":0.0,"fy":120.0},"aud6":{"w":90.0,"h":120.0,"hx":44.3,"hy":0.0,"fy":120.0},"aud7":{"w":90.0,"h":120.0,"hx":47.6,"hy":0.0,"fy":120.0},"brs0":{"w":130.0,"h":260.0,"hx":58.4,"hy":42.1,"fy":260.0},"brs1":{"w":152.0,"h":260.0,"hx":56.7,"hy":39.2,"fy":260.0},"brs2":{"w":133.0,"h":260.0,"hx":74.7,"hy":39.4,"fy":260.0},"brs3":{"w":140.0,"h":260.0,"hx":85.1,"hy":42.1,"fy":260.0},"mq_fly":{"w":169.0,"h":160.0,"hx":74.3,"hy":0.0,"fy":160.0},"mq_land":{"w":162.0,"h":160.0,"hx":69.3,"hy":0.0,"fy":160.0},"mq_dead":{"w":160.0,"h":160.0,"hx":85.1,"hy":0.0,"fy":160.0},"mq_queen":{"w":128.0,"h":160.0,"hx":63.2,"hy":0.0,"fy":160.0},"mae_calm":{"w":137.0,"h":200.0,"hx":68.7,"hy":0.0,"fy":200.0},"mae_joy":{"w":141.0,"h":200.0,"hx":69.5,"hy":0.0,"fy":200.0},"mae_itch":{"w":146.0,"h":200.0,"hx":67.7,"hy":0.0,"fy":200.0},"mae_panic":{"w":130.0,"h":200.0,"hx":65.3,"hy":0.0,"fy":200.0},"mae_sorry":{"w":161.0,"h":200.0,"hx":69.1,"hy":0.0,"fy":200.0}};
   const ART = {};
   Object.keys(ART_META).forEach(k => { const im = new Image(); im.onload = () => { ART[k] = im; }; im.src = "art/" + k + ".png"; });
   { const ord = { violin: [1, 0, 2, 3, 0, 2, 1], cello: [0, 1, 2, 3, 1, 0, 3, 2], brass: [0, 1, 2, 3, 0, 1, 2, 3, 1] };
@@ -2974,6 +2974,14 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
     else if (chaos > 60) mood = "panic";
     else if (combo >= 16) mood = "fever";
     else if (combo >= 6) mood = "bliss";
+    const mk = "mae_" + ({ joy: "joy", fever: "joy", bliss: "joy", itch: "itch", panic: "panic", sorry: "sorry" }[mood] || "calm");
+    if (ART[mk]) {
+      const md = ART_META[mk], hgt = R * 2.5, k = hgt / md.h;
+      const bob = mood === "joy" || mood === "fever" ? Math.abs(Math.sin(performance.now() / 160)) * -3 : mood === "panic" ? Math.sin(performance.now() / 40) * 1.5 : 0;
+      c.fillStyle = mood === "fever" ? "#6a4a12" : "#3b0f17"; c.fillRect(cx - R, cy - R, R * 2, R * 2);
+      c.drawImage(ART[mk], cx - md.hx * k + (mood === "panic" ? bob : 0), cy - R + 3 + (mood === "panic" ? 0 : bob), md.w * k, hgt);
+      if (maestro.bite > 0 || bites.length) { c.fillStyle = "#e2483d"; c.beginPath(); c.arc(cx + 6, cy - R + 12, 3, 0, Math.PI * 2); c.fill(); }
+    } else {
     const y0 = cy + 6;
     // 服
     c.fillStyle = "#141018"; c.beginPath(); c.ellipse(cx, cy + 40, 30, 16, 0, 0, Math.PI * 2); c.fill();
@@ -3033,6 +3041,7 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
     } else if (mood === "sorry" || mood === "itch") {
       c.strokeStyle = "#7a2228"; c.lineWidth = 1.4;
       c.beginPath(); c.moveTo(cx - 4, my + 1); c.quadraticCurveTo(cx - 2, my - 1, cx, my + 1); c.quadraticCurveTo(cx + 2, my + 3, cx + 4, my + 1); c.stroke();
+    }
     }
     c.restore();
     // 吹き出し
