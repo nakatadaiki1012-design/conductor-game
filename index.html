@@ -174,6 +174,11 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
   margin: 0;
   font-variant-numeric: tabular-nums;
 }
+.pausebtn {
+  position: absolute; left: 1.5%; bottom: 1%; width: 36px; height: 36px; border-radius: 50%; padding: 0;
+  background: rgba(15, 4, 6, 0.65); color: var(--ivory); font-size: 12px; letter-spacing: 1px;
+  box-shadow: inset 0 0 0 1.5px rgba(224, 176, 79, 0.6);
+}
 .loading {
   position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
   background: var(--ivory); color: var(--ink); padding: 14px 22px; border-radius: 999px;
@@ -297,6 +302,19 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
     </div>
 
     <div class="loading" id="loading" hidden>楽器の音を準備中…</div>
+    <button class="pausebtn" id="pauseBtn" type="button" aria-label="一時停止" hidden>II</button>
+    <div class="card" id="pauseCard" hidden>
+      <div class="card-inner">
+        <p class="eyebrow">PAUSE · 一時停止</p>
+        <h2>ひと休み</h2>
+        <p class="lead">楽団も蚊も止まっています。</p>
+        <button class="primary" id="resumeBtn" type="button">つづける</button>
+        <div class="row">
+          <button class="secondary" id="pRetryBtn" type="button">最初からやり直す</button>
+          <button class="secondary" id="pMenuBtn" type="button">曲をえらぶ</button>
+        </div>
+      </div>
+    </div>
 
     <div class="card" id="resultCard" hidden>
       <div class="card-inner">
@@ -1500,6 +1518,13 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
     osc(t, perfect ? 1568 : 1175, "triangle", 0.07, perfect ? 0.07 : 0.045);
     if (perfect) osc(t, 2349, "sine", 0.05, 0.03);
   }
+  // はじめての出来事は、その場で1回だけ教える
+  const hintsSeen = store.get("maestro.hints", {});
+  function hint(key, text, sub) {
+    if (hintsSeen[key] || banner.t > 0.3) return;
+    hintsSeen[key] = 1; store.set("maestro.hints", hintsSeen);
+    banner = { text, sub, t: 4 };
+  }
   function popup(x, y, text, color, size = 20) { pops.push({ x, y, text, color, size, t: 0 }); }
 
   function recallMark(m) { return { x: m.x, y: m.y - 55 * m.s - 30 }; }
@@ -1785,6 +1810,7 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
     m.state = "dead"; m.vy = -60; m.vx = (Math.random() - 0.5) * 80; m.t = 0;
     swats++;
     const pts = Math.round((onBeat ? base * 2.5 : base) * (fever ? 2 : 1));
+    if (onBeat && ac) { const t0 = ac.currentTime; osc(t0 + 0.03, 1976, "sine", 0.12, 0.05); osc(t0 + 0.09, 2637, "sine", 0.16, 0.04); }
     score += pts;
     popup(m.x, m.y + 28, (label || (onBeat ? "拍ぴったり撃退！" : "撃退")) + " +" + pts, onBeat ? "#ffe08a" : "#f5ecd6", 16);
     if (Math.hypot(m.x - HEAD.x, m.y - HEAD.y) < 50) popup(HEAD.x, HEAD.y - 70, "自分の頭をぺちっ", "#ffd0c0", 15);
@@ -2170,6 +2196,15 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
         if (!nearJump) banner = { text: everyText(e) + "振る", sub: e > 1 ? "テンポが速くなってきた！" : "1拍ずつに戻す", t: 2 };
       }
 
+      // はじめてのヒント
+      if (beatNow > 2) {
+        const liveM = mosq.filter(m => m.state !== "dead" && m.state !== "flee");
+        if (musicians.some(m => m.out && m.itch <= 0)) hint("recall", "団員が弾くのをやめてしまった", "緑の「戻して」か本人を、拍に合わせてタップ");
+        else if (liveM.some(m => m.state === "land")) hint("land", "蚊が団員に止まった！", "蚊だけをねらってタップ。団員に当たると減点");
+        else if (liveM.length) hint("mosq", "蚊が来た！ タップして撃退", "拍に合わせて叩くと高得点。団員には当てないように");
+        const nc = shownCues(beatNow)[0];
+        if (nc && !nc.late && !nc.atPrep && nc.prepB - beatNow < 5 && nc.prepB - beatNow > 2) hint("cue", "もうすぐ出番の団員がいます", "光っている団員を「今！」でタップして合図");
+      }
       // 蚊の出現
       if (beatNow >= 0 && beatNow < chart.lastTap - 6) {
         const c0 = chart.spawn(Math.max(0, beatNow) / chart.lastTap);
@@ -3564,13 +3599,34 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
   function loop(ts) {
     const dt = Math.min(0.05, Math.max(0, (ts - last) / 1000));
     last = ts;
-    update(dt);
+    if (!paused) update(dt);
     draw();
+    const inPlay = state === "play" || state === "prep" || state === "fermata";
+    if (pauseBtn.hidden !== !(inPlay && !paused)) pauseBtn.hidden = !(inPlay && !paused);
     requestAnimationFrame(loop);
   }
+  // 一時停止
+  let paused = false;
+  const pauseBtn = document.getElementById("pauseBtn"), pauseCard = document.getElementById("pauseCard");
+  function setPause(v) {
+    if (v && !(state === "play" || state === "prep" || state === "fermata")) return;
+    paused = v; pauseCard.hidden = !v;
+    if (gest && !gest.done) finishGesture(gest);
+    if (!ac) return;
+    if (v) ac.suspend(); else ac.resume().then(() => { clockOffset = null; syncClock(); });
+  }
+  function leavePause() {
+    paused = false; pauseCard.hidden = true;
+    if (ac) { ac.resume(); clockOffset = null; stopHolds(ac.currentTime, 0.05); }
+  }
+  pauseBtn.addEventListener("click", () => setPause(true));
+  document.getElementById("resumeBtn").addEventListener("click", () => setPause(false));
+  document.getElementById("pRetryBtn").addEventListener("click", () => { leavePause(); startGame(song); });
+  document.getElementById("pMenuBtn").addEventListener("click", () => { leavePause(); document.getElementById("menuBtn").click(); });
   document.addEventListener("visibilitychange", () => {
     if (!ac) return;
-    if (document.hidden) ac.suspend(); else ac.resume().then(() => { clockOffset = null; syncClock(); });
+    if (document.hidden) { if (state === "play" || state === "prep" || state === "fermata") setPause(true); else ac.suspend(); }
+    else if (!paused) ac.resume().then(() => { clockOffset = null; syncClock(); });
   });
   window.addEventListener("resize", resize);
 
