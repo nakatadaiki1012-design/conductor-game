@@ -285,7 +285,7 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
         <button class="secondary" id="calibBtn" type="button">タイミング調整（いま <span id="calibNow">0</span>ms）</button>
         <p class="note">いつも同じ向きにずれて叩いていると、遊んでいる間に自動でタイミングを補正します。</p>
         <p class="note">音が出ます。iPhoneはマナーモードだと音が鳴りません。</p>
-        <p class="note">楽器の音：MusyngKite サウンドフォント（CC BY-SA 3.0）／ midi-js-soundfonts（gleitz）。曲はこのゲーム用に短く編曲しています。</p>
+        <p class="note">楽器の音：VS Chamber Orchestra 2 Community Edition（Versilian Studios, CC0）、ティンパニなど一部は MusyngKite サウンドフォント（CC BY-SA 3.0）／ midi-js-soundfonts（gleitz）。曲はこのゲーム用に短く編曲しています。</p>
       </div>
     </div>
 
@@ -1014,7 +1014,7 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
     orchDyn = ac.createGain(); orchDyn.gain.value = 0.7;
     orchIn.connect(orchLP); orchLP.connect(orchDyn); orchDyn.connect(master);
     const verb = ac.createConvolver(); verb.buffer = makeHallIR();
-    const send = ac.createGain(); send.gain.value = 0.32;
+    const send = ac.createGain(); send.gain.value = 0.24;
     orchDyn.connect(send); send.connect(verb); verb.connect(master);
 
     sfxBus = ac.createGain(); sfxBus.gain.value = 1; sfxBus.connect(master);
@@ -1100,11 +1100,25 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
     eh: { file: "english_horn", ens: 1, pan: 0.05, atk: 0.04, rel: 0.3 },
     fl: { file: "flute", ens: 1, pan: -0.2, atk: 0.03, rel: 0.22 },
   };
+  // ---------- 本物のオーケストラ録音（VSCO 2 Community Edition, CC0） ----------
+  // 弦はセクション（何人もで弾いている録音）。長い音は「のばす奏法」、短い音は「短く弾く奏法」を使い分け、
+  // 指揮の大きさで p（やわらかい音色）と f（張りのある音色）の録音を切りかえる
+  const VS_INDEX = {"vln_sus":["A3_f","A3_p","A4_f","A4_p","B3_f","B3_p","B5_f","B5_p","C5_f","C5_p","D4_f","D4_p","D6_f","D6_p","E5_f","E5_p","G3_f","G3_p","G5_f","G5_p","Gb4_f","Gb4_p"],"vlc_sus":["A3_f","A3_p","B2_f","B2_p","B4_f","B4_p","C2_f","C2_p","C4_f","C4_p","D3_f","D3_p","D5_f","D5_p","E2_f","E2_p","E4_f","E4_p","F3_f","F3_p","F5_f","F5_p","G2_f","G2_p","G4_f","G4_p"],"vln_spic":["A3_f","A3_p","A4_f","A4_p","B3_f","B3_p","B5_f","B5_p","C5_f","C5_p","D4_f","D4_p","D6_f","D6_p","E5_f","E5_p","G3_f","G3_p","G5_f","G5_p","Gb4_f","Gb4_p"],"vlc_spic":["A3_f","A3_p","B2_f","B2_p","B4_f","B4_p","C2_f","C2_p","C4_f","C4_p","D3_f","D3_p","D5_f","D5_p","E2_f","E2_p","E4_f","E4_p","F3_f","F3_p","F5_f","F5_p","G2_f","G2_p","G4_f","G4_p"],"vlc_pizz":["A3_f","B2_f","B4_f","C2_f","C4_f","D3_f","D5_f","E2_f","E4_f","F3_f","F5_f","G2_f","G4_f"],"cb_sus":["A2_f","A2_p","Ab2_f","Ab2_p","Ab3_f","Ab3_p","B3_f","B3_p","Bb1_f","Bb1_p","C2_f","C2_p","D2_f","D2_p","Db3_f","Db3_p","E2_f","E2_p","E3_f","E3_p","G1_f","G1_p","Gb1_f","Gb1_p","Gb2_f","Gb2_p"],"hn_sus":["A1_p","A3_f","A3_p","Bb2_f","Bb2_p","C2_f","C2_p","C4_f","C4_p","D3_f","D3_p","D5_p","Eb2_f","Eb2_p","F3_f","F3_p","F5_p","G2_f","G2_p"],"hn_stac":["A3_f","Bb2_f","C2_f","C4_f","D3_f","D5_f","Eb2_f","F3_f","F5_f","G2_f"],"tp_sus":["A3_f","A3_p","A5_f","A5_p","Bb4_f","Bb4_p","C4_f","C4_p","C6_f","C6_p","D5_f","D5_p","Eb4_f","Eb4_p","F3_f","F3_p","F5_f","F5_p","G4_f","G4_p"],"tp_stac":["A3_f","A5_f","Bb4_f","C4_f","C6_f","D5_f","Eb4_f","F3_f","F4_f","F5_f","G4_f"],"bsn_sus":["A2_f","A4_f","Ab4_f","Bb1_f","Bb2_f","C3_f","C4_f","C5_f","Db2_f","Eb4_f","Eb5_f","F2_f","G3_f"],"bsn_stac":["A2_f","A3_f","Bb1_f","C3_f","C4_f","C5_f","D2_f","E3_f","E4_f","Eb3_f","F2_f","G3_f","G4_f"],"ob_vib":["Bb3_f","Bb3_p","Bb4_f","Bb4_p","Bb5_f","Bb5_p","D4_f","D4_p","D5_f","D5_p","D6_f","D6_p","F4_f","F4_p","F5_f","F5_p","F6_f","F6_p"],"fl_sus":["A4_f","A5_f","A6_f","C4_f","C5_f","C6_f","C7_f","E4_f","E5_f","E6_f"],"fl_stac":["A4_f","A5_f","A6_f","C5_f","C6_f","C7_f","E5_f","E6_f"]};
+  const VS = {
+    vln: { sus: "vln_sus", short: "vln_spic" }, vlc: { sus: "vlc_sus", short: "vlc_spic" }, low: { sus: "vlc_sus", short: "vlc_spic" },
+    cb: { sus: "cb_sus", ens: 2 }, bsn: { sus: "bsn_sus", short: "bsn_stac" }, pizz: { sus: "vlc_pizz", pluck: true },
+    brass: { sus: "tp_sus", short: "tp_stac" }, horn: { sus: "hn_sus", short: "hn_stac" }, pad: { sus: "vln_sus", low: "vlc_sus" },
+    eh: { sus: "ob_vib" }, fl: { sus: "fl_sus", short: "fl_stac" },
+  };
+  const rawVS = {}, vsBufs = {};
   const rawSamples = {}, sampleBufs = {};
   let samplesState = "idle", decodePromise = null;
   let holdVoices = [];
   function prefetchSamples() {
-    Object.keys(SAMPLE_NOTES).forEach(inst => SAMPLE_NOTES[inst].forEach(nm => {
+    Object.keys(VS_INDEX).forEach(set => VS_INDEX[set].forEach(nm => {
+      rawVS[set + "/" + nm] = fetch("sounds2/" + set + "/" + nm + ".mp3").then(r => (r.ok ? r.arrayBuffer() : null)).catch(() => null);
+    }));
+    Object.keys(SAMPLE_NOTES).filter(inst => inst === "timpani").forEach(inst => SAMPLE_NOTES[inst].forEach(nm => {
       rawSamples[inst + "/" + nm] = fetch("sounds/" + inst + "/" + nm + ".mp3")
         .then(r => (r.ok ? r.arrayBuffer() : null)).catch(() => null);
     }));
@@ -1120,21 +1134,29 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
   function decodeSamples() {
     if (decodePromise) return decodePromise;
     samplesState = "loading";
-    decodePromise = Promise.all(Object.keys(rawSamples).map(async key => {
+    const vsDone = Promise.all(Object.keys(rawVS).map(async key => {
+      const ab = await rawVS[key];
+      if (!ab) return;
+      const buf = await decodeOne(ab);
+      if (!buf) return;
+      const [set, nm] = key.split("/"), [note, layer] = nm.split("_");
+      (vsBufs[set] = vsBufs[set] || []).push({ midi: midiOf(note), layer, buf });
+    }));
+    decodePromise = Promise.all([vsDone].concat(Object.keys(rawSamples).map(async key => {
       const ab = await rawSamples[key];
       if (!ab) return;
       const buf = await decodeOne(ab);
       if (!buf) return;
       const [inst, nm] = key.split("/");
       (sampleBufs[inst] = sampleBufs[inst] || []).push({ midi: midiOf(nm), buf });
-    })).then(() => { samplesState = Object.keys(sampleBufs).length >= 6 ? "ready" : "failed"; });
+    }))).then(() => { samplesState = Object.keys(sampleBufs).length >= 6 || Object.keys(vsBufs).length >= 8 ? "ready" : "failed"; });
     return decodePromise;
   }
 
   function voice(t, buf, rate, peak, len, atk, rel, pan, loop) {
     const src = ac.createBufferSource();
     src.buffer = buf; src.playbackRate.value = rate;
-    if (loop) { src.loop = true; src.loopStart = 0.9; src.loopEnd = Math.min(buf.duration - 0.2, 2.7); }
+    if (loop) { src.loop = true; src.loopStart = buf.duration > 4 ? 1.6 : 0.9; src.loopEnd = buf.duration > 4 ? buf.duration - 0.6 : Math.min(buf.duration - 0.2, 2.7); }
     const g = ac.createGain();
     g.gain.setValueAtTime(0.0001, t);
     g.gain.linearRampToValueAtTime(peak, t + atk);
@@ -1147,7 +1169,38 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
     return { src, g };
   }
 
+  function playVS(t, midi, dur, inst, vol, detune, hold) {
+    const V = VS[inst], I = INST[inst];
+    if (!V || !I) return false;
+    const short = V.short && dur < 0.32 && !hold;
+    let set = short ? V.short : (V.low && midi < 57 ? V.low : V.sus);
+    const list = vsBufs[set];
+    if (!list || !list.length) return false;
+    // 指揮が大きいほど f の録音、小さいほど p の録音（音色そのものが変わる）
+    const want = inst === "pad" ? "p" : level * 0.7 + vol * 1.2 > 0.5 ? "f" : "p";
+    let cand = list.filter(x => x.layer === want);
+    if (!cand.length) cand = list;
+    let sm = cand[0];
+    cand.forEach(x => { if (Math.abs(x.midi - midi) < Math.abs(sm.midi - midi)) sm = x; });
+    const n = V.ens || 1;
+    for (let i = 0; i < n; i++) {
+      const det = (detune || 0) + (n > 1 ? (i - (n - 1) / 2) * 7 + (Math.random() - 0.5) * 4 : (Math.random() - 0.5) * 3);
+      const rate = Math.pow(2, (midi - sm.midi + det / 100) / 12);
+      const delay = i * 0.012 + Math.random() * 0.008;
+      const maxLen = sm.buf.duration / rate - 0.05;
+      const pluck = V.pluck || short;
+      const rel = pluck ? 0.12 : I.rel < 0 ? 0.3 : I.rel;
+      const len = pluck ? Math.min(maxLen, Math.max(dur, 0.18) + (V.pluck ? 0.6 : 0.08)) : Math.max(0.05, hold ? 30 : Math.min(dur, maxLen - rel));
+      const peak = vol * 5.7 * (sm.layer === "p" ? 0.82 : 1) / Math.sqrt(n) * (0.94 + Math.random() * 0.12);
+      const pan = I.pan + (n > 1 ? (i - (n - 1) / 2) * 0.2 : 0);
+      const atk = pluck ? 0.004 : 0.012 + 0.05 * (1 - level);
+      const v = voice(t + delay, sm.buf, rate, peak, len, atk, rel, pan, hold && !pluck);
+      if (hold) holdVoices.push(v);
+    }
+    return true;
+  }
   function playSample(t, midi, dur, inst, vol, detune, hold) {
+    if (playVS(t, midi, dur, inst, vol, detune, hold)) return true;
     const I = INST[inst];
     if (!I) return false;
     const list = sampleBufs[I.file];
