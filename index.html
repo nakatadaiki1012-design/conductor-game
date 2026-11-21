@@ -2395,6 +2395,9 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
   // ======================================================
   //  描画
   // ======================================================
+  // 背景の写真（読みこめたら描きなおす）
+  const BG = {};
+  [["curtain", "art/bg_curtain.jpg"], ["floor", "art/bg_floor.jpg"]].forEach(([k, src]) => { const im = new Image(); im.onload = () => { BG[k] = im; drawBackground(); }; im.src = src; });
   function drawBackground() {
     const c = bgx;
     c.setTransform(scale, 0, 0, scale, 0, 0);
@@ -2414,11 +2417,15 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
     c.beginPath(); c.moveTo(0, 60);
     for (let x = 0; x < W; x += 40) c.quadraticCurveTo(x + 20, 86, x + 40, 60);
     c.stroke();
+    if (BG.curtain) c.drawImage(BG.curtain, 0, 0, W, 150);
     const fg = c.createLinearGradient(0, 140, 0, H);
     fg.addColorStop(0, "#4e2f1a"); fg.addColorStop(0.45, "#7a4a2a"); fg.addColorStop(1, "#3a2213");
     c.fillStyle = fg; c.fillRect(0, 140, W, H - 140);
-    c.strokeStyle = "rgba(0,0,0,0.2)"; c.lineWidth = 1;
-    for (let i = -12; i <= 12; i++) { c.beginPath(); c.moveTo(240 + i * 22, 140); c.lineTo(240 + i * 70, H); c.stroke(); }
+    if (BG.floor) { c.globalAlpha = 0.9; c.drawImage(BG.floor, 0, 262, W, H - 262); c.globalAlpha = 1; }
+    else {
+      c.strokeStyle = "rgba(0,0,0,0.2)"; c.lineWidth = 1;
+      for (let i = -12; i <= 12; i++) { c.beginPath(); c.moveTo(240 + i * 22, 140); c.lineTo(240 + i * 70, H); c.stroke(); }
+    }
     [[140, 196, "#5d3920"], [196, 262, "#68412a"]].forEach(([y0, y1, col]) => {
       c.fillStyle = col; c.fillRect(0, y0, W, y1 - y0);
       c.fillStyle = "rgba(0,0,0,0.35)"; c.fillRect(0, y1 - 7, W, 7);
