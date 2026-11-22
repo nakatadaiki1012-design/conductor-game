@@ -1392,7 +1392,7 @@ summary { color: #22161a; }
   }
   // 聞こえている音の時刻（AudioContext の時間軸）
   // いつも同じ向きにずれていたら、タイミング調整を自動で少しずつ直す
-  let beatFlash = 0, misses = 0, fullCombo = false;
+  let beatFlash = 0, misses = 0, fullCombo = false, calmTold = false;
   let calibNoteAt = -99, calibDrift = 0, steadyN = 0, lastHalf = -99, judge = { text: "", sub: "", color: "#fff", t: 9 };
   function autoCalib() {
     // テンポが変わっているところ（accel. / rit.）のずれは、音の遅れではないので数えない
@@ -1879,10 +1879,10 @@ summary { color: #22161a; }
     if (best.count) {
       if (onBeat) popup(x, y - 30, String(best.b + 5), "#f5ecd6", 26);
     } else if (q === "perfect") {
-      perfects++; combo++; chaos = Math.max(0, chaos - 0.6); crowdUp(0.6); score += Math.round(20 * mult);
+      perfects++; combo++; chaos = Math.max(0, chaos - 0.6 - (chaos > 50 ? 1.6 : 0)); crowdUp(0.6); score += Math.round(20 * mult);
       judge = { text: "PERFECT", sub: "", color: "#ffe08a", t: 0 }; sfxHit(true);
     } else if (q === "good") {
-      goods++; combo++; chaos = Math.max(0, chaos - 0.2); crowdUp(0.3); score += Math.round(10 * mult);
+      goods++; combo++; chaos = Math.max(0, chaos - 0.2 - (chaos > 50 ? 0.8 : 0)); crowdUp(0.3); score += Math.round(10 * mult);
       judge = { text: "GOOD", sub: eSec < 0 ? "早い" : "遅い", color: "#cfe7c8", t: 0 }; sfxHit(false);
     } else g.pen = q;     // 拍の外のタップ：何かに当たれば許される（あとで決める）
     if (onBeat && !best.count) {
@@ -2308,14 +2308,15 @@ summary { color: #22161a; }
     while (evPtr < events.length && events[evPtr].b < pH) {
       const e = events[evPtr++];
       const mess = (layerMess[e.layer] || -99) > e.b;
-      let m = e.m, jt = Math.random() * 0.01, det = (Math.random() - 0.5) * chaos * 0.8;
+      let m = e.m, jt = Math.random() * 0.01, det = (Math.random() - 0.5) * chaos * 0.35;
       if (e.layer in ROWS && gatedOut(e.layer, e.b)) continue;   // 合図をもらっていないパートは鳴らない
       const iv = rowItch[e.layer] || 0;
       if (e.solo !== undefined && e.layer in ROWS && outOf(rowList(e.layer)[e.solo])) continue;   // ソリストがかいている
       if (iv > 0 && Math.random() < iv) continue;                                            // 弾けない人の分だけ音が抜ける
-      if (Math.random() < chaos / 120 + (mess ? 0.45 : 0) + iv * 0.5) {
-        m += [-6, -3, -1, 1, 2, 5][Math.floor(Math.random() * 6)];
-        jt = Math.random() * 0.08; det += (Math.random() - 0.5) * 80;
+      // 乱れても「拍の位置」はずらさない（音程だけ外れる）。耳で拍を取りなおせるように
+      if (Math.random() < chaos / 260 + (mess ? 0.4 : 0) + iv * 0.4) {
+        m += [-3, -1, 1, 2][Math.floor(Math.random() * 4)];
+        jt = Math.random() * 0.015; det += (Math.random() - 0.5) * 50;
       }
       const accent = Math.abs(e.b - Math.round(e.b)) < 0.01 && Math.round(e.b) % song.meter === 0 ? 1.12 : 1;
       playNote(Math.max(ac.currentTime, timeAt(e.b) + jt), m, e.d * 60 / A.T, e.inst, e.v * accent, det, e.hold);
@@ -2394,6 +2395,8 @@ summary { color: #22161a; }
         tapPtr++;
       }
       if (chaos >= 100) { chaos = 100; endGame("orchestra"); }
+      if (chaos > 65 && !calmTold) { calmTold = true; banner = { text: "落ち着いて", sub: "拍に合わせて叩けば、オケは戻ってくる", t: 2.6 }; }
+      if (chaos < 40) calmTold = false;
 
       // 強弱記号が変わったら知らせる
       const mk = dynMap.mark(Math.max(0, beatNow));
@@ -3708,10 +3711,7 @@ summary { color: #22161a; }
     }
     let sx = 0, sy = 0;
     if (!reduceMotion && shakeT > 0) { sx += (Math.random() - 0.5) * 10 * shakeT / 0.3; sy += (Math.random() - 0.5) * 10 * shakeT / 0.3; }
-    if (!reduceMotion && state === "play" && chaos > 60) {
-      const a = (chaos - 60) / 40 * 3;
-      sx = (Math.random() - 0.5) * a; sy = (Math.random() - 0.5) * a;
-    }
+
     c.setTransform(scale, 0, 0, scale, sx * scale, sy * scale);
     c.drawImage(bg, 0, 0, W, H);
 
@@ -3725,10 +3725,10 @@ summary { color: #22161a; }
     ["brass", "cello", "violin"].forEach(type => {
       const resting = playing && state !== "prep" && rowResting(type);
       rowList(type).forEach(m => {
-        const jAmp = reduceMotion ? 0 : chaos * 0.05;
+        const jAmp = reduceMotion ? 0 : chaos * 0.015;
         const mess = playing && (layerMess[m.type] || -99) > beatNow;
         const jit = { x: Math.sin(m.seed + now * 17) * (jAmp + (mess ? 3 : 0)), y: Math.cos(m.seed * 2 + now * 13) * jAmp };
-        const tilt = chaos > 45 ? Math.sin(m.seed + now * 3) * (chaos - 45) / 300 : 0;
+        const tilt = chaos > 45 ? Math.sin(m.seed + now * 3) * (chaos - 45) / 900 : 0;
         const isCueMan = activeCues.some(q => q.row === m.type && rowList(m.type)[q.who] === m);
         const glow = (isCueMan || (m.out && m.itch <= 0)) ? 0.55 + 0.45 * Math.pow(1 - beatPh, 2) : (activeCues.some(q => q.row === m.type) ? 0.18 : 0);
         let look = (240 - m.x) / 240 * 0.6, nd = 170;
@@ -3747,7 +3747,7 @@ summary { color: #22161a; }
       });
       drawStands(type);
     });
-    if (chaos > 0) { c.fillStyle = "rgba(226,72,61," + (chaos / 100 * 0.2) + ")"; c.fillRect(0, 88, W, 260); }
+    if (chaos > 0) { c.fillStyle = "rgba(226,72,61," + (chaos / 100 * 0.08) + ")"; c.fillRect(0, 88, W, 260); }
     // 拍が合った瞬間、舞台がふわっと明るくなる
     if (beatFlash > 0 && !reduceMotion) { c.fillStyle = "rgba(255,236,170," + beatFlash * 0.07 + ")"; c.fillRect(0, 88, W, 380); }
     // 合図が決まった団員にスポットライト
