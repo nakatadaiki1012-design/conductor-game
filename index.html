@@ -7,7 +7,7 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@600;800&family=Zen+Kaku+Gothic+New:wght@500;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Zen+Maru+Gothic:wght@500;700;900&display=swap">
 <style>
 /* Layout: one portrait concert-hall stage (2:3 canvas) centred on the screen; menus float over it like a printed programme card. */
 :root {
@@ -20,8 +20,8 @@
   --ink: #1a0b0d;
   --ink-soft: #6b4a3a;
   --accent-red: #9b1c22;
-  --display: "Shippori Mincho B1", "Hiragino Mincho ProN", "Yu Mincho", serif;
-  --ui: "Zen Kaku Gothic New", "Hiragino Sans", "Yu Gothic", sans-serif;
+  --display: "Dela Gothic One", "Hiragino Sans", "Yu Gothic", sans-serif;
+  --ui: "Zen Maru Gothic", "Hiragino Maru Gothic ProN", "Hiragino Sans", "Yu Gothic", sans-serif;
   color-scheme: dark;
 }
 html, body { height: 100%; }
@@ -215,6 +215,41 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
 #resultCard .rank b { font-size: 22px; margin-right: 6px; }
 #resultCard .row button { padding: 8px 12px; font-size: 14px; }
 .mini { font-size: 14px; padding: 8px 0; border-radius: 6px; background: #fffaf0; color: var(--ink); box-shadow: inset 0 0 0 1px var(--paper-line); }
+/* ---- 手描きのチラシのような見た目（飾り枠や金の線はやめる） ---- */
+.card { background: rgba(20, 10, 14, 0.72); }
+.card-inner {
+  background: #fff6e4; color: #22161a; border: 3px solid #22161a; border-radius: 14px;
+  box-shadow: 6px 6px 0 #22161a; padding: 20px 18px 18px;
+}
+#titleCard .card-inner { gap: 10px; }
+.eyebrow { display: inline-block; align-self: flex-start; letter-spacing: 0.05em; color: #22161a; font-weight: 700; font-size: 11px;
+  border: 1.5px dashed #22161a; border-radius: 4px; padding: 2px 8px; transform: rotate(-2deg); }
+h1 { font-family: var(--display); font-weight: 400; font-size: 38px; letter-spacing: 0.02em; line-height: 1.1;
+  background: linear-gradient(transparent 62%, #ffb39c 62%, #ffb39c 92%, transparent 92%); align-self: flex-start; padding: 0 4px; }
+h2 { font-family: var(--display); font-weight: 400; }
+h3 { color: #22161a; letter-spacing: 0.04em; font-size: 12px; font-weight: 900; margin-top: 6px; }
+.lead { font-size: 14px; line-height: 1.75; }
+.song { background: #fff; border: 2px solid #22161a; box-shadow: 3px 3px 0 #22161a; border-radius: 10px; transition: transform 0.08s, box-shadow 0.08s; }
+.song:hover { background: #fff; box-shadow: 4px 4px 0 #22161a; transform: translate(-1px, -1px); }
+.song:active { box-shadow: 1px 1px 0 #22161a; transform: translate(2px, 2px); }
+.song-title { font-family: var(--ui); font-weight: 900; font-size: 15px; }
+.song.lesson { background: #fdf0d6; }
+.song-best { color: #d8402f; }
+.stars, .medals { color: #e2a12a; }
+.primary { background: #e8453c; color: #fff; border: 2.5px solid #22161a; box-shadow: 3px 3px 0 #22161a; border-radius: 12px; }
+.primary:hover { background: #f05a4f; }
+.secondary { background: #fff; color: #22161a; border: 2px solid #22161a; box-shadow: 2px 2px 0 #22161a; border-radius: 12px; }
+.diff button, .mini { background: #fff; border: 2px solid #22161a; box-shadow: none; border-radius: 8px; color: #22161a; font-weight: 700; }
+.diff button[aria-pressed="true"] { background: #22161a; color: #fff6e4; box-shadow: none; }
+.rank { border-top: 2px dashed #22161a; font-family: var(--ui); font-weight: 700; }
+.rank b { font-family: var(--display); font-weight: 400; color: #e8453c; }
+.missions .ok .mk { color: #2f8a52; }
+details { border-top: 2px dashed rgba(34, 22, 26, 0.35); padding-top: 6px; }
+summary { color: #22161a; }
+.note { color: #6b5a5e; }
+#resultCard .card-inner { gap: 3px; box-shadow: 4px 4px 0 #22161a; }
+#resultCard h2 { font-size: 22px; }
+.pausebtn { box-shadow: 2px 2px 0 rgba(0,0,0,0.6); border: 2px solid #fff6e4; background: rgba(34, 22, 26, 0.75); }
 </style>
 </head>
 <body>
@@ -224,9 +259,9 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
 
     <div class="card" id="titleCard">
       <div class="card-inner">
-        <p class="eyebrow">PROGRAMME · 本日の演目</p>
+        <p class="eyebrow">今夜 19:00 開演</p>
         <h1>マエストロと蚊</h1>
-        <p class="lead">オーケストラはあなたの指揮棒についてきます。テンポも音量も出番の合図も、ぜんぶマエストロ次第。なのに蚊が飛んでいる。</p>
+        <p class="lead">本番5分前。ホールに蚊が一匹まぎれこんだ。<br>振るのをやめたら、演奏も止まる。</p>
         <h3>むずかしさ</h3>
         <div class="diff" id="diffRow" role="group" aria-label="むずかしさ">
           <button type="button" data-d="easy" aria-pressed="false">かんたん</button>
@@ -236,8 +271,8 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
         <p class="diff-note" id="diffNote"></p>
         <h3>テンポ</h3>
         <div class="diff" id="tempoRow" role="group" aria-label="テンポの方式" style="grid-template-columns:repeat(2,1fr)">
-          <button type="button" data-t="fixed" aria-pressed="true">音ゲー式（曲に合わせる）</button>
-          <button type="button" data-t="follow" aria-pressed="false">指揮者式（ついてくる）</button>
+          <button type="button" data-t="fixed" aria-pressed="true">楽譜どおり</button>
+          <button type="button" data-t="follow" aria-pressed="false">自分で決める</button>
         </div>
         <p class="diff-note" id="tempoNote"></p>
         <h3>玉の流れる速さ</h3>
@@ -246,45 +281,37 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
           <button type="button" data-s="normal" aria-pressed="true">ふつう</button>
           <button type="button" data-s="fast" aria-pressed="false">はやい</button>
         </div>
-        <h3>拍の音（カチカチ）</h3>
+        <h3>拍の音</h3>
         <div class="diff" id="clickRow" role="group" aria-label="拍の音">
           <button type="button" data-c="big" aria-pressed="true">大きめ</button>
           <button type="button" data-c="small" aria-pressed="false">小さめ</button>
           <button type="button" data-c="off" aria-pressed="false">なし</button>
         </div>
-        <h3>練習（はじめての人はここから）</h3>
+        <h3>まずは練習</h3>
         <div class="songs lessons" id="lessonList"></div>
-        <h3>曲をえらぶ</h3>
+        <h3>本番</h3>
         <p class="tour" id="tourLine"></p>
         <div class="songs" id="songList"></div>
-        <details open>
-          <summary>指揮のしかた</summary>
+        <details>
+          <summary>遊び方</summary>
           <ul>
-            <li><b>予備拍</b>：楽団はあなたの合図を待っています。<b>2回タップ</b>（1回目＝構え、2回目＝予備拍）。<b>2回の間隔がそのままテンポ</b>になり、次の拍で楽団が入ります。楽譜のテンポに近いほど高得点。</li>
-            <li><b>楽譜の帯</b>：画面上部に、これからのテンポと強弱が流れてきます。<b>拍の目盛りが詰まる＝速く、広がる＝遅く</b>。橙の線は accel.、青い線は rit.、𝄐は「止まる」。</li>
-            <li><b>テンポ</b>：流れてくる玉が金の線に重なった瞬間にタップ。「音ゲー式」では曲は楽譜どおりに進みます（accel. や rit. も楽譜どおり）。「指揮者式」にすると、楽団があなたの拍についてきます。</li>
-            <li><b>音量</b>：<b>玉が大きいところは大きく払い、小さいところはトンと軽く</b>。トンと軽く叩くと小さく、サッと大きく払うと大きく鳴ります。楽譜の p（小さく）f（大きく）に合わせましょう。</li>
-            <li><b>合図</b>：本物の指揮と同じく、<b>入る1拍前（予備拍）</b>に合図します。光った団員を「今！」でタップ（頭上の「合図」でも、<b>本人をタッチ</b>してもOK）。合図や呼び戻しのタッチでは団員は痛がりません。</li>
-            <li><b>締め</b>：最後の音はしばらくのばして、好きなところでタップして止めます。</li>
+            <li><b>2回タップで始まる。</b>その間隔が曲の速さになる（予備拍）。</li>
+            <li>あとは<b>玉が線に重なったらタップ</b>。大きい玉は大きく払う、小さい玉はトンと軽く。</li>
+            <li>光った団員は出番が近い。<b>入る1拍前に本人をタップ</b>して合図。合図がないと入ってこない。</li>
+            <li>最後の音はのばして、好きなところでタップして切る。</li>
           </ul>
         </details>
         <details>
-          <summary>蚊と団員について</summary>
+          <summary>蚊のこと</summary>
           <ul>
-            <li><b>蚊は団員をねらいます。</b>団員の頭のまわりを回ってから止まり、刺します。刺された団員は<b>弾くのをやめてしまいます</b>。かゆみが引くと頭の上に緑の「戻して」が出るので、<b>拍に合わせてタップして呼び戻しましょう</b>。弾いていない団員がいる間は、オケの乱れがどんどん増えます（100%で演奏中止）。</li>
-            <li>出番の直前の団員やソリストはねらわれやすい。かいている最中に出番が来ると、合図が失敗します。</li>
-            <li>蚊の上で振れば撃退。拍ぴったりならボーナス。拍の合間に叩いても、<b>蚊に当たればコンボは切れません</b>（空振りは BAD）。たまにマエストロの頭もねらわれます。</li>
-            <li><b>関係ない団員を叩くと −400点。</b>続けて叩くと減点が増えます。蚊ごと叩いてしまったときは −150点。大きく払うと、指揮棒の通り道にいる団員にも当たります。</li>
-            <li>団員に止まった蚊は、<b>蚊だけをピンポイントで</b>叩けば団員に当たらず<b>大きな得点</b>（飛んでいる蚊の約7倍）。待てば高得点、でも遅れると刺されます。近くの何もない所を振れば追い払えます。</li>
-            <li>得点は<b>音楽の出来</b>が中心：合図、全員そろって演奏している拍、テンポと強弱。合図の直前には、わざと蚊がやって来ることも。</li>
-            <li>拍から外れて振る・テンポや音量が楽譜から大きく外れると、オーケストラが乱れます。</li>
-            <li>終盤には王冠をかぶった<b>女王蚊</b>が出る曲も。手下を呼び、<b>拍ぴったりの一撃しか効きません</b>。</li>
-            <li>良い指揮をすると<b>客席</b>が盛り上がります。団員を叩くと…客席は笑います。</li>
+            <li>蚊は団員の頭に止まって刺す。刺された人は<b>弾くのをやめる</b>。かゆみが引いたら、拍に合わせてタップで呼び戻す。</li>
+            <li>止まった蚊を<b>蚊だけ</b>ねらって叩くと大きな得点。ずれて団員を叩くと −400。</li>
+            <li>弾かない人がいるほど、オケは崩れていく。崩れきったら終演。</li>
+            <li>王冠の蚊は、拍ぴったりで叩かないと効かない。</li>
           </ul>
         </details>
         <button class="secondary" id="calibBtn" type="button">タイミング調整（いま <span id="calibNow">0</span>ms）</button>
-        <p class="note">いつも同じ向きにずれて叩いていると、遊んでいる間に自動でタイミングを補正します。</p>
-        <p class="note">音が出ます。iPhoneはマナーモードだと音が鳴りません。</p>
+        <p class="note">音が出ます。iPhone はマナーモードを切ってください。叩くタイミングのずれは、遊んでいるうちに自動で直ります。</p>
         <p class="note">楽器の音：VS Chamber Orchestra 2 Community Edition（Versilian Studios, CC0）、ティンパニなど一部は MusyngKite サウンドフォント（CC BY-SA 3.0）／ midi-js-soundfonts（gleitz）。曲はこのゲーム用に短く編曲しています。</p>
       </div>
     </div>
@@ -293,7 +320,7 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
       <div class="card-inner">
         <p class="eyebrow">TUNING · タイミング調整</p>
         <h2>音に合わせてタップ</h2>
-        <p class="lead" id="calibMsg">「カッ、カッ」という音に合わせて、下のボタンを16回タップしてください。画面ではなく<b>音を聞いて</b>合わせるのがコツです。</p>
+        <p class="lead" id="calibMsg">「カッ、カッ」に合わせて16回。画面は見ずに、耳で。</p>
         <button class="pad" id="calibPad" type="button">はじめる</button>
         <p class="calib-value" id="calibVal">0 ms</p>
         <div class="row">
@@ -361,16 +388,16 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
   //  基本設定
   // ======================================================
   const W = 480, H = 720;
-  const FONT_UI = '"Zen Kaku Gothic New","Hiragino Sans","Yu Gothic",sans-serif';
-  const FONT_D = '"Shippori Mincho B1","Hiragino Mincho ProN","Yu Mincho",serif';
+  const FONT_UI = '"Zen Maru Gothic","Hiragino Maru Gothic ProN","Hiragino Sans","Yu Gothic",sans-serif';
+  const FONT_D = '"Dela Gothic One","Hiragino Sans","Yu Gothic",sans-serif';
   let PERFECT = 0.07, GOOD = 0.15;     // 判定の幅（秒）。むずかしさで変わる
   const DIFFS = {
     easy: { name: "かんたん", perfect: 0.11, good: 0.25, chaos: 0.6, mosq: -1, speed: 0.85, land: 0.6, sweep: false, ring: true, prepTol: 0.1, mult: 0.8, pin: 24, circle: 1.6,
-      note: "判定がゆるく、蚊も少なめ。払った棒は団員に当たりません。スコア×0.8" },
+      note: "判定がゆるく、蚊も少ない。払っても人には当たらない。" },
     normal: { name: "ふつう", perfect: 0.085, good: 0.19, chaos: 1, mosq: 0, speed: 1, land: 1, sweep: true, ring: true, prepTol: 0.07, mult: 1, pin: 18, circle: 1.2,
-      note: "標準のルールです。" },
+      note: "" },
     hard: { name: "むずかしい", perfect: 0.06, good: 0.13, chaos: 1.3, mosq: 1, speed: 1.2, land: 1.2, sweep: true, ring: false, prepTol: 0.05, mult: 1.5, pin: 14, circle: 0.9,
-      note: "判定がきびしく、蚊が多くて速い。蚊のまわりの「拍の輪」も出ません。スコア×1.5" },
+      note: "判定がきびしく、蚊が多い。蚊のまわりの輪も出ない。" },
   };
   const HEAD = { x: 240, y: 596, r: 30 };
   const BALD = { x: 240, y: 576 };
@@ -1131,7 +1158,47 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
       } catch (e) { res(null); }
     });
   }
+  // ---------- 効果音（本物の打楽器の録音） ----------
+  const SFX_NAMES = ["slap1", "slap2", "slapq", "clave", "claveq", "wood", "woodf", "tri", "triq", "bongo", "thud"];
+  const rawSfx = {}, sfxBuf = {};
+  SFX_NAMES.forEach(k => { rawSfx[k] = fetch("sfx/" + k + ".mp3").then(r => (r.ok ? r.arrayBuffer() : null)).catch(() => null); });
+  function decodeSfx() {
+    SFX_NAMES.forEach(async k => { const ab = await rawSfx[k]; if (ab && !sfxBuf[k]) { const b = await decodeOne(ab); if (b) sfxBuf[k] = b; } });
+  }
+  // 毎回少しずつ高さと大きさを変えて、同じ音のくり返しに聞こえないようにする
+  function playSfx(k, t, vol, rate, pan) {
+    const b = sfxBuf[k];
+    if (!b || !ac) return false;
+    const s = ac.createBufferSource(); s.buffer = b;
+    s.playbackRate.value = (rate || 1) * (0.96 + Math.random() * 0.08);
+    const g = ac.createGain(); g.gain.value = vol * (0.85 + Math.random() * 0.3);
+    s.connect(g);
+    if (ac.createStereoPanner) { const pn = ac.createStereoPanner(); pn.pan.value = clamp(pan || 0, -1, 1); g.connect(pn); pn.connect(sfxBus); } else g.connect(sfxBus);
+    s.start(Math.max(t, ac.currentTime));
+    return true;
+  }
+  // 拍手：一人ひとりが自分の速さで手をたたく（ノイズを流すだけの拍手にしない）
+  let clapBank = null;
+  function makeClaps() {
+    clapBank = [];
+    const sr = ac.sampleRate;
+    for (let k = 0; k < 10; k++) {
+      const len = Math.floor(sr * 0.07), buf = ac.createBuffer(1, len, sr), d = buf.getChannelData(0);
+      const f1 = 700 + Math.random() * 900, f2 = 1600 + Math.random() * 1600, tau = 0.006 + Math.random() * 0.01;
+      let a1 = 0, b1 = 0, a2 = 0, b2 = 0;
+      const r1 = Math.exp(-Math.PI * f1 / 3 / sr), c1 = 2 * r1 * Math.cos(2 * Math.PI * f1 / sr);
+      const r2 = Math.exp(-Math.PI * f2 / 4 / sr), c2 = 2 * r2 * Math.cos(2 * Math.PI * f2 / sr);
+      for (let i = 0; i < len; i++) {
+        const n = (Math.random() * 2 - 1) * Math.exp(-i / sr / tau);
+        const y1 = n + c1 * a1 - r1 * r1 * b1; b1 = a1; a1 = y1;
+        const y2 = n + c2 * a2 - r2 * r2 * b2; b2 = a2; a2 = y2;
+        d[i] = (y1 * 0.06 + y2 * 0.05 + n * 0.5);
+      }
+      clapBank.push(buf);
+    }
+  }
   function decodeSamples() {
+    decodeSfx();
     if (decodePromise) return decodePromise;
     samplesState = "loading";
     const vsDone = Promise.all(Object.keys(rawVS).map(async key => {
@@ -1238,10 +1305,11 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
     if (samplesState === "ready" && playSample(t, midi, dur, inst, vol, detune, hold)) return;
     playSynth(t, midi, dur, inst, vol, detune);
   }
-  function click(t, accent, vol) { osc(t, accent ? 2100 : 1600, "triangle", 0.04, vol, { atk: 0.001 }); }
+  function click(t, accent, vol) { if (!playSfx(accent ? "woodf" : "wood", t, vol * 2.2, accent ? 1 : 1.12)) osc(t, accent ? 2100 : 1600, "triangle", 0.04, vol, { atk: 0.001 }); }
   function sfxSwing(t, size) { noise(t, 0.08 + size * 0.1, 0.05 + size * 0.06, 2200 - size * 800, "bandpass", 0.6); }
-  function sfxSwat(t) { noise(t, 0.09, 0.45, 1800, "bandpass", 0.8); osc(t, 55, "sine", 0.12, 0.4); }
+  function sfxSwat(t) { if (!playSfx(Math.random() < 0.5 ? "slap1" : "slap2", t, 0.55, 0.95 + Math.random() * 0.15)) { noise(t, 0.09, 0.45, 1800, "bandpass", 0.8); osc(t, 55, "sine", 0.12, 0.4); } }
   function sfxBonk(t) {
+    if (playSfx("thud", t, 0.7, 1.05) && playSfx("bongo", t + 0.01, 0.35, 0.8)) return;
     const o = ac.createOscillator(), g = ac.createGain();
     o.type = "sine"; o.frequency.setValueAtTime(420, t); o.frequency.exponentialRampToValueAtTime(140, t + 0.15);
     g.gain.setValueAtTime(0.5, t); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.2);
@@ -1259,7 +1327,7 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
     s.connect(f); f.connect(g); g.connect(sfxBus);
     s.start(t, Math.random() * 0.3); s.stop(t + dur + 0.1);
   }
-  function sfxCue(t) { osc(t, 1568, "sine", 0.4, 0.1); osc(t + 0.06, 2093, "sine", 0.5, 0.08); }
+  function sfxCue(t) { if (!playSfx("tri", t, 0.32, 1)) { osc(t, 1568, "sine", 0.4, 0.1); osc(t + 0.06, 2093, "sine", 0.5, 0.08); } }
   function sfxBite(t) {
     const o = ac.createOscillator(), g = ac.createGain();
     o.type = "square"; o.frequency.setValueAtTime(1900, t); o.frequency.exponentialRampToValueAtTime(700, t + 0.18);
@@ -1267,20 +1335,31 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
     o.connect(g); g.connect(sfxBus); o.start(t); o.stop(t + 0.22);
   }
   function cheer(t, amount) {
-    // 客席のどよめき（ざわっ→わぁ）
+    // 客席のどよめき（ざわっ→わぁ）は控えめに、拍手を主に
+    applause(t + 0.05, Math.min(1, 0.35 + amount * 0.6));
+    if (amount < 0.6) return;
     const s = ac.createBufferSource(); s.buffer = noiseBuf; s.loop = true;
     const f = ac.createBiquadFilter(); f.type = "bandpass"; f.frequency.value = 700; f.Q.value = 0.8;
     const g = ac.createGain();
-    g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(0.09 * amount, t + 0.25); g.gain.exponentialRampToValueAtTime(0.0001, t + 1.4);
+    g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(0.035 * amount, t + 0.3); g.gain.exponentialRampToValueAtTime(0.0001, t + 1.4);
     f.frequency.setValueAtTime(500, t); f.frequency.linearRampToValueAtTime(1100, t + 0.4);
     s.connect(f); f.connect(g); g.connect(sfxBus); s.start(t); s.stop(t + 1.5);
-    applause(t + 0.2, 0.25 * amount);
   }
   function applause(t, amount) {
-    const n = Math.floor(160 * amount);
-    for (let i = 0; i < n; i++) {
-      const tt = t + Math.pow(Math.random(), 0.7) * 3.2;
-      noise(tt, 0.03 + Math.random() * 0.03, 0.05 + Math.random() * 0.08, 1200 + Math.random() * 2400, "bandpass", 1.2);
+    if (!clapBank) makeClaps();
+    const people = Math.round(5 + 28 * amount), dur = 1.6 + 2.6 * amount;
+    let count = 0;
+    for (let p = 0; p < people && count < 420; p++) {
+      const rate = 3.6 + Math.random() * 2.4, start = t + Math.random() * 0.35, end = start + dur * (0.6 + Math.random() * 0.4);
+      const pan = Math.random() * 1.6 - 0.8, loud = 0.25 + Math.random() * 0.5, bank = clapBank[Math.floor(Math.random() * clapBank.length)];
+      for (let tt = start; tt < end && count < 420; tt += (1 / rate) * (0.9 + Math.random() * 0.2)) {
+        const env = Math.min(1, (tt - start) / 0.25) * Math.min(1, (end - tt) / (dur * 0.35));
+        const s = ac.createBufferSource(); s.buffer = bank; s.playbackRate.value = 0.9 + Math.random() * 0.2;
+        const g = ac.createGain(); g.gain.value = 0.22 * loud * env * (0.4 + amount * 0.6);
+        s.connect(g);
+        if (ac.createStereoPanner) { const pn = ac.createStereoPanner(); pn.pan.value = pan; g.connect(pn); pn.connect(sfxBus); } else g.connect(sfxBus);
+        s.start(tt); count++;
+      }
     }
   }
 
@@ -1570,26 +1649,26 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
     let comment;
     if (cleared) {
       $("resEyebrow").textContent = "終演 · " + song.title;
-      $("resTitle").textContent = "ブラボー！";
-      $("resSub").textContent = "最後まで指揮しきりました。客席から拍手が鳴りやみません。";
-      comment = rank === "S" ? "スタンディングオベーション。テンポも強弱も思いのまま。蚊すら聴き入っていました。"
-        : rank === "A" ? "見事な本番。新聞の批評欄でほめられそうです。"
-        : "なんとか終演。団員たちは少しだけ首をかしげています。";
+      $("resTitle").textContent = rank === "S" ? "ブラボー" : rank === "A" ? "いい本番だった" : "なんとか終演";
+      $("resSub").textContent = pick(rank === "S" ? ["客席が総立ちになった。", "鳴りやまない拍手。コンマスが小さくうなずいた。"]
+        : rank === "A" ? ["楽屋に戻ると、ホルンの人が親指を立てていた。", "明日の新聞に小さく載るかもしれない。"]
+        : ["チェロの人が首をかしげている。", "拍手はまばら。でも最後まで振った。"]);
+      comment = "";
     } else if (endReason === "orchestra") {
       $("resEyebrow").textContent = "中断 · " + song.title;
-      $("resTitle").textContent = "オーケストラ暴走";
-      $("resSub").textContent = "弾かなくなった団員が増えて、演奏がばらばらになってしまいました。";
-      comment = "刺された団員は弾くのをやめます。かゆみが引いたら、頭の上の緑の「戻して」を拍に合わせてタップ。放っておくと演奏が崩れます。";
+      $("resTitle").textContent = "演奏が止まった";
+      $("resSub").textContent = "弾かない人が増えすぎて、音楽にならなくなった。";
+      comment = "かゆみが引いた団員は、拍に合わせてタップすると戻ってくる。";
     } else {
       $("resEyebrow").textContent = "中断 · " + song.title;
-      $("resTitle").textContent = "かゆくて指揮どころではない";
-      $("resSub").textContent = "頭を3か所刺されてしまいました。";
-      comment = "頭に止まった蚊も、拍に合わせて振れば追い払えます。";
+      $("resTitle").textContent = "かゆくて振れない";
+      $("resSub").textContent = "頭を3か所刺された。";
+      comment = "頭の蚊も、拍に合わせて振れば追い払える。";
     }
     const best = store.get("maestro.best." + song.id, null);
     let isNew = false;
     if (!best || score > best.score) { store.set("maestro.best." + song.id, { score, rank }); isNew = score > 0; }
-    $("resRank").innerHTML = "<b>" + rank + "</b>" + comment + (isNew ? "<br>ベストスコア更新！" : "");
+    $("resRank").innerHTML = "<b>" + rank + "</b>" + comment + (isNew ? "<br>自己ベスト" : "");
     // ミッション
     const res = { cleared, rank, bonks, swats, bitten, cueOk, cueTotal: cues.length, prepOk, prepTotal, queen: queenKilled, crowd: Math.round(crowd), cut: cutResult,
       tempoPct: tempoChecks ? tempoOk / tempoChecks * 100 : 0, dynPct: dynChecks ? dynOk / dynChecks * 100 : 0 };
@@ -1647,7 +1726,7 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
     crowd = clamp(crowd + v, 0, 100);
     if (!crowdHigh && crowd >= 85 && state === "play") {
       crowdHigh = true;
-      banner = { text: "客席がわいている！", sub: "このまま最後まで！", t: 1.8 };
+      banner = { text: pick(["客席が前のめりになってきた", "一列目のおばあさんが涙ぐんでいる", "客席の空気が変わった"]), sub: "", t: 1.8 };
       if (ac) cheer(ac.currentTime, 0.5);
     }
     if (crowd < 70) crowdHigh = false;
@@ -1656,8 +1735,8 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
   function sfxHit(perfect) {
     if (!ac || clickKey === "off") return;
     const t = ac.currentTime;
+    if (playSfx(perfect ? "clave" : "claveq", t, perfect ? 0.16 : 0.1, 1)) return;
     osc(t, perfect ? 1568 : 1175, "triangle", 0.07, perfect ? 0.07 : 0.045);
-    if (perfect) osc(t, 2349, "sine", 0.05, 0.03);
   }
   // はじめての出来事は、その場で1回だけ教える
   const hintsSeen = store.get("maestro.hints", {});
@@ -1666,16 +1745,32 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
     hintsSeen[key] = 1; store.set("maestro.hints", hintsSeen);
     banner = { text, sub, t: 4 };
   }
+  const pick = a => a[Math.floor(Math.random() * a.length)];
+  // 団員のせりふ。4つの性格で言い方が変わる
+  const LINES = {
+    polite: { bitten: ["あっ、かゆ…すみません", "失礼、ちょっと…", "刺されました…"], back: ["戻ります", "お待たせしました", "もう大丈夫です"], cue: ["はい", "（すっと息を吸う）", "参ります"],
+      itchy: ["もう少しだけ…", "すみません、まだ"], late: ["次の小節から入ります", "合わせます"], hit: ["痛っ…なぜ私を", "えっ"], hitWith: ["…蚊ごと、ですか", "ありがとう…ございます？"], miss: ["入りそびれました", "合図、見えませんでした"] },
+    gruff: { bitten: ["ぬう、やられた", "このやろう…", "かゆい。弾けん"], back: ["よし、戻る", "待たせたな", "ふん、もう平気だ"], cue: ["おう", "（うなずく）", "任せろ"],
+      itchy: ["まだだ", "かゆいと言っとる"], late: ["次から入る", "わかった、次だ"], hit: ["なにをする", "おい"], hitWith: ["…まあ、蚊は死んだな", "荒っぽいな"], miss: ["合図がなかったぞ", "どこを見とる"] },
+    cheerful: { bitten: ["ちょ、かゆっ！", "やられたー", "うわ、刺された"], back: ["復活！", "ただいまー", "もう平気！"], cue: ["待ってました", "いくよー", "（にっこり）"],
+      itchy: ["ちょっと待って", "かゆいのー"], late: ["次から行きまーす", "途中参加！"], hit: ["いったーい", "なんでー"], hitWith: ["蚊ごと!?", "ちょっと、もう"], miss: ["え、今だった？", "入りそびれた！"] },
+    shy: { bitten: ["…かゆい", "…あ", "（目がうるむ）"], back: ["…戻ります", "（そっと構える）", "…はい"], cue: ["…（こくり）", "…はい", "（小さく息を吸う）"],
+      itchy: ["…まだ", "（首をふる）"], late: ["…次から", "（小さくうなずく）"], hit: ["…いた", "（びくっ）"], hitWith: ["…", "（頭をおさえる）"], miss: ["…あれ", "（おろおろ）"] },
+  };
+  function say(m, kind) {
+    const type = m.old ? "gruff" : (m.seed * 7 | 0) % 3 === 0 ? "shy" : m.female && (m.seed | 0) % 2 ? "cheerful" : (m.seed * 3 | 0) % 2 ? "cheerful" : "polite";
+    return pick(LINES[type][kind] || ["…"]);
+  }
   function popup(x, y, text, color, size = 20) { pops.push({ x, y, text, color, size, t: 0 }); }
 
   function recallMark(m) { return { x: m.x, y: m.y - 55 * m.s - 30 }; }
   function tryRecall(x, y, ok) {
     const m = musicians.find(q => q.out && q.itch <= 0 && touches(q, recallMark(q), x, y));
     if (!m) return false;
-    if (!ok) { popup(m.x, m.y - 80 * m.s, "拍に合わせて呼び戻して", "#ffc9a8", 14); return true; }
+    if (!ok) { popup(m.x, m.y - 80 * m.s, "拍に合わせて", "#ffc9a8", 14); return true; }
     m.out = false; m.joy = 2; recalls++; m.spot = 1.2;
     score += 300; chaos = Math.max(0, chaos - 12); crowdUp(3);
-    popup(m.x, m.y - 80 * m.s, m.name + "「戻ります！」 +300", "#9fe0b0", 15);
+    popup(m.x, m.y - 80 * m.s, m.name + "「" + say(m, "back") + "」", "#9fe0b0", 15); popup(m.x, m.y - 62 * m.s, "+300", "#9fe0b0", 12);
     sfxCue(ac.currentTime);
     return true;
   }
@@ -1695,7 +1790,7 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
   function missCue(c, m, msg) {
     if (c.gate) {
       c.late = true; addChaos(6);
-      popup(m.x, m.y - 80 * m.s, m.name + "「" + msg + "」 あとからでも合図を！", "#ff8a7a", 14);
+      popup(m.x, m.y - 80 * m.s, m.name + "「" + msg + "」", "#ff8a7a", 14);
     } else {
       c.done = true; addChaos(10); layerMess[c.row] = c.b + 8; m.angry = 3;
       popup(m.x, m.y - 80 * m.s, m.name + "「" + msg + "」", "#ff8a7a", 15);
@@ -1716,8 +1811,8 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
     if (P.t1 !== null && th - P.t1 < 0.18) return;
     if (P.t1 === null || th - P.t1 > 3) {
       P.t1 = th;
-      if (holdVoices.length) { stopHolds(ac.currentTime, 0.1); popup(x, y - 52, "音を切って", "#f5ecd6", 15); }
-      popup(x, y - 30, "構え…", "#f5ecd6", 18);
+      if (holdVoices.length) { stopHolds(ac.currentTime, 0.1); popup(x, y - 52, "（音が止まる）", "#f5ecd6", 13); }
+      popup(x, y - 30, "構えて", "#f5ecd6", 16);
       sfxBreath(ac.currentTime, 0.5, 0.03);
       return;
     }
@@ -1727,10 +1822,10 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
     const T = tempoMode === "fixed" ? P.target : clamp(raw, P.target * 0.7, P.target * 1.4);
     prepTotal++;
     let msg;
-    if (Math.abs(r - 1) <= DIFF.prepTol) { prepOk++; score += 300; crowdUp(6); chaos = Math.max(0, chaos - 5); msg = "予備拍ぴったり！ ♩=" + Math.round(raw); }
-    else if (Math.abs(r - 1) <= 0.15) { score += 100; msg = "まずまずの予備拍 ♩=" + Math.round(raw); }
-    else { addChaos(6); msg = (r < 1 ? "予備拍が遅い" : "予備拍が速い") + " ♩=" + Math.round(raw); }
-    banner = { text: msg, sub: "目標 ♩=" + P.target + (Math.round(T) !== Math.round(raw) ? "　楽団は ♩=" + Math.round(T) + " で入ります" : "　楽団が入ります！"), t: 2.2 };
+    if (Math.abs(r - 1) <= DIFF.prepTol) { prepOk++; score += 300; crowdUp(6); chaos = Math.max(0, chaos - 5); msg = "いい予備拍 ♩=" + Math.round(raw); }
+    else if (Math.abs(r - 1) <= 0.15) { score += 100; msg = "♩=" + Math.round(raw) + "　まあまあ"; }
+    else { addChaos(6); msg = "♩=" + Math.round(raw) + (r < 1 ? "　ちょっと遅い" : "　ちょっと速い"); }
+    banner = { text: msg, sub: "楽譜は ♩=" + P.target, t: 2.2 };
     popup(x, y - 30, "予備拍", Math.abs(r - 1) <= 0.07 ? "#ffe08a" : "#f5ecd6", 18);
     // 2回目の予備拍で合図を出す場所
     const pc = cues.find(c => !c.done && c.atPrep && c.b === P.b);
@@ -1738,13 +1833,13 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
       const mk = cueMark(pc);
       pc.done = true;
       if (touches(mk.m, mk, x, y) && outOf(mk.m)) {
-        pc.done = false; missCue(pc, mk.m, "かゆくて入れない…");
+        pc.done = false; missCue(pc, mk.m, say(mk.m, "itchy"));
       } else if (touches(mk.m, mk, x, y)) {
         pc.ok = true; pc.enterB = pc.b; cueOk++; score += 1000; mk.m.joy = 2.5; mk.m.spot = 2;
-        popup(mk.x, mk.y - 26, mk.m.name + "「スッ（息を吸って）」 +1000", "#ffe08a", 16);
+        popup(mk.x, mk.y - 26, mk.m.name + "「" + say(mk.m, "cue") + "」", "#ffe08a", 15); popup(mk.x, mk.y - 8, "+1000", "#ffe08a", 12);
         sfxCue(ac.currentTime);
       } else {
-        pc.done = false; missCue(pc, mk.m, "合図がなかった…");
+        pc.done = false; missCue(pc, mk.m, say(mk.m, "miss"));
       }
     }
     const entry = th + 60 * e / T;
@@ -1791,7 +1886,7 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
       judge = { text: "GOOD", sub: eSec < 0 ? "早い" : "遅い", color: "#cfe7c8", t: 0 }; sfxHit(false);
     } else g.pen = q;     // 拍の外のタップ：何かに当たれば許される（あとで決める）
     if (onBeat && !best.count) {
-      hitBurst(q === "perfect");
+      hitBurst(q === "perfect", Math.round(best.b) % song.meter === 0);
       if (COMBO_MILE.includes(combo)) {
         const bonus = combo * 20;
         score += bonus; crowdUp(4);
@@ -1799,7 +1894,7 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
         if (ac) cheer(ac.currentTime, 0.25 + Math.min(0.4, combo / 200));
       }
     }
-    if (combo === 16) banner = { text: "ノリノリ！", sub: "スコア2倍・当たり判定アップ", t: 1.6 };
+    if (combo === 16) banner = { text: "乗ってきた", sub: "ここから得点2倍", t: 1.6 };
     maxCombo = Math.max(maxCombo, combo);
 
     // テンポはあなたの拍についてくる
@@ -1821,26 +1916,26 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
       onCueMark = true; g.cueM = mk.m;
       if (!best.count && !sc.late && !sc.atPrep && !(onBeat && sc.prepB === best.b)) {
         const left = Math.ceil(sc.prepB - pt - 0.3);
-        popup(mk.x, mk.y - 26, left >= 1 ? "まだ！ あと" + left + "拍" : "拍に合わせて合図を", "#ffc9a8", 14);
+        popup(mk.x, mk.y - 26, left >= 1 ? "あと" + left + "拍" : "拍に合わせて", "#ffc9a8", 14);
         mk.m.joy = 0.4;
       }
       if (sc.late && onBeat && !best.count) {
-        if (outOf(mk.m)) popup(mk.x, mk.y - 26, mk.m.name + "「まだかゆい…」", "#ff8a7a", 14);
+        if (outOf(mk.m)) popup(mk.x, mk.y - 26, mk.m.name + "「" + say(mk.m, "itchy") + "」", "#ff8a7a", 14);
         else {
           sc.done = true; sc.late = false; lateOk++;
           sc.enterB = (Math.floor(best.b / song.meter + 1e-6) + 1) * song.meter;
           score += 300; crowdUp(2); mk.m.joy = 1.5;
-          popup(mk.x, mk.y - 26, mk.m.name + "「次の小節から入ります！」 +300", "#cfe7c8", 14);
+          popup(mk.x, mk.y - 26, mk.m.name + "「" + say(mk.m, "late") + "」", "#cfe7c8", 14); popup(mk.x, mk.y - 8, "+300", "#cfe7c8", 12);
           sfxCue(ac.currentTime);
         }
       } else if (onBeat && !best.count && !sc.atPrep && !sc.late && sc.prepB === best.b && outOf(mk.m)) {
-        missCue(sc, mk.m, "かゆくて入れない…");
+        missCue(sc, mk.m, say(mk.m, "itchy"));
       } else if (onBeat && !best.count && !sc.atPrep && !sc.late && sc.prepB === best.b) {
         sc.done = true; sc.ok = true; sc.enterB = sc.b; cueOk++; crowdUp(6); mk.m.spot = 2;
         chaos = Math.max(0, chaos - 15);
         score += Math.round(1000 * (fever ? 2 : 1));
         mk.m.joy = 2.5;
-        popup(mk.x, mk.y - 26, mk.m.name + "「スッ（息を吸って）」 +" + Math.round(1000 * (fever ? 2 : 1)), "#ffe08a", 16);
+        popup(mk.x, mk.y - 26, mk.m.name + "「" + say(mk.m, "cue") + "」", "#ffe08a", 15); popup(mk.x, mk.y - 8, "+" + Math.round(1000 * (fever ? 2 : 1)), "#ffe08a", 12);
         sfxCue(ac.currentTime);
         flash = 0.5;
       }
@@ -1853,10 +1948,10 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
       if (!onCueMark && !g.safeLand) {
         const hm = musicianAt(x, y);
         if (hm) {
-          if (best.count) popup(x, y - 20, "そこは団員！", "#ffd0c0", 16);
+          if (best.count) popup(x, y - 20, "そこ、人", "#ffd0c0", 16);
           else hitMusician(hm, x, y, g);
         } else if (g.killed && nearestBodyGap(x, y) < 7) {
-          score += 200; popup(x, y + 26, "ギリギリ！ +200", "#ffe08a", 16);
+          score += 200; popup(x, y + 26, "すれすれ +200", "#ffe08a", 16);
         }
       }
     }
@@ -1870,13 +1965,13 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
   }
 
   const COMBO_MILE = [10, 25, 50, 75, 100, 150, 200, 250, 300];
-  function hitBurst(perfect) {
-    const n = perfect ? 10 : 4;
+  function hitBurst(perfect, down) {
+    const n = Math.round((perfect ? 6 : 2) + Math.random() * (down ? 8 : 4));
     for (let k = 0; k < n; k++) {
       const a = -Math.PI / 2 + (Math.random() - 0.5) * 2.6, v = 70 + Math.random() * 150;
       parts.push({ x: 104, y: 500, vx: Math.cos(a) * v, vy: Math.sin(a) * v, t: 0, c: perfect ? (k % 2 ? "#ffe08a" : "#fff6d8") : "#cfe7c8" });
     }
-    beatFlash = perfect ? 1 : 0.5;
+    beatFlash = down && perfect ? 0.8 : 0;
   }
 
   // 蚊を叩く（first: 振り始めの点 / それ以外: 払った通り道）
@@ -1888,21 +1983,21 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
       if (m.kind === "queen") {
         if (!first || d > R * 1.4) return;
         if (!onBeat) {
-          popup(m.x, m.y + 36, "効かない！ 拍に乗って叩け", "#ff8a7a", 15);
+          popup(m.x, m.y + 36, "効いてない。拍で叩く", "#ff8a7a", 15);
           const a = Math.atan2(m.y - y, m.x - x); m.vx = Math.cos(a) * 420; m.vy = Math.sin(a) * 420; m.stun = 0.3;
           return;
         }
         if (m.state === "land" && d <= (DIFF ? DIFF.pin : 15)) g.safeLand = true;
         m.hp--; shakeT = 0.2; sfxSwat(ac.currentTime); flash = 1; crowdUp(4);
         if (m.hp > 0) {
-          popup(m.x, m.y + 36, "女王に命中！ あと" + m.hp, "#ffe08a", 17);
+          popup(m.x, m.y + 36, "命中　あと" + m.hp, "#ffe08a", 17);
           score += 200;
           const a = Math.atan2(m.y - y, m.x - x); m.vx = Math.cos(a) * 380; m.vy = Math.sin(a) * 380; m.stun = 0.45;
           m.state = "fly"; m.wp = randWp(); m.wpT = 0; m.timer = 4;
         } else {
-          killMosquito(g, m, true, fever, 1200, "女王蚊を撃退！！");
+          killMosquito(g, m, true, fever, 1200, "女王蚊");
           queenKilled = true; g.killed++; crowdUp(20); shakeT = 0.4;
-          banner = { text: "女王蚊を撃退！", sub: "客席から大きな拍手", t: 2.4 };
+          banner = { text: "女王蚊、退場", sub: "", t: 2.4 };
           cheer(ac.currentTime + 0.1, 1);
         }
         return;
@@ -1910,15 +2005,15 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
       if (m.state === "land") {
         if (first && d <= (DIFF ? DIFF.pin : 15)) {
           // ピンポイント：団員には当たらない
-          killMosquito(g, m, onBeat, fever, 400, "神業！ 止まった蚊をピンポイント");
+          killMosquito(g, m, onBeat, fever, 400, "ピンポイント");
           g.killed++; g.safeLand = true;
           m.target.joy = 1.5;
         } else if (first && d < R * 2.2 && !musicianAt(x, y)) {
-          popup(m.x, m.y - 24, "追い払った！ +40", "#cfe7c8", 15); score += 40; g.struck = true;
+          popup(m.x, m.y - 24, "しっしっ +40", "#cfe7c8", 15); score += 40; g.struck = true;
           m.state = "fly"; m.wp = randWp(); m.wpT = 0;
           const a = Math.atan2(m.y - y, m.x - x); m.vx = Math.cos(a) * 300; m.vy = Math.sin(a) * 300;
         } else if (!first && d <= 18) {
-          killMosquito(g, m, onBeat, fever, 80, "なぎ払い撃退"); g.killed++;
+          killMosquito(g, m, onBeat, fever, 80, "払った"); g.killed++;
         }
         return;
       }
@@ -1928,10 +2023,10 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
           const a = Math.atan2(m.y - y, m.x - x);
           m.vx = Math.cos(a) * 380; m.vy = Math.sin(a) * 380 - 100;
           m.state = "fly"; m.wp = randWp(); m.wpT = 0; m.timer = 2.5; m.stun = 0.4;
-          popup(m.x, m.y + 30, "しぶとい！", "#ffd0c0", 16); g.struck = true;
+          popup(m.x, m.y + 30, "まだ飛んでる", "#ffd0c0", 16); g.struck = true;
           score += 50;
         } else {
-          killMosquito(g, m, onBeat, fever, m.kind === "big" ? 120 : m.kind === "fast" ? 100 : 60, first ? null : "なぎ払い");
+          killMosquito(g, m, onBeat, fever, m.kind === "big" ? 120 : m.kind === "fast" ? 100 : 60, first ? null : "払った");
           g.killed++;
           if (onBeat) crowdUp(3);
         }
@@ -1951,9 +2046,9 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
     m.state = "dead"; m.vy = -60; m.vx = (Math.random() - 0.5) * 80; m.t = 0;
     swats++;
     const pts = Math.round((onBeat ? base * 2.5 : base) * (fever ? 2 : 1));
-    if (onBeat && ac) { const t0 = ac.currentTime; osc(t0 + 0.03, 1976, "sine", 0.12, 0.05); osc(t0 + 0.09, 2637, "sine", 0.16, 0.04); }
+    if (onBeat && ac) playSfx("triq", ac.currentTime + 0.03, 0.22, 1.3, (m.x - 240) / 240);
     score += pts;
-    popup(m.x, m.y + 28, (label || (onBeat ? "拍ぴったり撃退！" : "撃退")) + " +" + pts, onBeat ? "#ffe08a" : "#f5ecd6", 16);
+    popup(m.x, m.y + 28, (label || (onBeat ? "ジャスト" : "パチン")) + " +" + pts, onBeat ? "#ffe08a" : "#f5ecd6", 16);
     if (Math.hypot(m.x - HEAD.x, m.y - HEAD.y) < 50) popup(HEAD.x, HEAD.y - 70, "自分の頭をぺちっ", "#ffd0c0", 15);
     for (let k = 0; k < 14; k++) {
       const a = Math.random() * Math.PI * 2, v = 60 + Math.random() * 160;
@@ -1974,7 +2069,7 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
       if (!g.bonked && DIFF.sweep && !(g.onCueMark && Math.hypot(px - g.x0, py - g.y0) < 20)) {
         const hm = musicianAt(px, py);
         if (hm && hm !== g.cueM) {
-          if (g.count) { if (!g.warnedCount) { popup(px, py - 20, "そこは団員！", "#ffd0c0", 16); g.warnedCount = true; } }
+          if (g.count) { if (!g.warnedCount) { popup(px, py - 20, "そこ、人", "#ffd0c0", 16); g.warnedCount = true; } }
           else hitMusician(hm, px, py, g, true);
         }
       }
@@ -2008,11 +2103,11 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
     score -= pen; bonkPenalty += pen; scoreFlash = 1;
     popup(x, y + 4, "−" + pen.toLocaleString("ja-JP") + (bonkStreak >= 2 ? "（" + bonkStreak + "連続）" : ""), "#ff5a4a", 24);
     m.hurt = 1.6; m.angry = 4.5; bonks++; shakeT = 0.15;
-    crowdUp(1); if (Math.random() < 0.6) { popup(240, 690, "（客席から笑い）", "#f5ecd6", 13); if (ac) cheer(ac.currentTime + 0.1, 0.35); }
+    crowdUp(1); if (Math.random() < 0.6) { popup(240, 690, pick(["（客席でクスクス）", "（前の席の子が笑った）", "（咳払いがひとつ）"]), "#f5ecd6", 13); if (ac) cheer(ac.currentTime + 0.1, 0.35); }
     addChaos(12); combo = 0;
     maestro.sorry = 2;
     layerMess[m.type] = Math.max(layerMess[m.type] || -99, beatNow + 3);
-    popup(x, y + 30, (related ? "蚊ごと叩いた" : "関係ない団員にゴツン") + "　" + m.name + "「いたっ！」", "#ffb0a0", 14);
+    popup(x, y + 30, m.name + "「" + say(m, related ? "hitWith" : "hit") + "」", "#ffb0a0", 14);
     sfxBonk(ac.currentTime);
     if (chaos >= 100) { chaos = 100; endGame("orchestra"); }
   }
@@ -2025,19 +2120,19 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
     orchDyn.gain.setTargetAtTime(0, t, 0.07);
     stopHolds(t, 0.07);
     let pts = 0;
-    if (auto) { cutResult = "のばしすぎ"; popup(240, 430, "のばしすぎ…", "#ff8a7a", 22); }
-    else if (held < 1.5) { cutResult = "早すぎ"; pts = 100; popup(240, 430, "締めが早すぎ…", "#ff8a7a", 22); }
-    else { cutResult = "見事"; pts = 1000; crowdUp(10); popup(240, 430, "見事な締め！ +1000", "#ffe08a", 26); }
+    if (auto) { cutResult = "のばしすぎ"; popup(240, 430, "のばしすぎた", "#ff8a7a", 22); }
+    else if (held < 1.5) { cutResult = "早すぎ"; pts = 100; popup(240, 430, "ちょっと早かった", "#ff8a7a", 22); }
+    else { cutResult = "見事"; pts = 1000; crowdUp(10); popup(240, 430, "きれいに切れた +1000", "#ffe08a", 26); }
     if (misses === 0 && perfects + goods > 0 && maxCombo >= perfects + goods) {
       fullCombo = true; pts += 3000; crowdUp(10);
-      banner = { text: goods === 0 ? "ALL PERFECT!!" : "FULL COMBO!", sub: "1拍も落とさずに振りきった　+3000", t: 3 };
+      banner = { text: goods === 0 ? "ALL PERFECT" : "FULL COMBO", sub: "+3000", t: 3 };
       if (ac) cheer(t + 0.2, 0.9);
     }
     score += pts;
     hand.tx = 300; hand.ty = 600; hand.amt = 1;
     applause(t + 0.35, (cutResult === "見事" ? 0.7 : 0.4) + crowd / 200);
     score += Math.round(crowd * 20);
-    popup(240, 470, "観客の満足度 " + Math.round(crowd) + "%  +" + Math.round(crowd * 20), "#f5ecd6", 18);
+    popup(240, 470, "客席の満足 " + Math.round(crowd) + "%  +" + Math.round(crowd * 20), "#f5ecd6", 18);
     maestro.joy = 4;
     musicians.forEach(m => { m.joy = 3; });
     endGame("clear");
@@ -2100,7 +2195,7 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
       if (m.summon <= 0) {
         m.summon = 5.5;
         const n = mosq.filter(q => q.state !== "dead" && q.state !== "flee" && q.kind !== "queen").length;
-        if (n < 3) { spawnMosquito({ speed: m.sp * 1.1, big: 0, fast: 0.6, land: 0.5 }, null, { x: m.x, y: m.y }); popup(m.x, m.y - 40, "手下を呼んだ！", "#ff8a7a", 14); }
+        if (n < 3) { spawnMosquito({ speed: m.sp * 1.1, big: 0, fast: 0.6, land: 0.5 }, null, { x: m.x, y: m.y }); popup(m.x, m.y - 40, "手下を呼んだ", "#ff8a7a", 14); }
       }
     }
     if (m.state === "dead") {
@@ -2145,7 +2240,7 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
         tg.itch = 3.5; tg.out = true; tg.bumps = (tg.bumps || 0) + 1; bitten++;
         layerMess[tg.type] = Math.max(layerMess[tg.type] || -99, beatNow + 4);
         addChaos(10); combo = 0; crowdUp(-4);
-        popup(tg.x, tg.y - 70 * tg.s, tg.name + "「かゆい！ もう弾けない…」", "#ff8a7a", 15);
+        popup(tg.x, tg.y - 70 * tg.s, tg.name + "「" + say(tg, "bitten") + "」", "#ff8a7a", 15);
         sfxBite(ac.currentTime);
         m.state = "fly"; m.wp = randWp(); m.wpT = 0; m.timer = (1.5 + Math.random() * 2) / m.sp;
       }
@@ -2160,7 +2255,7 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
       if (m.suck >= SUCK_TIME && state === "play") {
         addChaos(5); combo = 0; crowdUp(-2);
         bites.push({ x: BALD.x + (Math.random() - 0.5) * 30, y: BALD.y + 6 + (Math.random() - 0.5) * 10 });
-        popup(HEAD.x, HEAD.y - 70, "チクッ！（マエストロ）", "#ff6a5a", 22);
+        popup(HEAD.x, HEAD.y - 70, "いてっ（頭を刺された）", "#ff6a5a", 22);
         redFlash = 0.7; maestro.bite = 2.5;
         sfxBite(ac.currentTime);
         m.state = "fly"; m.wp = randWp(); m.wpT = 0; m.timer = (1.5 + Math.random() * 2) / m.sp;
@@ -2254,7 +2349,7 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
     if (state === "prep" && gest && !gest.done && performance.now() - gest.t0 > GESTURE_MS) finishGesture(gest);
     if (state === "play" && pendingPrep && vtc >= pendingPrep.t) {
       state = "prep"; prep = pendingPrep.p; prep.t1 = null; pendingPrep = null;
-      banner = { text: "予備拍で再開", sub: prep.label + "　目標 ♩=" + prep.target, t: 3 };
+      banner = { text: prep.label, sub: "2回タップで再開　♩=" + prep.target, t: 3 };
     }
     if (state === "play") {
       if (gest && !gest.done && performance.now() - gest.t0 > GESTURE_MS) finishGesture(gest);
@@ -2286,14 +2381,14 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
           const tgt = targetBpm(tb.b), r = (A.T || tgt) / tgt;
           tempoChecks++;
           if (tempoMode === "fixed" ? tb.hit : Math.abs(r - 1) <= 0.07) { tempoOk++; score += 20; }
-          else if (Math.abs(r - 1) > 0.16) { addChaos(2); warn("tempo", r < 1 ? "テンポが遅い！ 早めに振って" : "テンポが速い！ ゆっくり振って"); }
+          else if (Math.abs(r - 1) > 0.16) { addChaos(2); warn("tempo", r < 1 ? "遅れてる。少し前へ" : "走ってる。少し落ち着いて"); }
           const dv = dynMap.at(tb.b), mk = dynMap.mark(tb.b);
           dynChecks++;
           if (Math.abs(level - dv) <= 0.2) { dynOk++; score += 20; }
-          else if (Math.abs(level - dv) > 0.33) { addChaos(1.5); warn("dyn", level < dv ? "もっと大きく払って！（" + mk + "）" : "もっと小さく、トンと（" + mk + "）"); }
+          else if (Math.abs(level - dv) > 0.33) { addChaos(1.5); warn("dyn", level < dv ? mk + "　もっと大きく" : mk + "　もっと小さく"); }
         }
         cues.forEach(c => {
-          if (!c.done && !c.late && !c.atPrep && c.prepB === tb.b) missCue(c, rowList(c.row)[c.who], "入れなかった…");
+          if (!c.done && !c.late && !c.atPrep && c.prepB === tb.b) missCue(c, rowList(c.row)[c.who], say(rowList(c.row)[c.who], "miss"));
           if (c.late && !c.done && tb.b >= c.segEnd - 1) c.done = true;   // 出番が終わった
         });
         tapPtr++;
@@ -2319,22 +2414,22 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
         const prev = i > 0 ? chart.dyn[i - 1].v : d.v;
         const next = d.mark === "cresc." || d.mark === "dim." ? (chart.dyn[i + 1] || d).v : d.v;
         d.warned = true;
-        if (d.mark === "cresc." && next - d.v > 0.3) popup(240, 600, "4拍後から cresc.：少しずつ大きく払って", "#ffe08a", 16);
-        else if (next >= 0.6 && next - prev >= 0.25) popup(240, 600, "4拍後から " + d.mark + "：大きく払う準備！", "#ffb070", 18);
-        else if (next <= 0.35 && prev - next >= 0.25) popup(240, 600, "4拍後から " + d.mark + "：トンと軽く", "#bfe3ff", 17);
+        if (d.mark === "cresc." && next - d.v > 0.3) popup(240, 600, "cresc.　だんだん大きく", "#ffe08a", 16);
+        else if (next >= 0.6 && next - prev >= 0.25) popup(240, 600, d.mark + "　大きく払う", "#ffb070", 18);
+        else if (next <= 0.35 && prev - next >= 0.25) popup(240, 600, d.mark + "　トンと軽く", "#bfe3ff", 17);
       });
       // テンポ急変の予告
       jumps.forEach(j => {
         if (!j.warned && beatNow >= j.b - 6 && beatNow < j.b) {
           j.warned = true;
-          banner = { text: "もうすぐ楽団が止まります", sub: "予備拍（2回タップ）で次のテンポ ♩=" + j.target + " を示そう", t: 3.2 };
+          banner = { text: "このあと一度止まる", sub: "次は ♩=" + j.target + "。2回タップで出す", t: 3.2 };
         }
       });
       const e = everyAt(Math.max(0, beatNow + 4));
       const nearJump = jumps.some(j => Math.abs(j.b - (beatNow + 4)) < 7);
       if (beatNow > -1 && e !== lastEvery) {
         lastEvery = e;
-        if (!nearJump) banner = { text: everyText(e) + "振る", sub: e > 1 ? "テンポが速くなってきた！" : "1拍ずつに戻す", t: 2 };
+        if (!nearJump) banner = { text: everyText(e) + "振る", sub: "", t: 2 };
       }
 
       // 練習の説明
@@ -2342,11 +2437,11 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
       // はじめてのヒント
       if (beatNow > 2 && !song.lesson) {
         const liveM = mosq.filter(m => m.state !== "dead" && m.state !== "flee");
-        if (musicians.some(m => m.out && m.itch <= 0)) hint("recall", "団員が弾くのをやめてしまった", "緑の「戻して」か本人を、拍に合わせてタップ");
-        else if (liveM.some(m => m.state === "land")) hint("land", "蚊が団員に止まった！", "蚊だけをねらってタップ。団員に当たると減点");
-        else if (liveM.length) hint("mosq", "蚊が来た！ タップして撃退", "拍に合わせて叩くと高得点。団員には当てないように");
+        if (musicians.some(m => m.out && m.itch <= 0)) hint("recall", "弾くのをやめた人がいる", "拍に合わせて本人をタップ");
+        else if (liveM.some(m => m.state === "land")) hint("land", "蚊が頭に止まった", "蚊だけをねらって叩く");
+        else if (liveM.length) hint("mosq", "蚊が来た", "拍に合わせて叩く。人には当てない");
         const nc = shownCues(beatNow)[0];
-        if (nc && !nc.late && !nc.atPrep && nc.prepB - beatNow < 5 && nc.prepB - beatNow > 2) hint("cue", "もうすぐ出番の団員がいます", "光っている団員を「今！」でタップして合図");
+        if (nc && !nc.late && !nc.atPrep && nc.prepB - beatNow < 5 && nc.prepB - beatNow > 2) hint("cue", "もうすぐ出番の人がいる", "光っている人を、1拍前にタップ");
       }
       // 蚊の出現
       if (beatNow >= 0 && beatNow < chart.lastTap - 6) {
@@ -2358,7 +2453,7 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
         if (chart.boss && !bossSpawned && beatNow >= chart.boss.b) {
           bossSpawned = true;
           spawnMosquito(cfg, "queen");
-          banner = { text: "女王蚊が現れた！", sub: "拍ぴったりの一撃しか効かない。手下も呼ぶぞ", t: 3 };
+          banner = { text: "女王蚊のお出まし", sub: "拍ぴったりで叩かないと効かない", t: 3 };
           shakeT = 0.3;
         }
         if (!chart.noMosq && alive < cfg.max && spawnTimer <= 0) { spawnMosquito(cfg); spawnTimer = 1.3; }
@@ -2379,14 +2474,14 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
           const z = mosq[mosq.length - 1];
           z.state = "toPlayer"; z.target = tg; z.sp = Math.max(z.sp, 1.1); z.ambush = true;
           ambushes++;
-          popup(h.x, h.y - 60, tg === cm ? "出番の前に蚊が！" : "合図の直前に蚊が！", "#ffc9a8", 14);
+          popup(h.x, h.y - 60, tg === cm ? tg.name + "の出番前に蚊" : "合図の直前に蚊", "#ffc9a8", 14);
         });
       }
       // 最後の音：のばして、締める
       if (beatNow >= chart.lastTap + 0.3) {
         state = "fermata"; fermataT = vtc;
         mosq.forEach(m => { if (m.state !== "dead") m.state = "flee"; });
-        banner = { text: "のばして…", sub: "好きなところでタップして音を止めよう（2拍以上）", t: 4 };
+        banner = { text: "のばして", sub: "切りたいところでタップ", t: 4 };
       }
     }
     if (state === "fermata" && vtc - fermataT > 7) cutOff(vtc, true);
@@ -3227,7 +3322,7 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
       const mk = cueMark(activeCue), go = late || (activeCue.atPrep ? state === "prep" : left <= 1);
       c.textAlign = "center"; c.textBaseline = "middle";
       c.font = "800 13px " + FONT_D;
-      const txt = late ? mk.m.name + "がまだ入っていない！ 合図を" : mk.m.name + "の出番 " + (activeCue.atPrep ? (go ? "2回目の予備拍で合図！" : "次の予備拍で合図") : go ? "今！（予備拍）" : "予備拍まであと" + left + "拍");
+      const txt = late ? mk.m.name + "、まだ入れていない" : mk.m.name + (activeCue.atPrep ? (go ? "　2回目のタップで合図" : "　次の予備拍で合図") : go ? "　今" : "　あと" + left + "拍");
       const tw = c.measureText(txt).width + 16;
       const ly = mk.y - 44 < 128 ? mk.y + 22 : mk.y - 44;
       c.fillStyle = "rgba(15,4,6,0.85)"; c.fillRect(clamp(mk.x - tw / 2, 4, W - tw - 4), ly, tw, 20);
@@ -3818,8 +3913,8 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
   function renderTempo() {
     document.querySelectorAll("#tempoRow button").forEach(b => b.setAttribute("aria-pressed", b.dataset.t === tempoMode ? "true" : "false"));
     document.getElementById("tempoNote").textContent = tempoMode === "fixed"
-      ? "曲は楽譜どおりのテンポで進みます。流れてくる玉に合わせてタップ。タイミングが取りやすい方式です。"
-      : "楽団があなたのタップの速さについてきます。速く叩けば速く、遅く叩けば遅くなる上級者向け。";
+      ? "曲は楽譜の速さで進む。玉に合わせて叩くだけ。"
+      : "叩く速さに楽団がついてくる。慣れた人向け。";
   }
   document.querySelectorAll("#tempoRow button").forEach(b => b.addEventListener("click", () => { tempoMode = b.dataset.t; store.set("maestro.tempo", tempoMode); renderTempo(); }));
   renderTempo();
