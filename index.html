@@ -3364,6 +3364,9 @@ summary { color: #22161a; }
   }
   // ---------- 拍のレーン：玉が金の線に重なった瞬間にタップ ----------
   const LANE_Y = 356;
+  // 強弱の色：弱い＝水色、強い＝オレンジ
+  const dynCol = v => v <= 0.35 ? "#8fc8ff" : v >= 0.6 ? "#ff9a5a" : "#f5ecd6";
+  const DYN_JA = { pp: "とても弱く", p: "弱く", mp: "やや弱く", mf: "やや強く", f: "強く", ff: "とても強く", "cresc.": "だんだん強く", "dim.": "だんだん弱く" };
   const showScoreLane = false;   // 拍のレーンは楽団のすぐ下（目を動かさずに済むように）
   function drawBeatTrack() {
     const c = ctx, Y = LANE_Y, XH = 104, SPD = LANE_SPD[speedKey], XL = 70, XR = 476;
@@ -3396,6 +3399,15 @@ summary { color: #22161a; }
     c.font = "700 8px " + FONT_UI; c.fillStyle = "rgba(245,236,214,0.6)"; c.fillText("目標 " + Math.round(state === "prep" && prep ? prep.target : tg), 36, Y + 17);
     // 玉
     c.beginPath(); c.rect(XL, Y - 22, XR - XL, 44); c.clip();
+    // 強弱の山：帯の下から、強いところほど高く・オレンジに、弱いところほど低く・水色に
+    for (let i = 1; i < S.length; i++) {
+      const q = S[i]; if (q.wait) continue;
+      const x0 = XH + S[i - 1].t * SPD, x1 = XH + q.t * SPD;
+      if (x1 < XL || x0 > XR) continue;
+      const v = dynMap.at(Math.max(0, q.b)), h = 6 + 34 * v;
+      c.fillStyle = v <= 0.35 ? "rgba(110,180,255,0.32)" : v >= 0.6 ? "rgba(255,140,70,0.38)" : "rgba(245,236,214,0.18)";
+      c.fillRect(x0, Y + 22 - h, x1 - x0 + 0.6, h);
+    }
     // 止まる場所
     S.forEach(q => {
       if (!q.waitStart) return;
@@ -3421,15 +3433,15 @@ summary { color: #22161a; }
       if (x < XL - 16) continue;
       const down = Math.round(tb.b) % song.meter === 0, e = everyAt(tb.b);
       const num = e > 1 ? 1 : ((Math.round(tb.b) % song.meter) + song.meter) % song.meter + 1;
-      const dvN = dynMap.at(tb.b), r = (down ? 9.5 : 8) + 5.5 * dvN;
+      const dvN = dynMap.at(tb.b), r = 5.5 + 11 * dvN + (down ? 1.5 : 0);
       const cue = cues.find(cu => !cu.atPrep && cu.prepB === tb.b && !cu.done);
-      let fill = down ? "#ffe08a" : "#f5ecd6", alpha = 1;
+      let fill = dynCol(dvN), alpha = 1;
       if (tb.hit) { fill = "#8fcf9f"; alpha = Math.max(0, 1 + t * 2); }
       else if (tb.missed) { fill = "#e2483d"; alpha = Math.max(0, 1 + t * 1.5); }
       c.globalAlpha = alpha;
       c.fillStyle = fill; c.beginPath(); c.arc(x, Y, r, 0, Math.PI * 2); c.fill();
-      c.strokeStyle = "rgba(20,6,8,0.6)"; c.lineWidth = 1.5; c.stroke();
-      c.fillStyle = "#1a0b0d"; c.font = "800 " + (down ? 13 : 11) + "px " + FONT_UI; c.textAlign = "center"; c.textBaseline = "middle";
+      c.strokeStyle = down ? "#1a0b0d" : "rgba(20,6,8,0.6)"; c.lineWidth = down ? 2.5 : 1.5; c.stroke();
+      c.fillStyle = "#1a0b0d"; c.font = "800 " + Math.round(Math.max(8, r * 0.95)) + "px " + FONT_UI; c.textAlign = "center"; c.textBaseline = "middle";
       c.fillText(String(num), x, Y + 0.5);
       if (cue) {
         c.strokeStyle = "#ffe08a"; c.lineWidth = 2; c.beginPath(); c.arc(x, Y, r + 4, 0, Math.PI * 2); c.stroke();
@@ -3445,9 +3457,16 @@ summary { color: #22161a; }
       const t = timeOf(d.b); if (t === null) return;
       const x = XH + t * SPD; if (x > XR - 6 || x < XL) return;
       const v = d.mark === "cresc." || d.mark === "dim." ? null : d.v;
-      c.font = "italic 900 " + (d.mark.length > 2 ? 11 : 15) + "px Georgia, serif";
-      c.lineWidth = 3; c.strokeStyle = "rgba(15,4,6,0.9)"; c.strokeText(d.mark, x, Y - 30);
-      c.fillStyle = v === null ? "#ffe08a" : v >= 0.6 ? "#ffb070" : v <= 0.35 ? "#bfe3ff" : "#f5ecd6"; c.fillText(d.mark, x, Y - 30);
+      const col = v === null ? "#ffe08a" : dynCol(v), ja = DYN_JA[d.mark] || "";
+      c.font = "italic 900 " + (d.mark.length > 2 ? 12 : 17) + "px Georgia, serif";
+      const mw = c.measureText(d.mark).width;
+      c.font = "800 10px " + FONT_UI;
+      const jw = c.measureText(ja).width, x0 = x - (mw + 3 + jw) / 2;
+      c.textAlign = "left";
+      c.font = "italic 900 " + (d.mark.length > 2 ? 12 : 17) + "px Georgia, serif";
+      c.lineWidth = 3; c.strokeStyle = "rgba(15,4,6,0.9)"; c.strokeText(d.mark, x0, Y - 31); c.fillStyle = col; c.fillText(d.mark, x0, Y - 31);
+      c.font = "800 10px " + FONT_UI; c.strokeText(ja, x0 + mw + 3, Y - 30); c.fillText(ja, x0 + mw + 3, Y - 30);
+      c.textAlign = "center";
     });
     tempoMarks.forEach(m => {
       if (m.kind === "stop" || m.b < beatNow - 0.3) return;
@@ -3467,6 +3486,12 @@ summary { color: #22161a; }
       c.beginPath(); c.moveTo(x, Y - 18); c.quadraticCurveTo((x + mk.x) / 2, Math.min(Y, mk.y) - 30, mk.x, mk.y + 18); c.stroke();
       c.restore();
     });
+    // 線の左：いまの払いの大きさ（塗り）と、楽譜の強さ（白い線）
+    { const v = dynMap.at(Math.max(0, beatNow + 0.5)), gx = 76, top = Y - 19, hh = 38;
+      c.fillStyle = "rgba(15,4,6,0.7)"; c.fillRect(gx - 4, top, 8, hh);
+      const ok = Math.abs(level - v) <= 0.2;
+      c.fillStyle = ok ? "#8fcf9f" : level < v ? "#8fc8ff" : "#ff9a5a"; c.fillRect(gx - 3, top + hh * (1 - level), 6, hh * level);
+      c.fillStyle = "#fff"; c.fillRect(gx - 6, top + hh * (1 - v) - 1, 12, 2.5); }
     // 金の線（ここで叩く）。拍の瞬間に光る
     const nb = nextTapAfter(beatNow - 0.001), pb = nb > 0 ? taps[nb - 1] : null;
     const since = pb && A && A.T > 0 ? (beatNow - pb.b) * 60 / A.T : 9;
