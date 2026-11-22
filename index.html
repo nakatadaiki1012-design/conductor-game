@@ -296,8 +296,8 @@ summary { color: #22161a; }
           <summary>遊び方</summary>
           <ul>
             <li><b>2回タップで始まる。</b>その間隔が曲の速さになる（予備拍）。</li>
-            <li>あとは<b>玉が線に重なったらタップ</b>。大きい玉は大きく払う、小さい玉はトンと軽く。</li>
-            <li>光った団員は出番が近い。<b>入る1拍前に本人をタップ</b>して合図。合図がないと入ってこない。</li>
+            <li>あとは楽団のすぐ下の帯を見るだけ。<b>玉が線に重なったらタップ</b>。大きい玉は大きく払う、小さい玉はトンと軽く。玉の上の f や p は強弱の記号。</li>
+            <li>金の輪がついた玉からは、点線が出番の団員へのびる。<b>その玉の拍で、点線の先の団員をタップ</b>すると合図。合図がないと入ってこない。</li>
             <li>最後の音はのばして、好きなところでタップして切る。</li>
           </ul>
         </details>
@@ -2281,7 +2281,7 @@ summary { color: #22161a; }
   function warn(kind, text) {
     if (beatNow - warnAt[kind] < 4) return;
     warnAt[kind] = beatNow;
-    popup(240, kind === "tempo" ? 500 : 530, text, "#ffc9a8", 17);
+    popup(240, 416, text, "#ffc9a8", 17);
   }
 
   function schedule() {
@@ -2399,14 +2399,14 @@ summary { color: #22161a; }
       const mk = dynMap.mark(Math.max(0, beatNow));
       if (beatNow >= -1 && mk !== lastMark) {
         lastMark = mk;
-        popup(240, 560, mk + "　" + ({ pp: "とても小さく", p: "小さく", mp: "少し小さく", mf: "少し大きく", f: "大きく", ff: "とても大きく", "cresc.": "だんだん大きく", "dim.": "だんだん小さく" }[mk] || ""), "#ffe08a", 22);
+        popup(240, 416, mk + "　" + ({ pp: "とても小さく", p: "小さく", mp: "少し小さく", mf: "少し大きく", f: "大きく", ff: "とても大きく", "cresc.": "だんだん大きく", "dim.": "だんだん小さく" }[mk] || ""), "#ffe08a", 22);
       }
       // テンポが変わる4拍前に予告
       tempoMarks.forEach(m => {
         if (m.warned || m.kind === "stop" || !(beatNow >= m.b - 4 && beatNow < m.b - 0.5)) return;
         m.warned = true;
         const msg = m.kind === "accel." ? "4拍後から accel.：少しずつ早めに振って" : m.kind === "rit." ? "4拍後から rit.：少しずつゆっくり振って" : "4拍後に " + m.text + "：すぐ速さを変える";
-        popup(240, 572, msg, m.kind === "rit." ? "#8cc8ff" : "#ffb070", 16);
+        popup(240, 416, msg, m.kind === "rit." ? "#8cc8ff" : "#ffb070", 16);
       });
       // 強弱が大きく変わる4拍前に予告
       chart.dyn.forEach((d, i) => {
@@ -2414,9 +2414,9 @@ summary { color: #22161a; }
         const prev = i > 0 ? chart.dyn[i - 1].v : d.v;
         const next = d.mark === "cresc." || d.mark === "dim." ? (chart.dyn[i + 1] || d).v : d.v;
         d.warned = true;
-        if (d.mark === "cresc." && next - d.v > 0.3) popup(240, 600, "cresc.　だんだん大きく", "#ffe08a", 16);
-        else if (next >= 0.6 && next - prev >= 0.25) popup(240, 600, d.mark + "　大きく払う", "#ffb070", 18);
-        else if (next <= 0.35 && prev - next >= 0.25) popup(240, 600, d.mark + "　トンと軽く", "#bfe3ff", 17);
+        if (d.mark === "cresc." && next - d.v > 0.3) popup(240, 416, "cresc.　だんだん大きく", "#ffe08a", 16);
+        else if (next >= 0.6 && next - prev >= 0.25) popup(240, 416, d.mark + "　大きく払う", "#ffb070", 18);
+        else if (next <= 0.35 && prev - next >= 0.25) popup(240, 416, d.mark + "　トンと軽く", "#bfe3ff", 17);
       });
       // テンポ急変の予告
       jumps.forEach(j => {
@@ -3363,8 +3363,10 @@ summary { color: #22161a; }
     c.beginPath(); c.arc(x, y + 2, 1.8, 0, Math.PI * 2); c.fill();
   }
   // ---------- 拍のレーン：玉が金の線に重なった瞬間にタップ ----------
+  const LANE_Y = 356;
+  const showScoreLane = false;   // 拍のレーンは楽団のすぐ下（目を動かさずに済むように）
   function drawBeatTrack() {
-    const c = ctx, Y = 500, XH = 104, SPD = LANE_SPD[speedKey], XL = 70, XR = 476;
+    const c = ctx, Y = LANE_Y, XH = 104, SPD = LANE_SPD[speedKey], XL = 70, XR = 476;
     const S = laneSamples();
     const T0 = A && A.T > 0 ? A.T : (prep ? prep.target : targetBpm(Math.max(0, beatNow)));
     const timeOf = b => {
@@ -3436,6 +3438,35 @@ summary { color: #22161a; }
       c.globalAlpha = 1;
     }
     c.restore();
+    // 強弱とテンポの記号を、その拍の玉の真上に（上の帯を見なくていいように）
+    c.textAlign = "center"; c.textBaseline = "middle";
+    chart.dyn.forEach(d => {
+      if (!d.mark || d.b < beatNow - 0.3) return;
+      const t = timeOf(d.b); if (t === null) return;
+      const x = XH + t * SPD; if (x > XR - 6 || x < XL) return;
+      const v = d.mark === "cresc." || d.mark === "dim." ? null : d.v;
+      c.font = "italic 900 " + (d.mark.length > 2 ? 11 : 15) + "px Georgia, serif";
+      c.lineWidth = 3; c.strokeStyle = "rgba(15,4,6,0.9)"; c.strokeText(d.mark, x, Y - 30);
+      c.fillStyle = v === null ? "#ffe08a" : v >= 0.6 ? "#ffb070" : v <= 0.35 ? "#bfe3ff" : "#f5ecd6"; c.fillText(d.mark, x, Y - 30);
+    });
+    tempoMarks.forEach(m => {
+      if (m.kind === "stop" || m.b < beatNow - 0.3) return;
+      const t = timeOf(m.b); if (t === null) return;
+      const x = XH + t * SPD; if (x > XR - 10 || x < XL) return;
+      c.font = "italic 800 11px Georgia, serif"; c.lineWidth = 3; c.strokeStyle = "rgba(15,4,6,0.9)"; c.strokeText(m.text, x, Y - 46);
+      c.fillStyle = m.kind === "rit." ? "#8cc8ff" : "#ffb070"; c.fillText(m.text, x, Y - 46);
+    });
+    // 合図の玉から、合図する団員へ線をのばす（どこを・いつ、を一緒に見せる）
+    cues.forEach(cu => {
+      if (cu.done || cu.atPrep || cu.late || cu.prepB < beatNow - 0.2 || cu.prepB - beatNow > 6) return;
+      const t = timeOf(cu.prepB); if (t === null) return;
+      const x = XH + t * SPD; if (x > XR) return;
+      const mk = cueMark(cu), near = clamp(1 - (cu.prepB - beatNow) / 6, 0, 1);
+      c.save(); c.setLineDash([4, 4]); c.lineDashOffset = -performance.now() / 40;
+      c.strokeStyle = "rgba(255,224,138," + (0.35 + 0.6 * near) + ")"; c.lineWidth = 1.5 + 1.5 * near;
+      c.beginPath(); c.moveTo(x, Y - 18); c.quadraticCurveTo((x + mk.x) / 2, Math.min(Y, mk.y) - 30, mk.x, mk.y + 18); c.stroke();
+      c.restore();
+    });
     // 金の線（ここで叩く）。拍の瞬間に光る
     const nb = nextTapAfter(beatNow - 0.001), pb = nb > 0 ? taps[nb - 1] : null;
     const since = pb && A && A.T > 0 ? (beatNow - pb.b) * 60 / A.T : 9;
@@ -3490,6 +3521,7 @@ summary { color: #22161a; }
       c.fillRect(x - 1.5, MY - 5, 3, 10);
     });
     c.globalAlpha = 1;
+    drawSwingHint(338, Y + 32);
   }
 
   function drawScoreLane() {
@@ -3582,28 +3614,22 @@ summary { color: #22161a; }
   function drawSwingHint(gx, gy) {
     const c = ctx, v = dynMap.at(Math.max(0, beatNow + 0.5)), diff = v - level;
     const big = v >= 0.6, small = v <= 0.35;
-    const txt = big ? "サッと大きく払う" : small ? "トンと軽く" : "中くらいに";
-    const col = big ? "#ffb070" : small ? "#bfe3ff" : "#f5ecd6";
     const off = Math.abs(diff) > 0.25;
-    const blink = off ? 0.55 + 0.45 * Math.sin(performance.now() / 120) : 1;
+    const txt = off ? (diff > 0 ? "もっと大きく払う" : "もっと小さく、トンと") : big ? "大きく払う" : small ? "トンと軽く" : "ふつうに";
+    const col = off ? "#ffc9a8" : big ? "#ffb070" : small ? "#bfe3ff" : "#f5ecd6";
     c.save();
-    c.globalAlpha = blink;
-    c.textAlign = "center"; c.textBaseline = "middle";
-    c.font = "800 12px " + FONT_D;
-    c.lineWidth = 3; c.strokeStyle = "rgba(15,4,6,0.9)"; c.strokeText(txt, gx, gy - 66);
-    c.fillStyle = col; c.fillText(txt, gx, gy - 66);
+    c.globalAlpha = off ? 0.6 + 0.4 * Math.sin(performance.now() / 120) : 0.9;
+    c.textAlign = "left"; c.textBaseline = "middle";
     // 矢印の長さ＝振る大きさ
-    const len = 6 + 40 * v;
+    const len = 4 + 30 * v;
     c.strokeStyle = col; c.fillStyle = col; c.lineWidth = 3; c.lineCap = "round";
-    if (small) { c.beginPath(); c.arc(gx, gy - 50, 3.5, 0, Math.PI * 2); c.fill(); }
+    if (small) { c.beginPath(); c.arc(gx - 30, gy, 3.5, 0, Math.PI * 2); c.fill(); }
     else {
-      c.beginPath(); c.moveTo(gx - len / 2, gy - 50); c.lineTo(gx + len / 2, gy - 50); c.stroke();
-      c.beginPath(); c.moveTo(gx + len / 2 + 4, gy - 50); c.lineTo(gx + len / 2 - 3, gy - 55); c.lineTo(gx + len / 2 - 3, gy - 45); c.closePath(); c.fill();
+      c.beginPath(); c.moveTo(gx - 30 - len / 2, gy); c.lineTo(gx - 30 + len / 2, gy); c.stroke();
+      c.beginPath(); c.moveTo(gx - 30 + len / 2 + 4, gy); c.lineTo(gx - 30 + len / 2 - 3, gy - 5); c.lineTo(gx - 30 + len / 2 - 3, gy + 5); c.closePath(); c.fill();
     }
-    if (off) {
-      c.font = "700 10px " + FONT_UI; c.fillStyle = "#ffc9a8";
-      c.fillText(diff > 0 ? "もっと大きく" : "もっと小さく", gx, gy - 82);
-    }
+    c.font = "800 12px " + FONT_UI; c.lineWidth = 3; c.strokeStyle = "rgba(15,4,6,0.9)"; c.strokeText(txt, gx - 8, gy);
+    c.fillText(txt, gx - 8, gy);
     c.lineCap = "butt";
     c.restore();
   }
@@ -3740,7 +3766,7 @@ summary { color: #22161a; }
     c.globalAlpha = 1;
 
     if (playing) {
-      if (state === "play" && ringP !== null) {
+      if (false) {
         const gx = 420, gy = 652;
         c.strokeStyle = "rgba(245,236,214,0.25)"; c.lineWidth = 2;
         c.beginPath(); c.arc(gx, gy, 14, 0, Math.PI * 2); c.stroke();
@@ -3753,11 +3779,11 @@ summary { color: #22161a; }
       if (state === "prep" && prep) drawPrepGuide();
       if (banner.t > 0) {
         c.globalAlpha = Math.min(1, banner.t * 2); c.textAlign = "center"; c.textBaseline = "middle";
-        c.fillStyle = "rgba(15,4,6,0.7)"; c.fillRect(0, 346, W, 58);
-        c.font = "800 21px " + FONT_D; c.fillStyle = "#ffe08a";
-        c.fillText(banner.text, 240, 368);
-        c.font = "500 12px " + FONT_UI; c.fillStyle = "#f5ecd6";
-        c.fillText(banner.sub, 240, 391);
+        c.fillStyle = "rgba(15,4,6,0.7)"; c.fillRect(0, 428, W, 56);
+        c.font = "400 20px " + FONT_D; c.fillStyle = "#ffe08a";
+        c.fillText(banner.text, 240, 448);
+        c.font = "700 12px " + FONT_UI; c.fillStyle = "#f5ecd6";
+        c.fillText(banner.sub, 240, 471);
         c.globalAlpha = 1;
       }
       if (state === "fermata") {
@@ -3767,7 +3793,7 @@ summary { color: #22161a; }
         c.fillText(held >= 1.5 ? "いまだ！ 好きなところでタップ" : "まだのばして…", 240, 470);
       }
       drawHUD();
-      if (state === "play" || state === "prep") drawScoreLane();
+      if (showScoreLane && (state === "play" || state === "prep")) drawScoreLane();
       activeCues.forEach(q => drawCueMark(q));
       if (state === "play" || state === "prep") musicians.forEach(m => {
         if (!m.out) return;
